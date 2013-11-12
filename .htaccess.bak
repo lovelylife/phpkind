@@ -1,0 +1,34 @@
+﻿
+Options Indexes +FollowSymLinks -MultiViews 
+
+RewriteEngine On
+
+RewriteBase /
+
+#RewriteRule (\w+) $1.php [L]
+#RewriteRule ^(\w+)/?$ index.php?app=wayixia&mod=$1 [L]
+RewriteRule ^is/([0-9]+)/?$ index.php?app=wayixia&action=display&id=$1 [L]
+RewriteRule ^u/([\w\-]+)/albums/([0-9]+)/?$ index.php?app=wayixia&mod=default&action=display-album&u=$1&aid=$2 [L]
+RewriteRule ^d/([\w\-\.\$\?\s\t&]+)/?$ index.php?app=wayixia&mod=default&action=display-domain&d=$1 [L]
+RewriteRule ^u/([\w\-]+)/?$ index.php?app=wayixia&mod=default&action=display-all&u=$1 [L]
+RewriteRule ^helper/([\w\-]+)/?$ index.php?app=wayixia&mod=helper&action=$1 [L]
+RewriteRule ^index/?$ index.php?app=wayixia&mod=default [L]
+RewriteRule ^index/(\d+)$ index.php?app=wayixia&mod=default&p=$1 [L]
+RewriteRule ^index/([^/]+)/?$ index.php?app=wayixia&mod=default&tag=$1 [L]
+RewriteRule ^index/([^/]+)/([0-9]+)/?$ index.php?app=wayixia&mod=default&tag=$1&p=$2 [L]
+
+
+#RewriteCond %{HTTP_HOST} ^wayixia.com
+#RewriteCond %{REQUEST_URI} !^user.php$
+#RewriteCond %{REQUEST_URI} \.php$
+#RewriteRule (.*).php$ http://wayixia.com/$1 [R=permanent,L]
+#RewriteCond %{HTTP_HOST} !^www\.wayixia\.com
+#RewriteRule ^(.+) %{HTTP_HOST} [C]
+#RewriteRule ^([^.]+)\.wayixia\.com http://www\.wayixia\.com/user.php?username=$1
+
+# Rewrite 系统规则请勿修改
+#RewriteRule ^app/(\w+)$ index.php?app=$1
+#RewriteRule ^forum-([0-9]+)-([0-9]+)\.html$ forumdisplay.php?fid=$1&page=$2
+#RewriteRule ^thread-([0-9]+)-([0-9]+)-([0-9]+)\.html$ viewthread.php?tid=$1&extra=page\%3D$3&page=$2
+#RewriteRule ^space-(username|uid)-(.+)\.html$ space.php?$1=$2
+#RewriteRule ^tag-(.+)\.html$ tag.php?name=$1

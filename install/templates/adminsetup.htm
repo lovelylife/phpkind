@@ -1,0 +1,49 @@
+<?php require_once('templates/header.htm');?>
+<form method="post" action="" name="adminsetup" onSubmit="return chkreg();">
+<div style="width: 800px; background: #FFF; height: 547px; border: 5px solid #6694E3;">
+	<div class="titlebar">
+		<img src="images/logo.png" style="width: 30px;float: left; padding: 10px;"/>
+		 CMSHome 内容管理系统 - 安装
+	</div>
+	<div class="theader"> &raquo; 第五步：管理员设置</div>
+	<div class="content" style="height: 423px;">
+		<p>为了管理CMSHome企业网站管理系统的设置，您需要一个管理员帐号.请选择管理员名字、密码，输入信息并仔细检查后，选择 <b>保存</b> 。 </p>
+		<input name="app" type="hidden" value="<?=$_GET['app']?>">
+		<input name="setup" type="hidden" value="1">
+	  <fieldset>
+	  <legend><strong>管理员信息</strong></legend>
+	  	<table style="width: 100%;" cellpadding="5" cellspacing="0" class="clsTable">
+		<tr>
+		   	<td width="100">管理员用户名</td>
+		   	<td>
+			   <input type="text" id="regname" name="regname" onBlur="chkname();" />
+			</td>
+		</tr>
+		<tr>
+		   	<td>管理员密码</td>
+		   	<td>
+			   <input type="password" id="regpwd" name="regpwd" onBlur="chkpassword();"/>
+			</td>
+		</tr>
+		<tr>
+		   	<td>确认密码</td>
+		   	<td>
+			   <input type="password" id="aginpwd" name="aginpwd" onBlur="comfirmpassword()"/>
+			</td>
+		</tr>
+		<tr>
+		   	<td>电子邮件</td>
+		   	<td width="100"><input type="text" id="email" name="email"  onBlur="checke_mail();" /></td>
+		</tr>
+		<tr>
+		   	<td class="clstip" colspan="2" style="color:#990000;">请务必填写正确，以便当忘记密码时找回 </td>
+		</tr>
+		</table>
+	  </fieldset>
+	</div>
+	<div class="footer"> 
+		<input type="submit" name="submit" class="btn2" tabindex="20" value="保存管理设置" />
+	</div>
+</div>
+</form>
+<?php require_once('templates/footer.htm');?>

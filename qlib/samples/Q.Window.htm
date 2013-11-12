@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Q.window | QLib | Powered By PHPKIND</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<!-- 使用QLib控件是必须包含样式表 -->
+	<link type="text/css" rel="stylesheet" href="../ui.css" />
+	<!--  
+	提示：src="{QLib目录}/Q.js" 
+	根据实际存放路径， 测试代码都是在QLib目录的samples文件夹下，所以这里用的是"../Q.js" 
+	-->
+    <script type="text/javascript" src="../Q.js">
+	<!--
+	// 需要加载额外库时
+	import utils.stl;
+	import utils.xml;
+	import ui.contextmenu;
+	import ui.wndx-1-0-2;
+
+	-->
+	</script>
+
+    <script>
+    <!--
+
+	var g_test_window;
+    Q.Ready(function() {
+		Q.debug(true);
+		Q.setdebug(Q.$('debug_window'));
+		// 提示对话框
+		Q.$('btnOpenMessageBox').onclick = function() {
+			Q.MsgBox({
+			  title: "提示窗口"
+			  content: '提示窗口内容', 
+              onok : function() {alert(1); }
+			});
+		}
+
+		g_test_window = new Q.Window({wstyle: ''});
+		g_test_window.show(true);
+		g_test_window.setContent("<embed pluginspage='http://www.macromedia.com/go/getflashplayer' src='http://you.video.sina.com.cn/api/sinawebApi/outplayrefer.php/vid=3685396_1292548084_ah21RiZsBjPK+l1lHz2stqkP7KQNt6nki2O2vlasJQZdQ0/XM5GaZNUC4yDQFokbpWFOQpA6dvcg/s.swf' type='application/x-shockwave-flash' name='sinaplayer' allowFullScreen='true' allowScriptAccess='always' width='480' height='370' wmode='transparent'></embed>");
+		//$GetClient(wnd).innerHTML = '<br>testtasdfs<br/><br>';
+		$FitWindow(g_test_window.getwnd());
+		g_test_window.center();
+
+	});
+	
+
+
+    -->
+    </script>
+</head>
+<body onselectstart="return false;" style="height: 100%;overflow:hidden;-moz-user-select:none;-webkit-user-select: none;">
+
+<p>提示对话框</p>
+<button id="btnOpenMessageBox">MessageBox</button>
+
+<br>
+<div id='debug_window' style='width:100%;height: 300px;overflow: auto;'>
+
+</div>
+</body>
+</html>

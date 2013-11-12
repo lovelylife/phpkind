@@ -1,0 +1,53 @@
+html { margin: 0px; padding: 0px; height: 100%; border:none; }
+body {height: 100%; font-size:13px; background-color:#FFF; text-align:center; color: #333333; margin:0; padding:0;font-family:"宋体", verdana, arial, sans-serif;; }
+img{ border:0px;}
+
+form {margin:0; padding:0;}
+fieldset {
+	border-width: 1px;
+	border-color: #EEE;
+	margin-top: 5px;
+}
+.titlebar {
+	font-size: 16px;
+	text-align: left;
+	line-height:50px;
+	height:50px;
+	padding: 6px 0px; margin: 0px; 
+	width: 100%; 
+	background: #E0ECFF;
+	border-bottom: 1px solid #CCC;
+}
+
+.theader {
+	height: 30px;
+	line-height: 30px;
+	color: green;
+	text-align: left;
+	padding-left: 10px;
+	background: #F8F8F8;
+	border-bottom: 1px solid #CCC;
+}
+
+.content {
+	height: 323px;
+	line-height: 20px;
+	overflow: auto;
+	text-align: left;
+	padding: 0 10px;
+}
+
+.footer {
+	height: 30px;
+	line-height: 30px;
+	background: #F8F8F8;
+	border-top: 1px solid #CCC;
+}
+
+.clsTable td,.clsTable th {
+	border-bottom: 1px solid #EEE;
+}
+
+td.clstip {
+	background: #FFFFD4;
+}

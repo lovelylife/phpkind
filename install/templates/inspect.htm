@@ -1,0 +1,65 @@
+<?php require_once('templates/header.htm');?>
+<form method="post" action="index.php?action=db_setup&app=<?=$_GET['app']?>">
+<div style="width: 800px; background: #FFF; height: 647px; border: 5px solid #6694E3;">
+	<div class="titlebar">
+		<img src="images/logo.png" style="width: 30px;float: left; padding: 10px;"/>
+		 CMSHome 内容管理系统 - 安装
+	</div>
+	<div class="theader"> &raquo; 第二步：系统检测</div>
+	<div class="content" style="height: 523px;">
+		<p>请花些时间检查您的服务器是否支持安装CMSHome企业网站管理系统所需要的功能，请在继续安装前消除错误或警告信息，然后点击<b>安装</b>继续。</p>
+		
+		<fieldset>
+		<legend>系统检测结果</legend>
+		<div class="section">
+		<table style="width: 100%;" cellpadding="5" cellspacing="0" class="clsTable">
+		<tr style="border-bottom: 1px solid #EEE;">
+		  	<td>服务器地址</td>
+		  	<td width="100"><?php echo $_SERVER['SERVER_NAME']?></td>
+		</tr>
+		<tr>
+		  	<td>PHP页面最大执行时间</td>
+		  	<td><?php echo ini_get("max_execution_time")?></td>
+		</tr>
+		<tr>
+		  	<td>MySQL</td>
+		  	<td><?php echo $mysql_support?></td>
+		</tr>
+		 <tr>
+                        <td>GD图形库</td>
+                        <td><?php echo $gd_support?></td>
+                </tr>
+
+		<tr>
+		  	<td><strong>PHP版本[<a href="javascript:popupWindowLrg('phpinfo.php')">检测环境</a>] </strong></td>
+		  	<td><?php echo PHP_VERSION?> <?php echo $errormsg['version']?></td>
+		</tr>
+		</table>
+		</div>
+		</fieldset>
+		
+		<fieldset>
+		<legend>文件和目录权限</legend>
+		<div class='section'>
+		要能正常使用CMSHome企业网站管理系统，
+		需要将几个文件/目录设置为 "可写".  下面是需要设置为 "可写" 的目录清单, 
+		以及建议的 CHMOD 设置。在继续安装前，请做修改。
+		在浏览器中刷新本页面以重新检测设置。<br />
+		<table style="width: 100%;" cellpadding="5" cellspacing="0" class="clsTable">
+		<?php for($i=0; $i<$count; $i++){?>
+		   <tr>
+		   		<td><?php echo $w_check[$i]?></td>
+		   		<td width="100"><img src="images/<?php echo $class_check[$i]?>.png" /></td>
+		   </tr>
+		<?}?>
+		</table>
+		</div>
+		</fieldset>
+	</div>
+	<div class="footer"> 
+		<input type="submit" name="submit" tabindex="8" value=" 安装 " <?php echo $disabled?> />
+		<input type="button" name="refresh" tabindex="11" value="重新检查" onClick="history.go(0)" />
+	</div>
+</div>
+</form>
+<?php require_once('templates/footer.htm');?>

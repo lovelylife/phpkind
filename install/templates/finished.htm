@@ -1,0 +1,28 @@
+<?php require_once('templates/header.htm');?>
+<div style="width: 800px; background: #FFF; height: 347px; border: 5px solid #6694E3;">
+	<div class="titlebar">
+		<img src="images/logo.png" style="width: 30px;float: left; padding: 10px;"/>
+		 CMSHome 内容管理系统 - 安装
+	</div>
+	<div class="theader"> &raquo; 完成安装</div>
+	<div class="content" style="height: 223px;">
+		<br>
+		<h3 style="color: red;">恭喜！您已经成功安装了CMSHome企业网站管理系统！</h3>
+		<br>
+		<br>
+		<p>
+		基于安全考虑，您需要设置[<?echo $GLOBALS['config_file'];?>]文件的权限，系统安装后默认设为只读。</p>
+		<p>
+		请删除或改名<strong>/install</strong>目录，以防止再次安装而覆盖数据。</p>
+		
+		<div class="center">
+		
+		<br/><br />
+		</div>
+	</div>
+	<div class="footer"> 
+		<a class="btn2" href="../index.php?app=<?=$_GET['app']?>" target="_blank">点击这里转到网站前台</a>&nbsp;&nbsp;&nbsp;
+		<!--a class="btn2" href="../index.php?app=cms&mod=admincp">点击这里打开管理页面(请将此链接保存)</a-->
+	</div>
+</div>
+ <?php require_once('templates/footer.htm');?>

@@ -1,0 +1,25 @@
+<?php require_once('templates/header.htm');?>
+<div style="width: 800px; background: #FFF; height: 547px; border: 5px solid #6694E3;">
+	<div class="titlebar">
+		<img src="images/logo.png" style="width: 30px;float: left; padding: 10px;"/>
+		 CMSHome 内容管理系统 - 安装
+	</div>
+	<div class="theader"> &raquo; 第四步：创建数据库</div>
+	<div class="content" style="height: 423px;">
+		<div class='section'>
+		<ul class="inspect-list">
+		<?php create_table($content);?>
+		</ul>
+		</div>
+
+		<br />
+	</div>
+	<div class="footer"> 
+		<?php if($db_setup==1){?>
+		<form name="myform" method="post" action="index.php?action=adminsetup&app=<?=$_GET['app']?>" style="text-align:center;"><input type="submit" name="submit" class="btn2" value="点击进入管理设置" /></form>
+		<?}else{?>
+		<p>系统安装失败，请联系仔细检查您的mysql版本，和php版本，以及运行环境。</p>
+		<?}?>
+	</div>
+</div>
+<?php require_once('templates/footer.htm');?>

@@ -1,0 +1,57 @@
+<?php require_once('templates/header.htm');?>
+<form method="post" action="">
+<div style="width: 800px; background: #FFF; height: 547px; border: 5px solid #6694E3;">
+	<div class="titlebar">
+		<img src="images/logo.png" style="width: 30px;float: left; padding: 10px;"/>
+		 CMSHome 内容管理系统 - 安装
+	</div>
+	<div class="theader"> &raquo; 第三步：数据库参数设置</div>
+	<div class="content" style="height: 423px;">
+		<p>检查您的数据库设置情况，请在相应栏目仔细输入配置内容，点击 <b>保存数据库设置</b> 继续。</p>
+		<input name="app" type="hidden" value="<?=$_GET['app']?>">
+		<input name="setup" type="hidden" value="1">
+		<input name="db_type" type="hidden" value="mysql">
+
+		<table style="width: 100%;" cellpadding="5" cellspacing="0" class="clsTable">
+		<th colspan="2">默认数据库</th>
+		<tr>
+		   	<td width="200">数据库地址</td>
+		   	<td>
+			   <input type="text" id="db_host" name="db_host" value="localhost"/>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" class="clstip">数据库主机的格式可以是主机名字，例如 'db.myserver.com', 或者是IP地址，例如 '192.168.0.1',一般不需要更改。</td>
+		</tr>
+		<tr>
+		   	<td>用户名</td>
+		   	<td>
+			   <input type="text" id="db_username" name="db_username" value="root" />
+			</td>
+		</tr>
+		<tr>
+		   	<td>密  码</td>
+		   	<td><input type="password" id="db_pass" name="db_pass" /></td>
+		</tr>
+		<tr>
+		   	<td>数据库</td>
+		   	<td><input type="text" id="db_name" name="db_name" value="<? echo $cfg['name']; ?>"/></td>
+		</tr>
+		
+		<tr>
+		   	<td>表前缀
+			   <br />
+			   </td>
+		   	<td><input type="text" id="db_prefix" name="db_prefix" value="ch_"/></td>
+		</tr>
+		<tr>
+			<td colspan="2" class="clstip">例如：ch_ 请不要留空，且使用“_”结尾。</td>
+		</tr>
+		</table>
+	</div>
+	<div class="footer"> 
+		<input type="submit" name="submit" tabindex="15" value="保存数据库设置并继续" />
+	</div>
+</div>
+</form>
+<?php require_once('templates/footer.htm');?>

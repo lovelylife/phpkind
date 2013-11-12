@@ -1,0 +1,358 @@
+<!DOCTYPE>
+<html>
+<head>
+<title> {$fields:albumname} - {$fields:uname/} - wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/layout.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css"/>
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css" />
+<style>
+#thumbRPWrap{margin-bottom:10px}#thumbRP{font-size:0;padding:10px 0 15px 0;position:relative;width:200px}.thumb-item{float:left;display:block;width:64px;height:64px;padding:0;margin:0 2px 2px 0;position:relative;z-index:1}.thumb-item .thumb-bg{position:relative;float:left;display:block;background-color:transparent;_position:absolute}.thumb-item.hover{z-index:100;background-color:#fff;zoom:1}.thumb-item.hover .thumb-bg{padding:3px;top:-3px;left:-3px;background-color:#f45e5e;border:0 solid #ccc;width:64px;box-shadow:0 1px 4px #999;-webkit-box-shadow:0 1px 3px #ccc;-moz-box-shadow:0 1px 3px #ccc}.thumb-img-wrap{display:block;overflow:hidden;position:relative;z-index:1;width:64px;height:64px}.thumb-img-wrap .mask{height:64px;width:64px;top:0;left:0;display:block;background-color:transparent;position:absolute}.thumb-img-wrap .mask img{visibility:hidden}.thumb-img-wrap img{position:absolute;visibility:hidden;z-index:-1}a.btn-refresh{padding:0;font-weight:normal;cursor:pointer;text-indent:0;position:absolute;right:0;top:0;text-decoration:none;color:#606060;line-height:22px;font-size:14px}a.btn-refresh:hover{color:#e01a1a}
+
+.bulk{
+  float:left; 
+  display:block;
+  padding:0 3px;
+  overflow:hidden;
+}
+
+.bulk_style{
+  height:16px;
+  line-height:1.4em;
+  *line-height:1.5em;
+}
+
+.first_item {
+  padding-left: 0;
+}
+
+.pa { 
+  background:url({$themes:path}/bar_32.png) no-repeat 0px 0px; 
+  cursor:pointer;
+}
+.pa:hover { opacity:0.8; /*filter:alpha(opacity=80);*/}
+
+.icon32 { width:32px; height:32px; overflow:hidden; line-height:32px; display:block;}
+.icon32_qq { background-position: 0px -1696px; }
+.icon32_sina { background-position: 0px 0px; }
+.icon32_sohu { background-position:-232px -250px; }
+.icon32_kaixin { background-position:-196px -250px; }
+.icon32_taobao { background-position:-124px -250px; }
+.icon32_passit_more { background-position:-268px -250px; }
+
+.share_count {
+  float:left;
+	width:50px;
+	overflow:visible;
+	background-image:url({$themes:path}/count.gif); 
+    background-position:0px 0px;
+    font-weight: bold;
+    height: 32px;
+    line-height: 32px;
+    margin: 0 5px 0 3px;
+    padding: 0 3px 0 8px;
+    text-align: center;
+    display:block;
+}
+a.share_count:hover{
+	background-image:url({$themes:path}/count.gif); 
+  	background-position:0px -32px; 
+}
+
+.share_count span{
+  width:50px;
+  height:32px;
+  line-height: 32px;
+  display:block;
+  font-family:Arial,helvetica,sans-serif;
+  text-align:center;
+  font-size:16px;
+  font-weight:bold;
+  color:#333333;
+  cursor:default;
+  overflow:hidden;
+  background:none;
+}
+
+</style>
+
+<style>
+
+#wf-template {
+	display:none;
+}
+
+.pic {
+position: absolute;
+width: 50px;
+height: 50px;
+overflow: hidden;
+margin:0;
+padding:0;
+}
+
+.xx {
+  margin:0;
+  width: 88px;
+  height: 50px;
+  display: block;
+  padding: 0 0 0 60px;
+  word-wrap: break-word;
+  font-size:15px;
+}
+
+</style>
+
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+
+-->
+</script>
+
+<script src="{$themes:path/}/waterfall.js"></script>
+<script>
+<!--
+
+function check_width() {
+  if(Q.$('tweenimg').width > Q.$('tweenimg').parentNode.offsetWidth) {
+    Q.$('tweenimg').style.width = "100%";
+  }
+}
+
+function check_error(img) {
+  img.src = '{$themes:path}/icon48.png';
+}
+
+function check_image_width(img) {
+  var img_width = img.width;
+  var img_height = img.height;
+  if(img_width > img_height) {
+    img.style.height = "100%"; 
+  } else {
+    img.style.width = "100%";
+  }
+}
+
+-->
+</script>
+
+<body style="background:#f7f5f5;">
+
+{#template user.menubar/}
+
+
+<br><br><br><br>
+<div id="main">
+  <div id="page">
+    <div>
+      <h3 style="font-size: 16px; font-weight:normal">
+      来自 {$get:d} 的分享
+      </h3>
+      <br/>
+    </div>
+    <div class="wf-main" id="wf-main">
+    </div>
+    <div class="clear"></div>
+    <!--div id="left-column">
+      <div style="background: #FFF; height:45px;margin-top: 1px; border-bottom: #F1F1F1;line-height: 45px;font-size: 15px;">
+        <dt style="float: left; width: 88px; ">
+        <img src="{$cfg:site.avatar}/user48.{$fields:uname}.jpg" 
+        style="border:1px solid #CCC; width:48px;margin:20px;" onerror="check_error(this);">
+        </dt>
+        <dd style="margin-left: 88px;line-height: 32px; height: 32px;">
+          <p style="padding-top:12px; ">
+          <h3 style="font-size: 18px;">{$fields:uname}</h3>
+          </p>
+          <p style="color: #333;">
+          <span>{$fields:title}</span>
+          </p>
+        </dd>
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div id="right-column">
+      <DIV style="border:0; background: #FFF;font-size: 16px;height: 45px; line-height: 45px;text-indent: 20px;padding-top: 5px;">
+          <p style="color: #333; margin-top: 3px; margin-bottom: 5px;">
+            <em class="icon-calendar"></em>来自{$fields:from_domain}
+          </p>
+      </DIV>
+      <dl class="tbox" style="border:0;margin-top:0;">
+        <dd>
+          <ul class="module">
+          <style>
+            .thumb-domain {
+              width: 312px;
+              height: 148px;
+              padding-left: 2px;
+              background: #FFFFFF;
+            }
+
+            .thumb-domain .thumb-domain-item {
+              float: left;
+              width: 73px;
+              height: 73px;
+              margin: 5px 5px 0px 0;
+              background: #FFF;
+              overflow: hidden;
+            }
+
+            .thumb-domain-item:hover img {
+              opacity: 0.7;
+            }
+          </style>
+            <div class="thumb-domain">
+            <html:list id="domain_list" datasrc="data://domain_images"> 
+            <t:data>
+              <div class="thumb-domain-item">
+              <a href="{$app:path/}/is/[field:id]" target="_self">
+              <img src="{$app:path}{$cfg:site.thumb_images_dir/}/[field:file_name]"
+              width="100%" onload="check_image_width(this)"/>
+              </a>
+              </div>
+            </t:data>
+            </html:list>
+            </div>
+          </ul>
+          <div style="clear:both; height: 10px;">
+        </dd>
+      </dl>
+
+      <DIV style="border:0; background: #FFF;font-size: 16px;height: 45px; line-height: 45px;text-indent: 20px;padding-top: 5px;">
+          <p style="color: #333; margin-top: 3px; margin-bottom: 5px;">
+            <em class="icon-calendar"></em>{$fields:albumname}
+          </p>
+      </DIV>
+      <dl class="tbox" style="border:0;margin-top:0;">
+        <dd>
+          <ul class="module">
+          <style>
+            .thumb-domain {
+              width: 312px;
+              height: 148px;
+              padding-left: 2px;
+              background: #FFFFFF;
+            }
+
+            .thumb-domain .thumb-domain-item {
+              float: left;
+              width: 73px;
+              height: 73px;
+              margin: 5px 5px 0px 0;
+              background: #FFF;
+              overflow: hidden;
+            }
+
+            .thumb-domain-item:hover img {
+              opacity: 0.7;
+            }
+          </style>
+            <div class="thumb-domain">
+            <html:list id="album_images" datasrc="data://album_images"> 
+            <t:data>
+              <div class="thumb-domain-item">
+              <a href="{$app:path/}/is/[field:id]" target="_self">
+              <img src="{$app:path}{$cfg:site.thumb_images_dir/}/[field:file_name]"
+              width="100%" onload="check_image_width(this)"/>
+              </a>
+              </div>
+            </t:data>
+            </html:list>
+            </div>
+          </ul>
+          <div style="clear:both; height: 10px;">
+        </dd>
+      </dl>
+    </div>
+    <div class="clear"></div-->
+  </div>
+  <div class="clear"></div>
+  <div id="footer" class="tableheader">
+    <p>
+      Powered By <a href="http://wayixia.com">wayixia.com</a>. All Rights Reservered.
+    </p>
+  </div>
+</div>
+<br><br>
+
+<span id="wf-template">
+<!--div class="box wf-cld"-->
+  <div class="hidden">
+	<a href="">
+      
+    </a>
+    采集到
+    <a href=""></a>
+  </div>
+  <div class="actions hidden">
+    <div class="right">
+      <a href="" onclick="return false;" class="like btn btn11 wbtn">
+         <strong><em></em>赞</strong><span></span>
+	  </a>
+    </div>
+    <div class="left">
+      <a title="快速转采" href="" onclick="return false;" class="thunderpin btn btn11 wbtn">
+        <strong><em></em></strong><span></span>
+      </a>
+      <a href="#" class="repin btn btn11 wbtn">
+        <strong>转采</strong><span></span>
+      </a>
+    </div>
+  </div>
+  <a href="{$app:path}/is/[[id]]" target="_self" class="img x">
+    <img src="{$app:path}{$cfg:site.thumb_images_dir/}/[[file_name]]" width=[[width]] height=[[height]] alt="">
+  </a>
+  <p class="description">[[title]]</p>
+  <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
+  <div class="convo attribution clearfix">
+    <p class="NoImage">
+      <a href="{$app:path}/is/[[id]]" target="_self">[[from_domain]]
+      </a>
+    </p>
+  </div>
+  <div style="display:none;" class="comments muted"></div>
+<!--/div-->
+</span>
+
+<script type="text/javascript">
+
+function store(arr) {
+  var _this = this;
+  this.data = (arr instanceof Array)?arr:[];
+
+  this.pop = function(len) {
+    var arr = [];
+	while(len >= 0 && _this.data.length > 0) {
+	  arr.push(_this.data.shift());
+	  len--;
+	}
+	return arr;
+  }
+}
+var g_waterfall = null;
+var albums_data = {$fields:images_data};
+var g_store = new store(albums_data);
+
+Q.Ready(function(){
+  g_waterfall = new Waterfall({
+	"container":"wf-main",
+	"colWidth":238,
+	"colCount":4,
+	"template":Q.$('wf-template').innerHTML,
+  });
+
+  g_waterfall.append(g_store.pop(10));
+
+});
+
+</script>
+
+</body>
+</html>

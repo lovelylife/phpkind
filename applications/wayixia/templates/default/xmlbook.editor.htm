@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<TITLE>XML BOOK Document Reader | QLib </TITLE>
+<META http-equiv=Content-Type content="text/html; charset=UTF-8">
+<link type="text/css" rel="stylesheet" href="{$app:qlib}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/xmlbook/style.css" />
+<script language="javascript" id="js-loader" src="{$app:qlib}/Q.js">
+<!--
+
+import utils.stl;
+import utils.xml;
+import utils.templates-1-0-1;
+import utils.json2;
+import utils.ajax;
+
+import ui.button;
+import ui.wndx-1-0-2;
+import ui.simpletree;
+import ui.contextmenu;
+-->
+</script>
+<script language="JavaScript" src='{$themes:path}/xmlbook/xmlbookdoc.js'></script>
+<script language="javascript" src="{$themes:path}/xmlbook/editor.js"></script>
+<script language="javascript">
+<!--
+//! resize event handler
+function lpResizeHandler (evt) {
+    var h = Q.$('header');
+    var m = Q.$('menusbar');
+    var c = Q.$('content');
+    var d = Q.$('debug');
+    if((!c) || (!h)) return;
+	c.style.display = 'none';
+	c.style.height = (document.body.scrollHeight - h.offsetHeight - m.offsetHeight)+'px';
+    d.innerHTML = 'body('+document.body.scrollHeight+') - header('+h.offsetHeight+') - menubar('+m.offsetHeight+') = ' + c.style.height; 
+	c.style.display = '';
+}
+
+var fckInstance = null;
+var xmlBookInstance;
+var instanceName = 'xmlBookEditor';
+var bFCKCompleted = false;
+var bXMLBookCompleted = false;
+var timer = null;
+
+function XMLBook_OnCompletedSet() {
+	if(bFCKCompleted) {
+		xmlBookInstance.fckInstance = fckInstance;
+	}
+}
+// DOM ready
+Q.Ready(function() {
+    //! add resize handler
+    Q.addEvent(window, 'resize', lpResizeHandler);
+    
+    
+    Q.$('frame').onselect = function(evt) {
+        evt = evt | window.event;
+        evt.returnValue = false;
+    }
+
+	xmlBookInstance = new __xmlBookEditorL(
+			document.body,
+			'{$app:module}&inajax=true&cfg=xmlbook');
+
+	// 隐藏界面
+	Q.$('frame').style.display = 'none';
+	bXMLBookCompleted = true;
+	// 加载完后显示主界面
+	timer = setInterval(function() {
+		if(bFCKCompleted) {
+			xmlBookInstance.fckInstance = fckInstance;
+			clearInterval(timer);
+			Q.$('loadding').style.display = 'none';
+			Q.$('frame').style.display = '';
+			lpResizeHandler();
+		}
+	}, 300);
+	
+	
+});
+
+function FCKeditor_OnComplete( editorInstance ){
+	bFCKCompleted = true;
+	fckInstance = editorInstance;
+
+	editorInstance.LinkedField.form.onsubmit = function(){
+		MENU_Save(xmlBookInstance);
+		return false;
+	}
+}
+
+//-->
+</script>
+</head>
+
+<body style="margin: 0; padding: 0; border: 0px;" scroll="no" onselectstart="return false;">
+<div id="loadding">正在加载中...</div>
+<div id="frame" style="display:none;">
+
+<!-- frame -->
+<div id="header">
+    <div id="debug"></div>
+    <div id="header_title">
+        <br/><font color="yellow">&nbsp;☆ 欢迎使用</font>
+        <br/><font style="font-family: Times New Roman;font-size: 24px; color: white;">
+        &nbsp;&nbsp;&nbsp;&nbsp;Javascript经典专区 XML BOOK Reader v.1.1.20081220</font>
+        <br/><br/>
+    </div>
+    <div id="header_menus"> 
+        <!--ul class="titleStyle">
+            <li><a href="#" HIDEFOCUS><img src="images/icon/1.gif">打开</a></li>
+            <li><a href="#" HIDEFOCUS><img src="images/icon/2.gif">搜索</a></li>
+            <li><a href="#" HIDEFOCUS><img src="images/icon/3.gif">帮助</a></li>
+        </ul-->
+    </div>
+    
+</div>
+<div id="menusbar"></div>
+<div id="content"> 
+    <div id="frame_left">
+    
+    </div>
+    <div id="frame_right">
+        <div id="workspace" style="margin:0;height:99%;">
+		<!-- 欢迎使用XMLBook -->
+		<form method="post" target="_blank" style="height: 100%; width:100%;">
+		{$fields:editor/}
+		</form>
+		</div>
+    </div>
+</div>
+
+<!-- frame end -->
+</div>
+</body>
+</html>

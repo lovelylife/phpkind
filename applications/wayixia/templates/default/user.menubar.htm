@@ -1,0 +1,28 @@
+<div id="user-title-bar">
+<script src={$themes:path}/login.js></script>
+<div class="wf-main" style="z-index:3;">
+	<div class="nav-menu" style="height:40px;">
+		<ul id="user-menu">
+	<?php 
+	  $name = $theApp->get_user_info('name');
+	  if(empty($name)) {
+	?>	
+			<li><a href="{$app:app}">首页</a></li>
+			<li><a href="{$app:app}&mod=user&action=register">注册</a></li>
+			<li><a href="{$app:app}&mod=user&action=regular-login" >登录</a></li>
+	<?php
+	  } else {
+	?>
+	     <li>欢迎回来，<font style="color:#F60;"><?php echo $name;?></font></li>
+		 <li><a href="{$app:app}&mod=user&action=logout">退出</a></li>	     <li><a href="{$app:app}&mod=user&action=home"> 个人中心 </a></li>       
+		 <li><a href="{$app:app}">首页</a></li>
+	<?php 
+	  }
+	?>
+	    <li class="innerHeight">&nbsp;</li>
+		</ul>
+		
+	</div>
+</div>
+
+</div>

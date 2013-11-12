@@ -1,0 +1,84 @@
+<html>
+<head>
+	<title>FCKeditor - Sample</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+	<meta name="robots" content="noindex, nofollow" />
+	<link href="editor/_samples/sample.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="fckeditor.js"></script>
+</head>
+<body topmargin=0 leftmargin=0 rightmargin=0 style="background: transparent;" scroll="no">
+
+<table width="100%" style="width: 100%; height: 100%;" border=0 cellspacing=0 cellpadding=0>
+<tr>
+	<td style="">
+		<div style="border: 1px solid #CCC;background: #FFF; margin: 0 1px; color: #666; padding: 1px; font-size: 14px;">
+		&nbsp;<img src="images/edit.gif" style=" position: relative; bottom: -3px;" 
+			 onclick="return false; var parentWnd = document.getElementById('bookContainer').parentWnd;
+			 		  parentWnd.MENU_ReName(parentWnd.xmlBookInstance);	" />
+		<div id="bookContainer" style="display: none;"></div>
+		&nbsp;<span id="bookTitleContainer" title="双击编辑标题" >Javascript XML BOOK Editor v.1.0 </span>
+		 
+		<!-- <input style="padding: 5px; font-weight: bold;" value="标题" /> 
+		<input type="button" onclick="" value="保存标题" /> -->
+		</div>
+	</td>
+</tr>
+<tr>
+	<td style="width:100%; height: 100%; overflow: auto; margin: 0;">
+		<form method="post" target="_blank">
+			<script type="text/javascript">
+			<!--
+			// Automatically calculates the editor base path based on the _samples directory.
+			// This is usefull only for these samples. A real application should use something like this:
+			// oFCKeditor.BasePath = '/fckeditor/' ;	// '/fckeditor/' is the default value.
+			// var sBasePath = document.location.href.substring(0,document.location.href.lastIndexOf('_samples')) ;
+			
+			var parentWnd, xmlBookInstance;
+			var g_timer = null;
+			var sBasePath = '';
+			var oFCKeditor = new FCKeditor( 'FCKeditor1' ) ;
+			oFCKeditor.BasePath	= sBasePath ;
+			oFCKeditor.Height	= '100%' ;
+			oFCKeditor.Value	= '<p>欢迎使用<span style="font-size: x-small"><span> <span style="color: #0000ff"><span style="font-family: Times New Roman"><strong>XML</strong></span></span><span style="font-family: Times New Roman"><strong> <span style="color: #99cc00">BOOK</span> <span style="color: #ff0000">Editor <span style="color: #ff6600">App</span></span>&nbsp;v.1.0.0 With <a href="http://www.fckeditor.net">FCKEditor</a>.&nbsp; Powered By </strong></span></span></span><a href="http://onlyaa.com"><strong><span style="font-family: Times New Roman">Javascript </span></strong></a><a href="http://onlyaa.com"><strong><span style="font-family: Times New Roman">经典专区</span></strong></a></p>' ;
+			oFCKeditor.Create();
+			
+			function InitSystemThread() {
+				
+				g_timer = setInterval(
+					function(){
+						if(document.getElementById('bookContainer').parentWnd) {
+							clearInterval(g_timer);
+							parentWnd = document.getElementById('bookContainer').parentWnd;
+							parentWnd.xmlBookInstance.fckInstance = FCKeditorAPI.GetInstance('FCKeditor1');
+						}	
+					}, 10);
+				
+			}
+				
+			function FCKeditor_OnComplete( editorInstance ){
+					//parentWnd = document.getElementById('bookContainer').parentWnd;
+					//parentWnd.xmlBookInstance.fckInstance = FCKeditorAPI.GetInstance('FCKeditor1');
+					//alert(editorInstance);
+					InitSystemThread();
+			        editorInstance.LinkedField.form.onsubmit = function(){
+			        	
+						parentWnd.MENU_Save(parentWnd.xmlBookInstance)
+			        	return false;
+			        }
+			}
+			
+			function FCKeditor_OnFocus( editorInstance ) {
+				alert('t')	
+			}
+			//-->
+			</script>
+			<!-- 
+			<br />
+			<input type="submit" value="保存" />
+			-->
+		</form>
+		</td>
+</tr>
+</table>
+</body>
+</html>

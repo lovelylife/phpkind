@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="{$app:qlib}/ui.css" media="all">
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.json2;
+import utils.ajax;
+import ui.select;
+-->
+</script>
+<link rel="stylesheet" type="text/css" href="{$themes:path}/plugin_wayixia.css" media="all">
+<link rel="stylesheet" type="text/css" href="{$themes:path}/style.css" media="all">
+
+<style>
+<!--
+#left {
+      width: 232px;
+      height: 272px;
+	  background: #FFF;
+      float: left;
+	  text-align:center;
+	  border:3px solid #b6cddc;
+}
+    
+#right {
+      height: 272px;
+	  margin-left:242px;
+}
+
+#left_login {
+      height: 272px;
+	  background: #FFF;
+	  text-align:left;
+	  padding-left:30px;
+	  border:3px solid #b6cddc;
+}
+
+-->
+</style>
+
+<script>
+<!--
+// 快速挖图模式
+var g_quick_mode = false;
+var g_ctrl_select = null;
+var g_last_response = {};
+var login_error = {};
+login_error[-1] = '重复登录';
+login_error[-2] = '用户名或密码为空';
+login_error[-3] = '用户不存在或者密码错误';
+
+function ajax_wa() {
+  //pageUrl:info.pageUrl, 
+  //srcUrl:info.srcUrl
+  //image_info.referrer = location.href;
+  //image_info.cookie = document.cookie;
+  //image_info.title = document.title;
+  //image_info.from_protocol = location.protocol;
+  //image_info.from_domain = location.host;
+  //image_info.from_page = location.pathname+location.search;
+  var title = Q.$('image_title').value;
+  if(!title) {
+    alert('请输入标题');
+    Q.$('button-ok').disabled = false;
+    return;
+  } else {
+    g_last_response.title = title;
+  }
+
+  var user_album = Q.$('user_album').value;
+  if(!user_album) 
+    user_album = 0;
+
+  g_last_response.albumid = user_album;
+  document.cookie = 'album_id='+user_album+';';
+  
+  Q.Ajax({
+    command: '{$app:app}&mod=api&action=wa&inajax=true',
+    data: {img: g_last_response},
+    oncomplete : function(xmlhttp) {
+      // console.log(xmlhttp.responseText);
+      var resp = eval('('+xmlhttp.responseText+')');
+      if(resp) {
+        var result = resp.header;
+		if(result == 0) {
+		  alert('恭喜您，成功挖到了您想要的图片!');
+		  window.close();
+		} else if(result == -2) {
+		  // 登录界面
+		  Q.$('login-panel').style.display = '';
+		  Q.$('wa-panel').style.display = 'none';
+		  return;
+	    } else {
+		  alert('哎呀，挖一下，失败了!('+resp.data+')')
+		}
+	  } else {
+	  	alert('哎呀，挖一下，失败了!('+resp.data+')')
+	  }
+	  Q.$('button-ok').disabled = false;
+    }
+  });
+}
+
+function ajax_login() {
+  // 处理用户登录
+  var username = Q.$('login-name').value;
+  var userpwd = Q.$('login-pwd').value;
+
+  Q.Ajax({
+    command: '{$app:app}&mod=user&action=do-login&inajax=true',
+    data: {name: username, pwd: userpwd },
+    oncomplete : function(xmlhttp) {
+      // console.log(xmlhttp.responseText);
+      var resp = eval('('+xmlhttp.responseText+')');
+      if(resp && resp.header == 0) {
+        // 登录成功
+		Q.$('login-panel').style.display = 'none';
+		Q.$('wa-panel').style.display = '';
+	  } else {
+		var err = login_error[resp.header];
+		if(err) {
+		  alert('登录失败!('+err+')');
+		} else {
+		  alert('登录失败!(未知错误)');
+		}
+	  }
+
+	  Q.$('button-login').disabled= false;
+	  Q.$('button-ok').disabled= false;
+	}
+  });
+}
+
+function ajax_get_album_list() {
+
+}
+
+function getImageHandler() {
+	return function() {
+		Q.$('button-ok').disabled = false;
+		var img = this;
+		var img_width = img.width;
+		var img_height = img.height;
+		var max_width = 230;
+		var max_height = 270;
+		var result = max_width * img_height - max_height * img_width;
+		var width = 0;
+		var height = 0;
+		g_last_response.width = img.width;
+		g_last_response.height = img.height;
+		if(result<0) {
+		// 宽度
+			//img.width = max_width;
+			width  = max_width;
+			height = (max_width*img_height)/(img_width*1.0);
+		} else {
+			//img.height = max_height;
+			height = max_height;
+			width  = (img_width*height)/(img_height*1.0);
+		}
+		
+		img.style.width = width+'px';
+		img.style.height = height+'px';
+		img.style.marginTop = ((max_height-height)/2)+'px';
+	}
+}
+
+// page loaded
+Q.Ready(function() {
+
+// accept data
+g_last_response = {
+  pageUrl:decodeURIComponent(Q.GET('r')), 
+  srcUrl:decodeURIComponent(Q.GET('i')), 
+  cookie:decodeURIComponent(Q.GET('c')),
+  title:decodeURIComponent(Q.GET('t')),
+};
+
+// init image area
+Q.$('wayixia-image').onerror = function() {	Q.$('button-ok').disabled = true; }
+Q.$('wayixia-image').onload = getImageHandler();
+Q.$('wayixia-image').src = g_last_response.srcUrl;
+
+// title
+Q.$('image_title').value = g_last_response.title;
+
+// buttons
+Q.$('button-ok').onclick = function() {
+	var _this = this;
+	_this.disabled = true;
+	// Tell the background page to add the image
+	// get data from form 
+    ajax_wa();
+}
+
+Q.$('button-cancel').onclick=function() { window.close(); }
+Q.$('button-login').onclick=function() { this.disabled = true; ajax_login(); }
+
+Q.$('login-panel').style.display = 'none';
+Q.$('login-forgetpwd').href='{$app:app}&mod=user&action=forgetpwd';
+Q.$('login-forgetpwd').target = '_blank';
+Q.$('login-register').href='{$app:app}&mod=user&action=register';
+Q.$('login-register').target = '_blank';
+
+/*
+g_ctrl_select = new Q.selector(Q.$('user_album'));
+g_ctrl_select.itemChange = function(v) {
+	if(v == -1) {
+	  alert('msg');
+	  return ;
+	}
+	return true;
+}
+*/
+
+});
+
+//-->
+</script>
+</head>
+<body style="background:#CFDFEF;margin:0;padding:0;height:100%;">
+
+<div id="wa-panel" style="margin:auto; padding: 10px; border:1px solid #CCC;">
+	<div style="clear:both; height:35px; line-height:35px;text-indent: 0px;color: #000;">
+	<h3 style="margin: 0px; color:#4d6a7c;" id="wayixia_title"> 
+		亲！您将挖到的图片如下：
+	</h3>
+	</div>
+	<div id="left">
+		<img id="wayixia-image" class="image" style="max-height: 270px;	max-width: 230px;">
+	</div>
+	<div id="right">
+		<html:select 
+		  id="user_album" 
+		  datasrc="data://useralbums" 
+		  style="width: 430px;height:30px;"
+		>
+		<t:data>
+		  <option value="[field:value]">[field:text]</option>
+		</t:data>
+		<option value="0" selected>待分类</option>
+		</html:select>
+		<br><br>
+		<textarea id="image_title" style="width: 427px; height: 175px;"></textarea>
+
+		<p align="right" style="padding:0;margin:7px 0;">
+			<span id="button-cancel" class="uploadBtn small" style="width: 100px;"> No, 放弃 </span>
+			<span id="button-ok" class="uploadBtn small" style="width: 100px; " disabled> Ok，挖好了 </span>
+		</p>
+	</div>
+</div>
+
+<div id="login-panel" style="margin:auto; padding: 10px; border:1px solid #CCC;">
+	<div style="clear:both; height:35px; line-height:35px;text-indent: 0px;color: #000;">
+	<h3 style="margin: 0px; color:#4d6a7c;" id="wayixia_title"> 
+		亲！您还没有登录哦：
+	</h3>
+	</div>
+	<div id="left_login">
+		<br><br>
+		用户名:<br><input type="text" id="login-name"/>
+		<br><br>密码:<br>
+		<input type="password" id="login-pwd"/>
+		<br/>
+		(<a href="#" target="_blank" id="login-forgetpwd">忘记密码</a> 
+		| <a href="#" target="_blank" id="login-register">注册</a>)
+		<br><br><br>
+		<p align="left">
+			<button id="button-login" style="width: 100px; height: 30px;"> Ok，登录 </button>
+		</p>
+	</div>
+</div>
+
+
+</body>
+</html>

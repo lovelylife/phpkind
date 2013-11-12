@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> 挖一下，让更多人分享~ Powered By wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+import utils.xml;
+import ui.wndx-1-0-2;
+-->
+</script>
+<script src="{$themes:path/}/waterfall.js"></script>
+
+<body style="background:#f7f5f5;">
+<script type="text/javascript">
+<!--
+
+function upload_click() {
+  Q.$('user_file').click();
+}
+
+function callback(url) {
+  alert(url);
+}
+
+
+var file_name='{$fields:filename}';
+var result = '{$fields:result}';
+
+Q.Ready(function(){
+  Q.$('upload_form').action = location.href + '&doupload=true';
+  //{$app:module/}&action=avatar-upload-panel&doupload=true
+  Q.$('user_file').onchange = function() {
+    Q.$('upload_form').submit();
+  }
+
+  if(Q.GET('doupload')) {
+    if(result == 'ok') {
+      var callback = Q.GET('callback');
+      var f = parent[callback];
+      if(typeof f == 'function') {
+        f(file_name);
+      } else {
+        alert('call back function is not specified!');
+      }
+      //callback();
+    } else {
+      alert(result);
+    }
+  }
+
+});
+
+//-->
+</script>
+
+<body>
+<form 
+  id="upload_form" 
+  action="" 
+  method="post" 
+  enctype="multipart/form-data"
+  style="margin:0px;padding:0px;"
+>
+  <input id="user_file" type="file" name="user_file" style="height: 22px;"/>
+  <input type="hidden" name="inputctrl" value="{$get:inputctrl}" />
+  <input type="hidden" name="render" value="{$get:render}" />
+  <input type="hidden" name="type" value="{$get:type}" />
+  <input type="hidden" name="app" value="{$get:app}" />
+  <input type="hidden" name="uploaddir" value="{$get:uploaddir/}" />
+  <input type="hidden" name="resdir" value="{$get:resdir/}"  />
+</form>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> 挖一下，让更多人分享~ - www.wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta property="qc:admins" content="354076571110116375" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/layout.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
+<style>
+#wf-template {
+	display:none;
+}
+
+/*CSS page style pagination*/
+
+DIV.pager {
+	PADDING-RIGHT: 0px; 
+	PADDING-LEFT: 0px; 
+	FONT-SIZE: 15px; 
+	PADDING-BOTTOM: 10px; 
+	COLOR: #48b9ef; 
+	PADDING-TOP: 10px; 
+	FONT-FAMILY: Arial, Helvetica, sans-serif; 
+	BACKGROUND-COLOR: #fff; 
+	TEXT-ALIGN: left;
+	text-indent:5px;
+}
+
+DIV.pager A {
+	BORDER: #f0f0f0 2px solid;
+	PADDING-TOP: 8px; 
+	PADDING-RIGHT: 12px; 
+	PADDING-BOTTOM: 8px; 
+	PADDING-LEFT: 12px; 
+	MARGIN: 0px 2px; 
+	COLOR: #48b9ef; 		
+	TEXT-DECORATION: none
+}
+
+DIV.pager A:hover {
+	BORDER: #ff5a00 2px solid; COLOR: #ff5a00;
+}
+DIV.pager A:active {
+	BORDER: #ff5a00 2px solid; COLOR: #ff5a00;
+}
+DIV.pager SPAN.current {
+	PADDING-TOP: 8px; 
+	PADDING-RIGHT: 12px; 
+	PADDING-BOTTOM: 8px; 
+	PADDING-LEFT: 12px; 
+	MARGIN: 0px 2px 0px 0px;
+	BORDER: #ff5a00 2px solid; 
+	BACKGROUND-COLOR: #ff6c16;
+	
+	COLOR: #fff;  
+}
+
+DIV.pager SPAN.disabled {
+	DISPLAY: none
+}
+
+
+</style>
+
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.tween;
+-->
+</script>
+<script src="{$themes:path/}/waterfall.js"></script>
+</head>
+
+<body  style="background:#f7f5f5;">
+{#template index.menu/}
+<br><br>
+
+<div class="wf-main" id="wf-main">
+    <div class="box wf-cld">
+	<a href="{$app:path}/helper/whatis" style="font-size:14px;">什么是挖一下?</a>
+	<br><br>
+	<a href="{$app:path}/helper/install">
+	<span class="uploadBtn small" style="width:195px;color:#333;">
+	<span> 开始使用 >> </span></span>
+	</a>
+	<br><br>
+	</div>
+</div>
+<div class="wf-main" align="left">
+	<div class="pager">
+		<span class="disabled"> &lt;  Prev</span>
+		<!--span class="current">1</span>
+		<a href="#">2</a>
+		<a href="#">3</a>
+		<a href="#">4</a>
+		<a href="#">5</a>
+		<a href="#">6</a>
+		<a href="#">7</a>...<a href="#">199</a>
+		<a href="#">200</a>
+		<a href="#">Next  &gt; </a-->
+		{$fields:pager}
+	</div>
+
+	
+	<div id="footer" class="tableheader">
+    <p>
+      Powered By <a href="http://wayixia.com">wayixia.com</a>. All Rights Reservered. <a href="http://www.miitbeian.gov.cn/">沪ICP备13019405号</a>
+    </p>
+  </div>
+</div>
+
+<span id="wf-template">
+<!--div class="box wf-cld"-->
+  <div class="hidden">
+	<a href="">
+      karlh
+    </a>
+    采集到
+    <a href="">自然美</a>
+  </div>
+  <div class="actions hidden">
+    <div class="right">
+      <a data-id="39605487" href="/#" onclick="return false;" class="like btn btn11 wbtn">
+         <strong><em></em>赞</strong><span></span>
+	  </a>
+    </div>
+    <div class="left">
+      <a data-id="39605487" title="快速转采" href="/#" onclick="return false;" class="thunderpin btn btn11 wbtn">
+        <strong><em></em></strong><span></span>
+      </a>
+      <a onclick=""
+         href="/#" class="repin btn btn11 wbtn">
+        <strong>转采</strong><span></span>
+      </a>
+    </div>
+  </div>
+  <a href="{$app:path/}/is/[[id]]" target="_self" class="img  x">
+    <img src="{$app:path}{$cfg:site.thumb_images_dir/}/[[file_name]]" width=[[width]] height=[[height]] alt="karlh采集到自然美">
+  </a>
+  <p class="description">[[title]]</p>
+  <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
+  <div class="convo attribution clearfix">
+    <p class="NoImage">
+      <a href="{$app:path/}/is/[[id]]" target="_blank">[[from_domain]]
+      </a>
+    </p>
+  </div>
+  <div style="display:none;" class="comments muted"></div>
+  <div style="display: none;" class="write convo clearfix">
+    <a href="http:" title="" class="img x">
+      <!--img src=""-->
+    </a>
+    <form action="" method="POST">
+      <textarea placeholder="添加评论或把采集@给好友" class="GridComment"></textarea>
+      <a href="#" onclick="return false;" class="grid_comment_button"></a>
+    </form>
+  </div>
+<!--/div-->
+</span>
+
+<script type="text/javascript">
+
+
+function store(arr) {
+  var _this = this;
+  this.data = (arr instanceof Array)?arr:[];
+
+  this.pop = function(len) {
+    var arr = [];
+	while(len >= 0 && _this.data.length > 0) {
+	  arr.push(_this.data.shift());
+	  len--;
+	}
+	return arr;
+  }
+}
+
+/*
+var g_waterfall = null;
+
+// test 
+ var html = "xxxx<a>[[url]]</a>[[url]]yyyyyyy";
+ var arr = [{url:'http://baidu.com'}];
+
+ var output = html.replace(/\[\[(\w+)\]\]/ig, 
+	function(w,w2,w3,w4) {
+		return arr[0][w2];
+	}
+ );
+
+ alert(output);
+*/
+
+var images_data = {$fields:images_data/};
+var g_store = new store(images_data);
+
+function getScrollTop(){     
+         var scrollTop=0;     
+         if(document.documentElement&&document.documentElement.scrollTop){     
+           scrollTop=document.documentElement.scrollTop;     
+         }else if(document.body){     
+           scrollTop=document.body.scrollTop;     
+         }     
+         return scrollTop;     
+       }     
+
+Q.Ready(function(){
+
+  g_waterfall = new Waterfall({
+	"container":"wf-main",
+	"colWidth":248,
+	"colCount":4,
+	"template":Q.$('wf-template').innerHTML,
+	"animate" : new alpha(),
+  });
+
+
+
+  g_waterfall.append(g_store.pop(10));
+
+  var nav = Q.$('nav');
+  var nav_menu = Q.$('nav_wrapper');
+  Q.addEvent(window, 'scroll', 
+    function() {
+	  var pos = Q.absPosition(nav);
+	  if(pos.top <= getScrollTop()) {
+	    //console.log(pos.top);
+		nav_menu.className = 'main_in_wrapper floating';
+	  } else {
+	    nav_menu.className = 'main_in_wrapper';
+	  }
+	}
+  , false)
+});
+
+
+</script>
+</body>
+</html>

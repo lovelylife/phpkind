@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> 挖一下，忘记密码 Powered By PHPKind</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link rel="stylesheet" type="text/css" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
+
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+//-->
+</script>
+<script>
+<!--
+Q.Ready(function(){
+
+Q.$('get-pwd').onclick = function() {
+  var name = Q.$('name').value;
+  var email = Q.$('email').value;
+  if(!name || !email) {
+    error('用户名和邮箱地址不能为空');
+	return;
+  }
+
+  Q.Ajax({
+    command: '{$app:module}&action=do-forgot-pwd&inajax=true',
+	data : {name:name, email:email},
+	oncomplete : function(xmlhttp) {
+	  try {
+		var resp = eval('('+xmlhttp.responseText+')');
+		if(resp.header != 0) {
+		  error(resp.data);
+		} else {
+		  Q.$("forget-2").innerHTML = resp.data;
+
+		  Q.$("forget-1").style.display = 'none';
+	      Q.$("forget-2").style.display = '';
+		}
+	  } catch (e) {
+        error(xmlhttp.responseText);
+	  }
+	}
+  });
+}
+
+
+Q.$("forget-2").style.display = 'none';
+
+});
+
+var alpha_object = new alpha();
+
+function error(msg) {
+  Q.$("error").style.opacity = 1;
+  Q.$("error").innerHTML = msg;
+  setTimeout(function() {
+	alpha_object.push(Q.$("error"));
+	alpha_object.play();
+  }, 3000); 
+}
+
+function alpha() {
+  var _this = this;
+
+  this.data = [];
+  this.play = function() {
+	if(_this.data.length == 0) {
+	   return;
+	}
+	e = _this.data[0];
+	var op = parseFloat(e.style.opacity, 10);
+	op = op - 0.1;
+	if(op >= 0.1) {
+	  e.style.opacity = op;
+	} else {
+	  e.style.opacity = 0.0;
+	  _this.data.shift();
+	}
+	setTimeout(function() { _this.play();}, 40);
+  }
+
+  this.push = function(e) {
+    
+	_this.data.push(e);
+  }
+
+  this.completed = function() {return _this.data.length == 0; };
+}
+
+//-->
+</script>
+
+</head>
+
+<body>
+
+{#template user.menubar/}
+
+<div id="wrapper" class="skin01" style="margin-top: 40px;"> 
+<div class="bground"> 
+  <div id="content">  
+  <div id="cnthld" class="beibao" style="display: block;"> 
+  <ul class="content-tab"> 
+  <li class="beibao-tab">
+    <a id="my-beibao" href="#" class="tab-title songti tabbtn" hidefocus="">
+    <span class="tab-title-tag"></span>忘记密码
+    </a>  
+  </li>
+  </ul> 
+  <div class="cnthld-main clearfix">
+    <div class="loadingtpl">LOADING...</div> 
+	<div class="col leftside"> 
+	  <div class="plzhld" data-fill="tab_content">
+	    <br><br>
+		<div class="regmain">
+			<div class="right" style="display:none;;">
+				
+			</div>
+			<div class="left">
+				<table cellpadding="0" cellspacing="0" border="0" width="80%" style="margin-left:20px;">
+					<tr>
+						<td>
+              用户名：<br><br>
+							<input id="name" type=text value="{$fields:authkey/}" />
+							<span class="msg" id="msg-username"></span>
+						</td>
+					</tr>
+					<tr>
+            <td>
+              电子邮件：<br><br>
+            <input id="email" type=text value="{$fields:authkey/}" />
+						<span class="msg" id="msg-password"></span></td>
+					</tr>
+          <tr>
+						<td>
+              <button id="get-pwd">找回密码</button>
+              <br/><br/>
+              <!-- error msg -->
+              <div id="error" style="border:1px solid #EEE;line-height:30px;text-indent:5px;color:red; opacity:0;"></div>
+              </div>
+              <div class="regmain" style="height:300px;display:none;" id="forget-2">
+              密码重置邮件已经发送到邮箱，请注意查收!
+              </div>
+            </td>
+					</tr>
+				</table>
+          
+			</div>
+		</div>
+	  </div>
+	  <div class="leftside-shadow"></div> 
+	</div> 
+  </div>
+  </div> 
+  </div> 
+  
+  <div id="foot"> <div class="mod-footer"> <div class="bottom-line2"> <p>© WAYIXIA.COM <em class="s-bottom-copyright">&nbsp;&nbsp;&nbsp;&nbsp;</em></p> </div></div> </div> </div> 
+
+  <a class="mod-go-top-btn" href="#" onclick="return false" style="display: none; position: fixed; bottom: 5px; right: 66.5px;"></a> 
+</div>
+
+</body>
+</html>

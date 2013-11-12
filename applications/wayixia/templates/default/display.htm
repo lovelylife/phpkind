@@ -1,0 +1,291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title> {$fields:title/} - wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/layout.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css"/>
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css" />
+
+<style>
+#thumbRPWrap{margin-bottom:10px}#thumbRP{font-size:0;padding:10px 0 15px 0;position:relative;width:200px}.thumb-item{float:left;display:block;width:64px;height:64px;padding:0;margin:0 2px 2px 0;position:relative;z-index:1}.thumb-item .thumb-bg{position:relative;float:left;display:block;background-color:transparent;_position:absolute}.thumb-item.hover{z-index:100;background-color:#fff;zoom:1}.thumb-item.hover .thumb-bg{padding:3px;top:-3px;left:-3px;background-color:#f45e5e;border:0 solid #ccc;width:64px;box-shadow:0 1px 4px #999;-webkit-box-shadow:0 1px 3px #ccc;-moz-box-shadow:0 1px 3px #ccc}.thumb-img-wrap{display:block;overflow:hidden;position:relative;z-index:1;width:64px;height:64px}.thumb-img-wrap .mask{height:64px;width:64px;top:0;left:0;display:block;background-color:transparent;position:absolute}.thumb-img-wrap .mask img{visibility:hidden}.thumb-img-wrap img{position:absolute;visibility:hidden;z-index:-1}a.btn-refresh{padding:0;font-weight:normal;cursor:pointer;text-indent:0;position:absolute;right:0;top:0;text-decoration:none;color:#606060;line-height:22px;font-size:14px}a.btn-refresh:hover{color:#e01a1a}
+
+
+.thumb-domain {width: 312px;height: 148px;padding-left: 2px;background: #FFFFFF;}
+.thumb-domain .thumb-domain-item {float: left;width: 73px;height: 73px;margin: 5px 5px 0px 0;background: #F8F8F8;overflow: hidden;}
+.thumb-domain-item:hover {opacity: 0.7;}
+
+
+#view_arrows a.prev {
+	position: fixed;
+	left: 0;
+	top: 50%;
+	width: 60px;
+	height: 600px;
+	background: url({$themes:path}/prev_next.png) 0 0 no-repeat;
+	margin-top: -300px;
+	cursor: pointer;
+}
+
+#view_arrows a.prev:hover {
+	background-position: -80px 0 ;
+}
+
+#view_arrows .next {
+	position: fixed;
+	right: 0;
+	top: 50%;
+	width: 60px;
+	height: 600px;
+	background: url({$themes:path}/prev_next.png) -240px 0 no-repeat;
+	margin-top: -300px;
+	cursor: pointer;
+}
+
+#view_arrows a.next:hover {
+	background-position: -320px 0 ;
+}
+
+.seg-title {
+  position: relative;
+  border:0; 
+  background-color: #FFF;
+  font-size: 16px;
+  height: 45px; 
+  line-height: 45px;
+  text-indent: 20px;
+  padding-top: 0px;
+}
+
+.normalitem > div.arrow {
+  display: block;
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  top:20px;
+  right: 30px;
+  background: url({$themes:path}/seg-title-arrow.png) left top no-repeat;
+}
+
+.selectitem > div.arrow {
+  display: block;
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  top:20px;
+  right: 30px;
+  background: url({$themes:path}/seg-title-arrow.png) -20px top no-repeat;
+}
+
+</style>
+
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+
+-->
+</script>
+<script src="{$themes:path/}/share.js" ></script>
+<script type="text/javascript" src="{$themes:path}/lightwindow/prototype.js"></script>
+<script type="text/javascript" src="{$themes:path}/lightwindow/scriptaculous.js?load=effects"></script>
+<script type="text/javascript" src="{$themes:path}/lightwindow/lightwindow.js"></script>
+<link rel="stylesheet" href="{$themes:path}/lightwindow/css/lightwindow.css" type="text/css" media="screen" />
+<script>
+<!--
+
+function check_width() {
+  if(Q.$('tweenimg').width > Q.$('tweenimg').parentNode.offsetWidth) {
+    Q.$('tweenimg').style.width = "100%";
+  }
+}
+
+function check_error(img) {
+  img.src = '{$themes:path}/icon48.png';
+}
+
+function check_image_width(img) {
+  var img_width = img.width;
+  var img_height = img.height;
+  if(img_width > img_height) {
+    img.style.height = "100%"; 
+  } else {
+    img.style.width = "100%";
+  }
+}
+
+var tree_items = ['tree_album', 'tree_domain'];
+var tree_selected = null;
+Q.Ready(function() {
+tree_selected = Q.$('tree_album');
+for(var i=0; i < tree_items.length; i++) {
+	var e = Q.$(tree_items[i]);
+	if(e) {
+		e.onclick = function(evt) {
+			for(var i=0; i < tree_items.length; i++) {
+				if(Q.$(tree_items[i]) == this) {
+          if(tree_selected == this) {
+            tree_selected = null;
+            Q.$(tree_items[i]+'_content').style.display='none';
+            Q.$(tree_items[i]).className='seg-title normalitem'
+          } else {
+            Q.$(tree_items[i]+'_content').style.display = 'block';
+            this.style.backgroundColor='#FFF';
+            tree_selected = this;
+            this.className='seg-title selectitem'
+          }					
+				} else {
+					Q.$(tree_items[i]+'_content').style.display='none';
+          Q.$(tree_items[i]).className='seg-title normalitem'
+				}
+			}
+		}
+
+		e.onmouseover=function(evt){		  
+      if(tree_selected != this) {
+        this.style.backgroundColor='#F8F8F8';
+      }
+		}
+
+    e.onmouseout=function(evt) {
+      if(tree_selected != this) {
+        this.style.backgroundColor='#FFF';
+      }
+
+    }
+	}
+}
+
+});
+
+-->
+</script>
+
+<body style="background:#f7f5f5;">
+
+{#template user.menubar/}
+
+
+<br><br><br><br>
+
+<div id="view_arrows">
+	{$fields:next}
+	{$fields:prev}
+	<!--a href="{$app:path}/is/{$fields:next}" class="prev x "></a>
+	<a href="{$app:path}/is/{$fields:prev}" class="next x "></a-->
+</div>
+
+<div id="main">
+  <div id="page">
+    <div id="left-column">
+      <div style="background: #FFF; height:45px;margin-top: 1px; border-bottom: #F1F1F1;line-height: 45px;font-size: 15px;">
+        <dt style="float: left; width: 88px; ">
+        <img src="{$app:path}{$cfg:site.avatar}/user48.{$fields:uname}.jpg" 
+        style="border:1px solid #CCC; width:48px;margin:20px;" onerror="check_error(this);">
+        </dt>
+        <dd style="margin-left: 88px;line-height: 32px; height: 32px;">
+          <p style="padding-top:12px; ">
+          <h3 style="font-size: 18px;"><a href="{$app:path}/u/{$fields:uname}">{$fields:nickname}&nbsp;</a></h3>
+          </p>
+          <p style="color: #333;">
+          <span>{$fields:title}</span>
+          </p>
+        </dd>
+      </div>
+      <div class="clear"></div>
+      <div class="panel" align="center">
+        <div style="position:relative;background: url({$themes:path}/img_bg.png) repeat; line-height:0;">        
+          <img id="tweenimg" src="{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}" onload="check_width()"/>
+          <div style="position:absolute; right:3px; top:3px;">
+            <a href="{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}" class="lightwindow" rel="/\\:;*?&lt;&gt;'”|®™©&amp;#[Sushi]" title="图片查看" caption="{$fields:title}" author="{$fields:nickname}">查看大图</a>
+          </div>
+          </div>
+        <div class="clear"></div>
+      </div>
+
+      <dl class="tbox" style="border:0;">
+        <dt>
+          <strong style="color: #333;text-indent: 5px;">
+          <em class="icon-calendar"></em>&nbsp;&nbsp;分享至:
+          </strong>
+        </dt>
+        <dd>
+          <a class="bulk first_item" href="javascript:void(0);" onclick="share2sina();"><span class="pa icon32 icon32_sina"></span></a> 
+          <!--a class="bulk"><span class="pa icon32 icon32_qq"></span></a> 
+          <a class="share_count"><span title="已累计分享5次">5</span></a-->
+		  <div id="qqwb_share__" data-appkey="801365852" data-icon="0" data-counter="0" data-content="{$fields:title}" data-pic="http://wayixia.com{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}"></div>
+		  <script src="http://mat1.gtimg.com/app/openjs/openjs.js#autoboot=no&debug=no"></script>
+          <div style="clear:both; height: 10px;"></div>
+        </dd>
+      </dl>
+    </div>
+    <div id="right-column">
+      <DIV class="seg-title selectitem" id="tree_album">
+          <p style="color: #333; margin-top: 0px; margin-bottom: 0px;">
+            <em class="icon-calendar"></em>
+            <a href="{$app:path/}/u/{$fields:uname}/albums/{$fields:album_id}">
+              {$fields:albumname}
+            </a>
+          </p>
+          <div class="arrow"></div>
+      </DIV>
+      <dl class="tbox" style="border:0;margin-top:0;"  id="tree_album_content">
+        <dd>
+          <ul class="module">
+            <div class="thumb-domain">
+            <html:list id="domain_list" datasrc="data://album_images"> 
+            <t:data>
+              <a href="{$app:path/}/is/[field:id]" target="_self">
+              <div class="thumb-domain-item" style="background:url({$app:path}{$cfg:site.thumb_images_dir/}/[field:file_name]) 50% 50% no-repeat">
+              </div>
+              </a>
+            </t:data>
+            </html:list>
+            </div>
+          </ul>
+          <div style="clear:both; height: 10px;">
+        </dd>
+      </dl>
+
+      <DIV class="seg-title normalitem" style="border-top: 1px solid #EEE;" id="tree_domain" >
+          <p style="color: #333; margin-top: 0px; margin-bottom: 3px;">
+            <em class="icon-calendar"></em><a href="{$app:path/}/d/{$fields:from_domain}">来自{$fields:from_domain}的分享</a>
+          </p>
+          <div class="arrow"></div>
+      </DIV>
+      <dl class="tbox" style="border:0;margin-top:0;display:none" id="tree_domain_content">
+        <dd>
+          <ul class="module">
+            <div class="thumb-domain">
+            <html:list id="album_images" datasrc="data://domain_images"> 
+            <t:data>
+              <a href="{$app:path/}/d/{$fields:from_domain}" target="_self">
+              <div class="thumb-domain-item" style="background:url({$app:path}{$cfg:site.thumb_images_dir/}/[field:file_name]) 50% 50% no-repeat">
+              </div>
+              </a>
+            </t:data>
+            </html:list>
+            </div>
+          </ul>
+          <div style="clear:both; height: 10px;">
+        </dd>
+      </dl>
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div class="clear"></div>
+  <div id="footer" class="tableheader">
+    <p>
+      Powered By <a href="http://wayixia.com">wayixia.com</a>. All Rights Reservered.
+    </p>
+  </div>
+</div>
+<br><br>
+
+</body>
+</html>

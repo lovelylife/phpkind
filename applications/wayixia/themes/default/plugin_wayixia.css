@@ -1,0 +1,248 @@
+
+/*
+#wayixia_list 
+{ 
+	list-style:none;
+	margin:auto;
+	margin-top: 25px;
+	width: 1000px;
+}
+
+#wayixia_list li 
+{
+	float:left;
+	position:relative;
+	margin:5px;
+	background:#FFF;
+	border:3px solid #ccc;
+	border-radius:5px;
+	text-align:center;
+}
+
+#wayixia_list li > div 
+{
+	margin:0;
+	padding:0;
+	width:180px;
+	height:200px;
+	line-height:200px;
+}
+
+#wayixia_list li > div p
+{
+	margin:0;
+	padding:0;
+	width:180px;
+	height:200px;
+	line-height:200px;
+}
+
+#wayixia_list li img.aimg
+{
+	cursor:pointer;
+	padding:0;
+	margin:0;
+	vertical-align:middle;
+}
+
+
+#wayixia_list li:hover
+{ 
+	border:3px solid #333; 
+}
+
+#wayixia_list li:hover .info
+{
+	background-color:#333;
+	color:#FFF;
+}
+
+.info
+{
+	position:absolute;
+	right:0;
+	bottom:0;
+	border-top-left-radius:4px;
+	background-color:#ccc;
+	padding:2px 4px 0;
+	color:#333;
+	opacity: 0.6;
+}
+
+
+.link{position:absolute;left:50%;bottom:60px;opacity:0.7;margin-left:-35px;width:70px;height:22px;line-height:22px;text-align:center;background:#ccc;border-radius:4px;display:none;color:#000;font-size:12px;}
+.link:hover{background:#7BCEDD;color:#069;}
+.simple_tool{cursor:pointer;vertical-align:text-top;padding:0 5px 0 0;display:none;}
+
+*/
+
+
+#wayixia_container, #wayixia_container *{
+	-webkit-box-sizing: content-box;
+	-moz-box-sizing: content-box;
+	-ms-box-sizing: content-box;
+	box-sizing: content-box;
+}
+
+#wayixia_container {
+	font-family: arial, 'helvetica neue', sans-serif;
+	position: absolute;
+	padding-top: 37px;
+	z-index: 999999999999989;
+	top: 0;
+	left: 0;
+	background-color: #FFF;
+	opacity: 1;
+	hasLayout: -1;
+}
+
+.wayixia_box {
+	position: relative;
+	padding: 0;
+	margin: 5;
+	float: left;
+	background-color: #fff;
+/*	border: solid #e7e7e7;
+	border-width: 0 1px 1px 0;
+*/
+	height: 200px;
+	width: 200px;
+	opacity: 1;
+	z-index: 10002;
+	text-align: center;
+	overflow: hidden;
+
+	margin:8px;
+	background:#FFF;
+	border:3px solid #ccc;
+	border-radius:5px;
+	text-align:center;
+}
+
+.wayixia_info
+{
+	position:absolute;
+	right:0;
+	bottom:0;
+	border-top-left-radius:4px;
+	background-color:#ccc;
+	padding:2px 4px 0;
+	color:#333;
+	opacity: 0.6;
+	z-index: 1;
+}
+
+.wayixia_box:hover
+{ 
+	border:3px solid #333; 
+}
+
+.wayixia_box:hover .wayixia_info
+{
+	background-color:#333;
+	color:#FFF;
+}
+
+.wayixia_box .wayixia_image {
+	border: none;
+	height: 200px;
+	width: 200px;
+	opacity: 1;
+	padding: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.wayixia_box .wayixia_image .image {
+	max-height: 200px;
+	max-width: 200px;
+	/*
+	width: auto !important;
+	height: auto !important;
+	*/
+}
+
+.wayixia_box strong.wa:hover,.wayixia_box strong.qwa:hover {
+	display:block;
+}
+
+.wayixia_box strong.wa {
+	width: 72px;
+	left: 75px;
+	background-position: -40px 0;
+}
+
+.wayixia_box strong.qwa {
+	width: 24px;
+	left: 52px;
+	background-position: 0 0;
+}
+
+.wayixia_box strong.qwa:hover {
+	background-position: 0 -50px;
+}
+
+.wayixia_box strong.wa:hover {
+	background-position: -40px -50px;
+}
+
+.wayixia_box strong {
+	text-indent: -9999px;
+	position: absolute;
+	top: 82px;
+	display: none;
+	height: 32px;
+	background: url(wa_sprite.png) no-repeat 0 0;
+}
+
+.wayixia_box .wayixia_image a {
+	text-align: center;
+}
+
+.wayixia_box .wing_box {
+  display: none;
+  position:absolute;
+  left:10px;
+  top:70px;
+  right:10px;
+  bottom:0px; 
+  height:50px;
+  border-radius:5px;
+  border:1px solid #F1F1F1;
+  line-height:50px;
+  font-size:14px;
+  font-family:arial;
+  text-align:left;
+}
+
+.wayixia_box .wing_box_ing {
+  display: block ;
+  text-indent: 53px;
+  background:#FFF url(wing32.gif) 10px center no-repeat;
+}
+
+.wayixia_box .wing_box_ok {
+  display:block ;
+  text-indent: 45px;
+  background:#FFF url(sprite_ok.png) 20px center no-repeat;
+}
+
+.wayixia_box .wing_box_error {
+  display: block;
+  text-indent: 45px;
+  background:#FFF url(sprite_error.png) 20px center no-repeat;
+}
+
+.wayixia_box .wing_box_warn {
+  display: block;
+  text-indent: 45px;
+  background:#FFF url(sprite_warn.png) 20px center no-repeat;
+}
+
+div.cache_image_1 {
+  width: 0;
+  height:0;
+  visibility:hidden;
+  background:#FFF url(wing32.gif) left top no-repeat;
+}

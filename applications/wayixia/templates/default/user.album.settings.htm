@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> {$fields:albumname} - 我的画集 - wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
+
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.tween;
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+import utils.xml;
+import ui.wndx-1-0-2;
+-->
+</script>
+<script src="{$themes:path/}/waterfall.js"></script>
+
+<body style="background:#f7f5f5;">
+<script type="text/javascript">
+<!--
+var g_test_window = null;
+var g_ctrl_select = null;
+
+Q.Ready(function() {
+  var album_id = parseInt('{$fields:id}', 10);
+  if(album_id == 0) {
+    // 系统分类不能编辑
+	Q.$('button-save').disabled = true;
+	Q.$('button-delete').disabled = true;
+	Q.$('album_name').disabled = true;
+	Q.$('description').disabled = true;
+  }
+
+  // save settings
+  Q.$('button-save').onclick=function() {
+    Q.$('button-delete').disabled = true;
+	this.disabled = true;
+    var data = {};
+
+	var album_id = parseInt('{$fields:id}', 10);
+	if(album_id == 0) {
+	  alert('该背包是系统默认，不能修改');
+      Q.$('button-delete').disabled = false;
+	  this.disabled = false;
+	  return;
+	} else {
+	  data['id'] = album_id;
+	}
+
+	var album_name = Q.$('album_name').value;
+	if(!album_name) {
+	  alert('请输入背包名称!');
+	  Q.$('button-delete').disabled = false;
+	  this.disabled = false;
+	  return;
+	} else {
+	  data['album_name'] = album_name;
+	}
+
+	var album_class = Q.$('album_class').value;
+    if(!album_class) {
+	  alert('请选择所属分类!');
+	  Q.$('button-delete').disabled = false;
+	  this.disabled = false;
+	  return;
+	} else {
+	  data['album_class'] = album_class;
+	}
+
+	data['description'] = Q.$('description').value;
+	
+	Q.Ajax({
+	  command: '{$app:app}&mod=album&action=edit&inajax=true',
+	  data : data,
+	  oncomplete : function(xmlhttp) {
+	    try {
+          var resp = eval('('+xmlhttp.responseText+')');
+		  if(resp.header == 0) {
+		    alert('操作成功');
+		  } else {
+		    alert(resp.data);
+		  }
+	    } catch (e) {
+		  alert(xmlhttp.responseText);
+	    }
+		Q.$('button-save').disabled = false;
+	    Q.$('button-delete').disabled = false;
+	  }
+	});
+  }
+
+  Q.$('button-delete').onclick=function() {
+    var data = {};
+    var album_id = parseInt('{$fields:id}', 10);
+	if(album_id == 0) {
+	  alert('该背包是系统默认，不能删除');
+      Q.$('button-delete').disabled = false;
+	  this.disabled = false;
+	  return;
+	} else {
+	  data['id'] = album_id;
+	}
+
+    if(!window.confirm("确认删除吗?")) {
+	  return;
+	}
+
+    Q.Ajax({
+	  command: '{$app:app}&mod=album&action=delete&inajax=true',
+	  data : data,
+	  oncomplete : function(xmlhttp) {
+	    try {
+          var resp = eval('('+xmlhttp.responseText+')');
+		  if(resp.header == 0) {
+		    alert('操作成功');
+			location.href="{$app:app}&mod=user&action=home";
+		  } else {
+		    alert(resp.data);
+		  }
+	    } catch (e) {
+		  alert(xmlhttp.responseText);
+	    }
+		Q.$('button-save').disabled = false;
+	    Q.$('button-delete').disabled = false;
+	  }
+	});
+  }
+
+  Q.$('description').onkeydown = function(evt) {
+	Q.$('last_bytes').innerHTML = "还剩"+(99-this.value.length)+"字";
+  }
+
+  Q.$('last_bytes').innerHTML = "还剩"+(100-Q.$('description').value.length)+"字";
+
+});
+
+//-->
+</script>
+
+{#template user.menubar}
+
+<div id="wrapper" class="skin01" style="margin-top: 40px;"> 
+<div class="bground"> 
+  <!--div id="head"> 
+	{#template user.infoheader}
+  </div--> 
+  <div id="content">  
+  <div id="cnthld" class="settings" style="display: block;"> 
+  <ul class="content-tab"> 
+  <li class="beibao-tab">
+    <a id="my-beibao" href="{$app:module}&id={$get:id}" class="tab-title songti tabbtn" hidefocus="">
+	  <span class="tab-title-tag">查看</span>内容
+    </a>  
+  </li>
+  <li class="settings-tab">
+    <a id="my-settings" href="#" class="tab-title songti tabbtn" hidefocus="">
+      <span class="tab-title-tag">画集</span>设置
+    </a>  
+  </li>
+  <!--li class="tieba-tab"><a id="tiebatab" href="#" class="tab-title songti tabbtn" hidefocus="" data-click="tieba"><span class="tab-title-tag"></span>贴吧</a> </li-->
+  </ul> 
+  <div class="cnthld-main clearfix">
+    <div class="loadingtpl">LOADING...</div> 
+	<div class="col leftside"> 
+	  <div class="plzhld" data-fill="tab_content">
+	    <div class="action-bar"> <p>
+		 <a href="{$app:app}&mod=user&action=home">我的画集 </a> </p></div>
+		<br>
+		<div style="padding-left:20px;padding-top:10px; line-height: 40px;">
+
+			<p> 名称：<br>
+			    <input id="album_name" type="text" size="30" maxlength="30" value="{$fields:albumname}" style="width: 360px;"/>
+				<span class="msg" id="msg-username"></span>
+			</p>
+			<p> 所属分类：<br>
+			    <html:select 
+            id="album_class" 
+            datasrc="sql://select * from ##__album_class order by `orders`" 
+            style="width: 369px; height: 30px;"
+            keySelected="name"
+            valueSelected="{$fields:classname}"
+            maskSelected="selected"
+          >
+				<t:data>
+				  <option value="[field:name]" [field:selected]>[field:name]</option>
+				</t:data>
+				<option value="0">待分类</option>
+				</html:select>
+				<span class="msg" id="msg-album_class"></span>
+			</p>
+			<p> 描述：(<span id="last_bytes">剩余100字</span>)<br>
+				<textarea id="description" cols="70" rows="5" maxlength="100" />{$fields:description}</textarea>
+				<span class="msg" id="msg-description"></span>
+			</p>
+			<p> <br>
+				<span class="uploadBtn small" id='button-save'> 保 存 </span>
+				<span class="uploadBtn small" id='button-delete'> 删 除</span>
+			</p>
+		</div>
+	  </div>
+	  <br><br><br><br>
+	  </div> 
+	
+	  <div class="leftside-shadow"></div> 
+	</div> 
+	<!--div class="col rightside"> 
+	  <div class="plzhld p1" data-fill="friend_content"></div> 
+	</div--> 
+  </div>
+  </div> 
+  </div> 
+  
+  <div id="foot"> <div class="mod-footer"> <div class="bottom-line2"> <p>© WAYIXIA.COM <em class="s-bottom-copyright">&nbsp;&nbsp;&nbsp;&nbsp;</em></p> </div></div> </div> </div> 
+  
+  <!--div class="mod-right-nav nav-normal" id="navhld" style="display: block;">
+  <div class="plzhld">
+    <div class="right-nav-issues" id="1000002" style="display: block;"> 
+      <span class="question-mark"></span> 
+      <a href="http://qingting.baidu.com/index?pid=17" class="issues" target="_blank">意见反馈</a> 
+    </div>
+  </div>
+  </div-->
+  <a class="mod-go-top-btn" href="#" onclick="return false" style="display: none; position: fixed; bottom: 5px; right: 66.5px;"></a> </div>
+
+</body>
+</html>

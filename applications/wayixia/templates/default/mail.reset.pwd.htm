@@ -1,0 +1,32 @@
+<!DOCTYPE>
+<html>
+<head>
+<title>来自挖一下的密码重置邮件</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style>
+html, body { height: 100%; background:#fff; }
+body, form, menu, dir, fieldset, blockquote, p, pre, ul, ol, dl, dd{ padding: 0; margin: 0; }
+div, p { display: block; }
+ul, ol, dl, li { list-style: none; }
+img { border: 0; }
+a { text-decoration: none; }
+a:hover { text-decoration: underline; }
+.clear { clear: both; padding: 0; margin: 0; }
+.p12 { font-size: 12px; line-height: 20px;}
+#mail{ width:590px; height:575px; padding:100px 30px 30px 30px; margin:30px auto 60px;}
+#mail{ font-size:14px; color:#000000; line-height:25px;}
+#mail a{ font-size:14px; color:#FF7E00; line-height:25px; text-decoration:underline;}
+#mail p{ padding:0 0 15px 0; margin:0;}
+</style>
+<base target="_blank">
+<body style="margin-bottom: 0px; margin-top: 0px; padding-bottom: 0px; padding-top: 0px;">
+	<div id="mail">
+		<p><b>亲爱的{$fields:username}，您好！</b><br>
+			-----------------------------------------------------------------------------</p>
+		<p>请点击下面的链接，重置密码，以便您在[挖一下]能顺利进行登录。<br>
+		<a href="http://{$app:host/}{$app:module}&action=change-pwd&u={$fields:username}&authkey={$fields:key}" target="_blank">http://{$app:host/}{$app:module}&action=change-pwd&u={$fields:username}&authkey={$fields:key}</a><br>
+		-----------------------------------------------------------------------------</p>
+		&lt;--如果您不能点击此链接，请将以上链接复制到浏览器地址栏中访问--&gt;
+	</div>
+</body>
+</html>

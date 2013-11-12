@@ -1,0 +1,630 @@
+@charset "UTF-8";
+
+
+body,h1,h2,h3,h4,h5,h6,hr,p,blockquote,dl,dt,dd,ul,ol,li,pre,form,fieldset,legend,button,input,textarea,th,td {
+	margin:0;
+	padding:0
+}
+
+body {
+	background-color: #fff;
+	color: #000;
+	margin: 0;			/* void out browser-defined gutterspace */
+	padding: 0;
+    font-family: Arial, SimSun; font-size:14px;/* calibri, the "IN" font for reading text on screens */
+	min-height:100%;
+}
+
+img {border:0;}
+
+ul,ol {list-style-type:none;}
+
+.clear {
+	clear: both;		/* generic clearing element so that whatever comes 
+						   after this element will appear below all floating 
+						   elements above it */
+}
+
+.hide {
+	display: none;		/* generic class to hide elements from CSS-capable
+						   browsers */
+}
+
+#main {
+	max-width: 980px;	/* max resolution - 25px to accomadate for the vertical
+						   scrollbar */
+	min-width: 980px;	/* min resolution - 25px */
+	margin: 0 auto;		/* auto horizontal margins will cause the layout to be
+						   horizontally centered (usually) */
+	font-size:13px;
+
+}
+
+#book {
+	margin: 1em;			/* reserve some gutter space around the layout even
+							   in very low resolution */
+	border: solid 1px #ccc;
+	background-color: #fff;
+}
+
+#masthead,
+#footer {
+	border-top: solid 0px #ccc;
+	margin: 1em;
+	padding: 1px 0.5em;
+}
+
+#masthead {
+	padding: 1em;
+	margin-bottom: 0;
+	background-image: url(../images/flair3.png);
+	background-repeat: no-repeat;
+	background-position: 100% 20%;
+}
+
+#masthead h1 {
+	font-size: 1em;
+	margin: 0;
+}
+
+#masthead h2 {
+	font-size: 2em;
+	margin: 0;
+}
+
+#main-menu {
+	margin-top: -0.85em;	/* ( 1.2em (line height) + .5em (gutter) ) / 2 */
+}
+
+#main-menu ul.rMenu li a {
+	border-color: #ccc;
+	color: #000;
+	background-color: #fff;
+	padding-top: 0.25em;
+	padding-bottom: 0.25em;
+	line-height: 1.2em;		/* these last three are important to define if 
+							   we're to vertically center this element on
+							   the bottom border of the mastead. see previous
+							   selector */
+}
+
+#main-menu ul.rMenu li a:hover {
+	border-color: #ccc;
+	background-color: #eee;
+	color: #009;
+}
+
+#binding {
+	padding-right: 2.1em;	/* 1.6em (width of #toolbox) + .5em (gutterspace) */
+}
+
+#page {
+	float: left;			/* #toolbox will float next to #page */
+	width: 100%;
+}
+
+div.panel {
+
+	border: solid 0px #ccc;
+	padding: 1px 1em;
+	margin: 0.5em;
+	margin-bottom: 0;		/* don't rely on margin collapsing. simply have
+							   no bottom margin */
+
+}
+
+div.panel p,div {
+    line-height: 26px;
+}
+
+#left-column {
+	float: left;
+	width: 620px;				/* width of main column as a percent of the 
+							   available horizontal space */
+	margin-right:10px;
+	background-color:#fff;
+	box-shadow:0 1px 3px rgba(0,0,0,.3);
+	-moz-box-shadow:0 1px 3px rgba(0,0,0,.3);
+	-webkit-box-shadow:0 1px 3px rgba(0,0,0,.3)
+}
+
+#left-column div.panel {
+	margin-right: 0.25em;
+}
+
+#right-column {
+	float: left;
+	width: 350px;				/* 100% - <width of #left column> */
+	font-size: 0.85em;		/* gutter space of panels inside #right-column
+							   is defined in EMs. If you change the 
+							   font size of this column YOU MUST CHANGE
+							   the gutter space dimensions of panels
+							   in this column. the formula here is simple:
+
+							   ( 1 / <font size> ) * <target size>
+
+							   Apply this formula and round to the 
+							   nearest hundreth. Look below for some
+							   examples. */
+
+	background-color:#fff;
+	box-shadow:0 1px 3px rgba(0,0,0,.3);
+	-moz-box-shadow:0 1px 3px rgba(0,0,0,.3);
+	-webkit-box-shadow:0 1px 3px rgba(0,0,0,.3)
+}
+#right-column div.panel {
+	margin-left: 0.29em;	/* ( 1em / 0.85em ) * 0.25em = 0.29em */
+	margin-right: 0.59em;	/* ( 1em / 0.85em ) * 0.5em = 0.59em */
+	margin-top: 0.59em;		/* ( 1em / 0.85em ) * 0.5em = 0.59em */
+}
+#toolbox {
+	width: 1.6em;
+	float: left;
+	margin-right: -1.6em;	/* if you change this, check the HACKS section below.
+							   as you need to update that as well */
+	text-align: center;
+}
+#toolbox div.panel {
+	padding: 0;
+	margin-left: 0;
+	margin-right: 0;		/* already have gutterspace created, no need
+							   for the panels to do it as well */
+	border: none;			/* no border. this is a style choice. */
+}
+#toolbox button {
+	background-color: #fff;
+	color: #000;
+	border: solid 1px #ccc;
+}
+#toolbox p.fontsize-set {
+	margin-top: 0;
+}
+#toolbox p.fontsize-set input,
+#toolbox p.theme-picker input {
+	width: 1.6em;				/* target width of toolbox buttons */
+	height: 1.6em;				/* target height (make 'em square) */
+	margin-bottom: 0.5em;		/* gutterspace between buttons */
+	border: solid 1px #ccc;		/* border to make it look buttonish */
+	background-color: #fff;
+	color: #000;
+	cursor: pointer;			/* give user visual feedback that it's
+								   a button */
+	padding: 0;
+	font-size: 1em;				/* if this isn't explicitly set the buttons
+								   won't change in size as the layout's
+								   font size is increased */
+	line-height: 1.6em;			/* set to the height of the box should get
+								   the text vertically aligned */
+`	text-align: center;
+}
+#toolbox p.fontsize-set input:hover {
+	background-color: #eee;
+}
+#toolbox p.fontsize-set small,
+#toolbox p.fontsize-set big {
+	font-size: 1em;				/* we need to set the font sizes for BIG and
+								   SMALL tags on the input buttoms themselves
+								   otherwise the buttons themselves (not the
+								   text) won't be of equal size */
+}
+#toolbox p.fontsize-set small input {
+						/* formula for calculating the width and height of
+						   these buttons so they're all the same size:
+						   <target size> * ( 1 / <font-size> ) */
+	font-size: 0.8em;
+	width: 2em;			/* 1.6 * ( 1 / 0.8 ) = 2 */
+	height: 2em;
+	line-height: 2em;
+}
+#toolbox p.fontsize-set big input {
+	font-size: 1.2em;
+	width: 1.33em;		/* 1.6 * ( 1 / 1.2 ) = 1.33 */
+	height: 1.33em;
+	line-height: 1.33em;
+}
+#toolbox p.theme-picker input.blue {
+	background-color: #ccf;
+}
+#toolbox p.theme-picker input.red {
+	background-color: #fcc;
+}
+#toolbox p.theme-picker input.green {
+	background-color: #cfc;
+}
+#toolbox p.theme-picker input.orange {
+	background-color: #fc9;
+}
+#toolbox p.theme-picker input.gray {
+	background-color: #ccc;
+}
+#footer {
+	padding: 1px 1em;
+	text-align: center;
+}
+div.two-columns {
+	width: 100%;
+}
+div.two-columns div.tc-left-column {
+	float: left;
+	width: 50%;
+	vertical-align: top;
+}
+div.two-columns div.tc-right-column {
+	float: left;
+	width: 50%;
+	vertical-align: top;
+}
+div.two-columns div.tc-right-align {
+	text-align: right;
+}
+div.two-columns div.tc-left-column div.tc-panel {
+	margin-right: 1em;
+}
+div.two-columns div.tc-right-column div.tc-panel {
+	margin-left: 1em;
+}
+div.tc-border div.tc-left-column {
+	margin-right: -1px;
+	border-right: solid 1px #ccc;
+}
+div.tc-border  div.tc-right-column {
+	border-left: solid 1px #ccc;
+}
+
+.tbox{ border-bottom:1px solid #BFD4E0;overflow:hidden;padding: 0;margin: 0.5em 3px 0.5em 3px;}
+.tbox dt{ height:34px;background:url(mbox-tbg.png) right top no-repeat;overflow:hidden;clear:both; }
+.tbox dt strong{font-size: 15px;height:34px;line-height:34px;padding-left:0px;padding-right:4px;display:block;float:left;color:#222;background:url(mbox-tbg.png) left top no-repeat;letter-spacing:1px;}
+.tbox dt strong a{color:#222; }
+.tbox dt strong a:hover{color:#444;text-decoration:none;}
+.tbox dt span.more{float:right;position:relative;line-height:35px;padding-right:8px;color:#777;}
+.tbox dt span.more a{color:#777;text-decoration:none;}.tbox dt span.more a:hover{color:#333;}
+.tbox dt span.label{height:24px;float:right;overflow:hidden;padding-right:1px;padding-top:2px;}
+.tbox dt span.label a{height:25px;display:block;line-height:23px;border-left:1px solid #BFD4E0;float:left;color:#666;text-decoration:none;overflow:hidden;letter-spacing:1px;padding:0 7px 0 8px;}
+.tbox dt span.label a:hover{color:#360;}
+.tbox dt span.label a.thisclass{background:#FFF;color:#333;border-top:3px solid #F1F7EE;}
+.tbox dd{ border-left:0px solid #BFD4E0;border-right:0px solid #BFD4E0; overflow:hidden; padding:3px 15px 0; margin:0; font-size: 15px;}
+
+
+
+/* CSS Hacks
+ * --
+ * These things are a necessity of CSS life. While I wish we didn't have to 
+ * resort to such sillyness, if you want to keep your layout as compatible
+ * as possible you need to invest in some CSS trickery like this for layouts
+ * that go beyond a single column.
+ *
+ * The Key Hacks Used In this Layout
+ *
+ * [* html]		Any rule that starts with this will only be applied by
+ *				Win/IE 6, Mac/IE 5 and earlier versions. This is a quick
+ *				and dirty way to hide CSS from non-IE browsers
+ *
+ * [\*]			The backslash acts as an escape character for Mac/IE. Thus
+ *				changing how it interprets the closing comment mark, 
+ *				essentially causing Mac/IE to ignore it and treat anything
+ *				that follows as part of a CSS comment until another,
+ *				unescaped closing comment mark is found. This allows us
+ *				to hide IE hacks specific to Windows from Mac users.
+ *
+ * [min-width:0]		- IE 7
+ * [position:relative]	- IE 6
+ * [height:0.01%]		- IE 5
+ *				This is used to trigger hasLayout in Win/IE. hasLayout is 
+ *				a unique property of IE's rendering engine that is the 
+ *				root of almost every IE rendering bug. triggering hasLayout
+ *				will often resolve a rendering issue in IE, although it
+ *				can sometimes lead to other rendering bugs.
+ *
+ */
+.clear {					/* hide from IE/Mac \*/
+	padding-bottom: 1px;
+	margin-bottom: -1px;	/* this padding/margin hack is here for
+							   older Mozilla engines (Netscape 7, 6,
+							   FireFox pre 2.0) which will not allow 
+							   an element to clear unless it has some 
+							   effect on how the rest of the layout 
+							   renders (ie, it takes up space). 
+							   Hidden from IE/Mac as it triggers a 
+							   horizontal scrollbar. */
+}
+#page,
+#left-column,
+#right-column,
+#toolbox {
+	overflow: visible;		/* an old hack for Win/IE where the width of
+							   italicized text is not properly calculated
+							   and leads to possibly breaking the layout. */
+}
+#main-menu {
+	padding-left: 1em;
+	padding-right: 1em;		/* for clients that can't center the menu,
+							   such as Mac/IE and Netscape 6 */
+}
+#book {
+	min-width: 0;			/* for IE 7 */
+}
+* html #book {				/* hide from IE/Mac \*/
+	position: relative;		/* for IE 6 */
+}
+* html #binding {
+	height: 100%;			/* for IE 5.5 */
+}
+div.tc-right-column,
+#right-column {
+	margin-right: -1px;		/* for IE's rounding bug */
+}
+* html #masthead {
+	background-image: none;	/* for IE 6 and earlier - can't really do
+							   transparent PNGs */
+}
+* html #toolbox {
+	margin-right: -100%;	/* for Mac/IE \*/
+	margin-right: -1.6em;	/* reset for Win/IE */
+}
+* html div.tc-border div.tc-right-column {
+	margin-right: -100%;	/* for IE */
+}
+* html div.tc-panel {		/* hide from Mac/IE \*/
+	padding: 1px 0;			/* help IE ignore margin collapse */
+}
+
+/******************************************************************************/
+
+
+
+#header {
+	width:100%;
+	height:40px;
+	position:relative;
+	z-index:20;
+	margin:auto
+}
+#header .logo,#sugOut,#header .center,#header form,#header .middle {
+	float:left
+}
+#kw {
+	height:20px;
+	margin-top:3px;
+	margin-left:1px;
+	width:100%;
+	border-width:0;
+	outline:0;
+	background:0;
+	text-indent:1px;
+	_position:relative;
+	_left:-2px;
+	_margin-top:5px;
+	_height:18px
+}
+#sugIn {
+	display:inline-block;
+	width:215px;
+	height:30px
+}
+#sugOut {
+	float:right;
+	height:30px;
+	background:url("http://img.baidu.com/img/image/liulan/top-bg.png") no-repeat -4px top transparent;
+	_background:url("http://img.baidu.com/img/image/liulan/top-bg.gif") no-repeat -4px top transparent
+}
+#sugOut.focus {
+	background-position:-4px -33px
+}
+#sugOut .sb {
+	width:30px;
+	height:30px;
+	padding:0;
+	background:0;
+	border:0;
+	cursor:pointer;
+	margin-left:0;
+	vertical-align:top
+}
+#header form {
+	margin:7px 0 0 0;
+	width:100%;
+	height:30px
+}
+.logo {
+	margin-top:-6px;
+	_position:relative
+}
+.logo img {
+	width:91px;
+	height:30px;
+	border:0;
+	margin-right:10px
+}
+
+#nav div ul.main li.more-open,#nav ul li#btn-more.in {
+	background:url("nav-bg.gif") repeat-x center -95px;
+	border-width:0 1px;
+	padding:0;
+	border-color:#2f333c;
+	border-style:solid
+}
+#nav ul li#btn-more a.not-tag {
+	z-index:1111;
+	height:48px;
+	background:url("nav-bg.gif") no-repeat center -348px
+}
+#nav ul li#btn-more.in {
+	background:red url("nav-bg.png") repeat-x left -48px
+}
+li#btn-more.more-open a:hover {
+	background-color:green
+}
+li#btn-more table {
+	display:none;
+	position:absolute;
+	height:165px;
+	top:48px;
+	right:-1px;
+	background-color:#4f5870;
+	border:1px solid #000;
+	border-top:0;
+	border-collapse:collapse
+}
+li#btn-more table.more-open {
+	display:block
+}
+#btn-more table tr {
+	height:165px
+}
+#btn-more table#more-menu td {
+	vertical-align:top;
+	min-height:165px;
+	_height:165px;
+	background-color:#4f5870;
+	width:60px;
+	padding:10px 5px;
+	background:url("nav-bg.png") no-repeat 0 -191px;
+	_background:url("nav-bg.gif") no-repeat 0 -191px
+}
+#btn-more table#more-menu td.first {
+	background:0
+}
+#btn-more td.more-menu div.more-item {
+	float:none;
+	padding:3px 0;
+	height:auto;
+	background:0;
+	background-color:#4f5870
+}
+#btn-more td.more-menu div.more-item a {
+	display:block;
+	float:none;
+	height:24px;
+	width:58px;
+	line-height:24px;
+	padding:0;
+	text-decoration:none;
+	font-size:14px;
+	color:#f7f7f7;
+	font-weight:bold;
+	text-align:center;
+	border-radius:3px;
+	background-color:transparent
+}
+#btn-more td.more-menu div.more-item a.curr {
+	background-position:-6px -432px
+}
+#btn-more td.more-menu div.more-item a:hover {
+	float:none;
+	border-radius:3px;
+	background:url("nav-bg.png") no-repeat -6px -403px;
+	_background:url("nav-bg.gif") no-repeat -6px -403px
+}
+.wrapper_for_middle {
+	margin:0 auto
+}
+.wrapper_for_margin {
+	margin:0 0 0 20px
+}
+.wrapper_for_bg {
+	background:#fff
+}
+#nav {
+	margin:0 auto;
+	overflow:visible;
+	position:relative;
+	z-index:2;
+	min-width:1010px;
+	height:48px;
+	background:url("nav-bg.png") repeat-x;
+	box-shadow:0 1px 3px #666;
+	-webkit-box-shadow:0 1px 3px #666;
+	-moz-box-shadow:0 1px 3px #666;
+	*border-bottom:1px solid #888;
+	border-bottom:1px solid #888\0;
+	visibility:hidden
+}
+:root #nav {
+	border-bottom:1px solid #888\9
+}
+#nav .wrapper_for_middle {
+	height:48px
+}
+#nav div.main_wrapper,#nav div.main_in_wrapper {
+	height:48px;
+	zoom:1;
+	position:relative;
+	z-index:3
+}
+#nav div.floating {
+	background:url("nav-bg.png") repeat-x
+}
+#nav ul.main {
+	width:989px;
+	height:48px;
+	zoom:1;
+	margin:0;
+	position:relative;
+	list-style:none;
+	padding:0
+}
+#nav ul.main li {
+	float:left;
+	background:url("nav-bg.png") no-repeat left -144px;
+	_background:url("nav-bg.gif") no-repeat left -144px;
+	position:relative;
+	padding:0 1px
+}
+#nav ul.main li.first {
+	background:0
+}
+#nav ul.main li a {
+	line-height:48px;
+	float:left;
+	padding:0 22px 0 23px;
+	text-decoration:none;
+	font-size:15px;
+	color:#f7f7f7;
+	font-weight:bold
+}
+#nav li .hot {
+	position:absolute;
+	width:27px;
+	height:18px;
+	background:url("img/hot.gif") no-repeat;
+	right:0;
+	top:-8px;
+	display:block
+}
+#nav div.floating {
+	position:fixed;
+	top:0;
+	opacity:.9;
+	box-shadow:0 1px 3px #666;
+	-webkit-box-shadow:0 1px 3px #666;
+	-moz-box-shadow:0 1px 3px #666;
+	width:100%
+}
+#nav div.floating li .hot {
+	visibility:hidden
+}
+#nav ul.main li.after_hover,#nav ul.main li.after_on {
+	background:0
+}
+#nav ul.main li:hover,#nav ul.main li.hover,#nav ul.main li.curr {
+	background:#2f333c
+}
+#nav ul.main li a:hover {
+	background:#474d59 url("nav-bg.png") repeat-x left -96px
+}
+
+#nav ul.main li a.curr,#nav ul.main li a:hover.curr {
+	background:#f00 url("nav-bg.png") repeat-x left -460px;
+	color:#fff
+}
+
+#nav ul.main li a.home,#nav ul.main li a:hover.home {
+	background:#f00 url("nav-bg.png") repeat-x left -48px;
+	color:#fff
+}
+
+
+#nav #btn-zhuanti {
+	position:absolute;
+	right:0
+}

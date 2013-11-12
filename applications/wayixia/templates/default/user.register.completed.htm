@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> 注册新用户 Powered By PHPKind</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link rel="stylesheet" type="text/css" href="{$app:qlib/}/ui.css" />
+<link rel="stylesheet" type="text/css" href="{$themes:path/}/all.css" />
+<link rel="stylesheet" type="text/css" href="{$themes:path/}/style.css" />
+<link rel="stylesheet" type="text/css" href="{$themes:path/}/registeruser.css" />
+
+<script src="{$app:qlib}/Q.js"></script>
+
+<!--
+{$app:name/}<br>
+{$theme:path}<br>
+{$cfg:dbs.default.type/}<br/>
+{$app:root}<br/>
+{$app:app}<br/>
+{$app:module}<br/>
+-->
+
+</head>
+
+<body>
+<div class="regtop">
+	<ul>
+		<li><a href="{$app:app}">首页</a></li>
+		<li><a href="{$app:app}&mod=user&action=register">注册</a></li>
+		<li><a href="{$app:app}&mod=user&action=login">登录</a></li>
+	</ul>
+</div>
+<div class="regtitle">
+	<strong>新用户注册</strong>
+</div>
+<div class="regmain" style="height:300px;">
+	{$fields:resultmsg/}	
+</div>
+
+<!--用户中心底部-->
+<div class="footer">
+	<span class="copyright">Powered by <a href="http://wayixia.com">wayixia.com</a> Copyright &copy;2013-2015 </span>
+</div>
+<!--//用户中心底部-->
+
+</body>
+</html>

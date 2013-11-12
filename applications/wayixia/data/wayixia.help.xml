@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XMLBOOK>
+	<BOOKNAME>挖一下帮助文档</BOOKNAME>
+	<AUTHOR>LovelyLife</AUTHOR>
+	<PRESS>wayixia.com</PRESS>
+	<FORWARD/>
+	<DESCRIPTION>挖一下网站的说明已经相关的帮助信息</DESCRIPTION>
+	<PAGES>
+		<PAGE><TITLE>关于【挖一下】</TITLE><CONTEXT><![CDATA[<p><span style="font-size: xx-large;">AAA<span style="color: rgb(0, 0, 255);">AAAAAA<span style="color: rgb(255, 0, 0);">AAAAAAAA</span>AAAAAAA</span>AAA</span></p>]]></CONTEXT><PAGES/></PAGE></PAGES>
+	<APPENDIX>附录</APPENDIX>
+</XMLBOOK>

@@ -1,0 +1,150 @@
+{#dict src="dict.ui"}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title> Powered By PHPKind</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="/phpkind/qlib/ui.css" />
+<style>
+#screen {
+width:100%;
+height: 600px;
+overflow: auto;
+background: #000;
+color: #cccccc;
+}
+
+.xxx { background: #FFFF00;}
+</style>
+
+<body>
+
+<h3 style="line-height:20px;">the application "{$app:name/}" is running.</h3>
+
+<!--
+{$app:name/}<br>
+{$$theme:path}<br>
+{$cfg:dbs.default.type/}<br/>
+{$app:root}<br/>
+{$app:app}<br/>
+{$app:module}<br/>
+-->
+
+<h3>环境变量:</h3>
+
+<?php 
+phpkind_info(); 
+//print_r(get_defined_vars()); 
+?>
+
+
+<h3>select 控件：</h3>
+
+<html:select id="test_select" valueSelected="{$v:test_select}" datasrc="dict://dicSiteType">
+<option>{$app:app}test</option>
+<t:data>
+<option value="[field:value]">{$app:app} [field:text] </option>
+</t:data>
+</html:select>
+
+<h3>
+data数据源：
+</h3>
+<html:table 
+	id="mydata" 
+	datasrc="data://mydata1" 
+	cellpadding="3" 
+	cellspacing="1"
+	style="background: #333; width: 500px;"
+	valueSelected="key:value"
+>
+<thead style="background:red; color:white;">
+<th width="100" align="left">value</th>
+<th width="400" align="left">text</th>
+</thead>
+<t:data>
+<tr 
+onmouseover="this.style.backgroundColor='#FFFF00';"
+onmouseout="this.style.backgroundColor='';"
+>
+<td>[field:value]</td>
+<td>[field:text]</td>
+</tr>
+</t:data>
+</html:table>
+
+<h3>
+table page：
+</h3>
+<html:table 
+	id="mydata2" 
+	datasrc="sql://select * from c_table_3" 
+	pagesize="10"
+	cellpadding="3" 
+	cellspacing="1"
+	style="background: #333; width: 500px;"
+	valueSelected="key:value"
+>
+<thead style="background:red; color:white;">
+<th width="100" align="left">value</th>
+<th width="400" align="left">text</th>
+</thead>
+<t:data>
+<tr 
+onmouseover="this.style.backgroundColor='#FFFF00';"
+onmouseout="this.style.backgroundColor='';"
+>
+<td>[field:id]</td>
+<td>[field:url]</td>
+</tr>
+</t:data>
+<tr style="background:white">
+<td width="100" colspan=2 align="left">
+<t:pager>
+[[field:index]]
+</t:pager>
+</td>
+</tr>
+</html:table>
+
+<h4>list:</h4>
+<html:list
+	id="mydatalist" 
+	datasrc="data://mydatas" 
+	cellpadding="3" 
+	cellspacing="1"
+	style="background: #333; width: 500px;"
+	keySelected="index"
+	valueSelected="3"
+	maskSelected="class='xxx'"
+>
+<t:data>
+<li [field:selected]>
+[[field:index]][field:value] - [field:text]
+</li>
+</t:data>
+</html:list>
+
+
+<h4>select:</h4>
+<html:select 
+  id="mydataselect" 
+  datasrc="data://mydata"
+  keySelected="value"
+  valueSelected="v3"
+  maskSelected="selected"
+>
+  <t:data>
+  <option value="[field:value]" [field:selected]>[field:text]</option>
+  </t:data>
+</html:select>
+
+
+<h4>uploader</h4>
+<button id="btn_upload"> upload </button>
+
+<html:uploader id="upload_btn_upload"></html:uploader>
+
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title> Powered By PHPKind</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="/phpkind/qlib/ui.css" />
+<style>
+#screen {
+width:100%;
+height: 600px;
+overflow: auto;
+background: #000;
+color: #cccccc;
+}
+</style>
+<script id="js-loader" src="{$app:qlib/}/Q.js">
+<!--
+import utils.stl;
+import utils.xml;
+import utils.templates-1-0-1;
+import utils.json2;
+import utils.ajax;
+
+import ui.jtable;
+
+//-->
+</script>
+<script>
+<!--
+Q.Ready(function() {
+
+
+	Q.$("search-button").onclick=function() {
+		Q.Ajax({
+		  command: '{$app:app}&mod=service&inajax=true&action=songurl&name='+Q.$('song-name').value,
+		  data : {},
+		  oncomplete : function(xmlhttp) {
+			Q.$("output-wnd").value = (xmlhttp.responseText);
+		  }
+		});
+	}
+
+	Q.$('selector_artist').onchange = function() {
+		//http://localhost/phpkind/?app=cdmusic&mod=collector&inajax=true&action=artist
+		var id = this.options[this.selectedIndex].value;
+		Q.Ajax({
+		  command: '{$app:app}&mod=collector&inajax=true&action=artist&id='+id,
+		  data : {},
+		  oncomplete : function(xmlhttp) {
+		    try
+		    {
+				var result = eval('('+xmlhttp.responseText+')');
+				print_sql(id, result.data);
+		    }
+		    catch (e)
+		    {
+				alert(xmlhttp.responseText);
+		    }	
+		  }
+		});
+	}
+
+});
+
+function implode (glue, pieces) {
+  // http://kevin.vanzonneveld.net
+  // +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+  // +   improved by: Waldo Malqui Silva
+  // +   improved by: Itsacon (http://www.itsacon.net/)
+  // +   bugfixed by: Brett Zamir (http://brett-zamir.me)
+  // *     example 1: implode(' ', ['Kevin', 'van', 'Zonneveld']);
+  // *     returns 1: 'Kevin van Zonneveld'
+  // *     example 2: implode(' ', {first:'Kevin', last: 'van Zonneveld'});
+  // *     returns 2: 'Kevin van Zonneveld'
+  var i = '',
+    retVal = '',
+    tGlue = '';
+  if (arguments.length === 1) {
+    pieces = glue;
+    glue = '';
+  }
+  if (typeof(pieces) === 'object') {
+    if (Object.prototype.toString.call(pieces) === '[object Array]') {
+      return pieces.join(glue);
+    } 
+    for (i in pieces) {
+      retVal += tGlue + pieces[i];
+      tGlue = glue;
+    }
+    return retVal;
+  }
+  return pieces;
+}
+
+// 组合insert语句(insert into ##__$table(...) values(...);
+function insert_sql(table, fields, isPrefix) {
+	var setFields = [];
+	var setValues = [];
+	for(var name in fields) {
+		setFields.push(name);
+		setValues.push(fields[name]);
+	}
+	setFields = "`"+implode("`,`", setFields)+"`";
+	setValues = "'"+implode("','", setValues)+"'";
+		
+	var prefix = isPrefix ? "ch_" : "";
+		
+	$sql = "INSERT INTO `"+prefix+table+"` ("+setFields+") VALUES("+setValues+");";
+	return $sql;	
+}
+
+function print_sql(id, r) {
+	var output_string = '';
+	if(r instanceof Array) {
+		Q.$('artist-count').innerText=''+r.length+'位';
+		for(var i=0; i<r.length; i++) {
+			var fields = {artisttype: id, name:r[i]};
+			var sql = insert_sql('artist', fields, true);
+			output_string += sql+'\n';
+		}
+
+		Q.$("output-wnd-sql").value = output_string;
+	}
+}
+
+//-->
+</script>
+
+
+<body>
+
+<!--
+<h3 style="line-height:20px;">the application "{$app:name/}" is running.</h3>
+应用程序名称{$app:name/}<br>
+标签转义 {$$theme:path}<br>
+数据库类型{$cfg:DB.TYPE/}<br/>
+{$app:root}<br/>
+{$app:app}<br/>
+{$app:module}<br/>
+-->
+
+<h3>艺术家列表:</h3>
+<html:table id="table_artist" datasrc="sql://select * from ##__artisttype" pagesize="4" cellspacing="3" border="1">
+<tr>
+<th width="100" align="left">Id</th>
+<th width="200" align="left"><a href="#" color="red">Name</a></th>
+</tr>
+<t:data>
+<tr>
+    <td>[field:id/]</td>
+    <td><a href="{$app:app}&id=[field:id/]"> [field:name/] </a></td>
+</tr>
+</t:data>
+<tr>
+<td width="100" colspan=2 align="left">
+<t:pager>
+[[field:index]]
+</t:pager>
+</td>
+</tr>
+</html:table>
+
+<br />
+歌曲名称：
+<input type="text" id="song-name" /> 
+<button id="search-button">Search</button>
+<hr>
+<textarea id="output-wnd" cols="100" rows="10"></textarea>
+
+<hr>
+歌手采集(<font id="artist-count" color="red"></font>)：
+<html:select datasrc="sql://select * from ##__artisttype" id="selector_artist">
+<option value="0">请选择...</option>
+<t:data>
+<option value="[field:id/]">[field:name/]</option></t:data>
+</html:select>
+<hr/>
+<textarea id="output-wnd-sql" cols="100" rows="10"></textarea>
+
+<html:jtable id="my_jtable" 
+	datasrc="sql://select * from ##__artisttype"
+	wstyle="|WS_TITLEBAR"
+>
+<t:cols>
+<item fieldname="id" align="center">column 1 </item>
+<item fieldname="name" align="left">  column 2 </item>
+<item fieldname="name" align="left"> column 3 </item>
+</t:cols>
+<t:data>
+</t:data>
+</html:jtable>
+
+</body>
+</html>

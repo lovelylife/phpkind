@@ -71,14 +71,14 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 
 	function edit_panel() {
 	  $t = new CLASS_TEMPLATES($this->App());
-    $t->load('user.album.settings');
+		$t->load('user.album.settings');
 
-    $db = &$this->App()->db();
+		$db = &$this->App()->db();
 		$album_id = intval($_GET['id'], 10);
-    if($album_id != 0) {
+		if($album_id != 0) {
 		  // get albums info
 		  $sql_get_album = "select * from ##__users_albums where id='{$album_id}' limit 0, 1;";
-      $album_info = $db->get_row($sql_get_album);
+		  $album_info = $db->get_row($sql_get_album);
 		  if(empty($album_info)) 
 		    die('invalid album');
 		} else {

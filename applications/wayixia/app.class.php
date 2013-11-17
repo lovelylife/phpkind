@@ -120,6 +120,26 @@ class CLASS_WAYIXIA_APPLICATION extends CLASS_APPLICATION {
 
 	return $sql_albums_list;
   }
+
+  function get_images_dir() {
+    $d = $this->Config('site.images_dir');
+    if(!is_dir($d)) {
+      $d = _BIND_ROOT._IPATH.$d;
+      createfolders($d);
+    }
+    
+    return $d;    
+  }
+
+  function get_thumbs_dir() {
+    $d = $this->Config('site.thumb_images_dir');
+    if(!is_dir($d)) {
+      $d = _BIND_ROOT._IPATH.$d;
+      createfolders($d);
+    }
+    
+    return $d;
+  }
 }
 
 ?>

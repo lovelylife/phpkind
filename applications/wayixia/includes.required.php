@@ -14,7 +14,8 @@ return array(
   _KROOT.'/simpleimage.class.php',
   _KROOT.'/qimage.class.php',
   _KROOT.'/q-rpc.php',
-  _KROOT.'/smtp.class.php'
+  _KROOT.'/smtp.class.php',
+  '/rc4crypt.class.php',
 );
 
 ?>

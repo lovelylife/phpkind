@@ -37,15 +37,16 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
       $tag = $_GET['tag'];
 
       $sql = "select ";
-      $sql.= "R.file_name, R.width, R.height, U.id as id, U.from_domain, U.title ";
+      $sql.= "R.file_name, R.width, R.height, U.id as id, U.from_host, U.title ";
       $sql.= " from ##__images_resource AS R, ##__users_images AS U ";
-	  $sql.= " where U.resource_id=R.id and U.album_id!=0 ";
+	  $sql.= " where U.res_id=R.id and U.album_id!=0 ";
 	  // where condition
 	  if(!empty($tag))
 		$sql.=" and U.album_id in (select id from ##__users_albums where `classname`='{$tag}') ";
 
 	  $sql.=" order by U.id DESC ";
 
+      echo $sql;
       $page_size = 50;
       $totalsize = $this->App()->db()->query_count($sql);
 

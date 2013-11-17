@@ -97,166 +97,147 @@ class CLASS_MODULE_API extends CLASS_MODULE {
   }
 
   function add_image_($img_info) {
-    // $_SESSION['user-key'];
     $theApp = &$this->App();
     $user_key = $theApp->get_user_info('user-key');
-    // 重复登录
     if(!$user_key || empty($user_key)) {
-      $this->AjaxHeader(-2); // 未登录
-      $this->AjaxData('请先登录！');
+      $this->AjaxHeader(-2); // not login
+      $this->AjaxData('you must login!');
       return;
     }
+    
+    $img_src   = $img_info['srcUrl'];
+    $album_id  = $img_info['albumid'];
+    $page_url  = $img_info['pageUrl'];  
+    $img_title = $img_info['title'];
 
-	$img_title = $img_info['title'];
-	$page_url = $img_info['pageUrl'];
-    $img_src = $img_info['srcUrl'];
-	$img_width = intval($img_info['width'],10);
-	$img_height = intval($img_info['height'],10);
-	$album_id = $img_info['albumid'];
-	//$from_protocol = $img_info['from_protocol'];
-	//$from_domain = $img_info['from_domain'];
-    //$from_page = $img_info['from_page'];
-	if(!isset($img_info['albumid'])) {
-	  // 待分类图
-	  $album_id = 0;
-	}
-
-	// 解析url
-	// $url = 'http://username:password@hostname/path?arg=value#anchor';
-	$url = parse_url($page_url);
-	$from_protocol = $url['scheme'];
-	$user_info = '';
-	if(isset($url['user'])) {
-		$user_info .= $url['user'];
-	}
-
-	if(isset($url['pass'])) {
-		$user_info .= ':'.$url['pass'];
-	}
-		
-	$from_domain = $url['host'];
-	if(isset($url['port'])) {
-		$from_domain .= ':'.$url['port'];
-	}
-
-	if(!empty($user_info)) {
-		$from_domain = $user_info.'@'.$from_domain;
-	}
-
-    $from_page = $url['path'];
-	if(isset($url['query'])) { //.'?'.$url[''].$url['from_page'];
-      $from_page .= '?'.$url['query'];
-    }
-
-	if(isset($url['fragment'])) {
-		$from_page .= '#'.$url['fragment'];
-	}
+    if(!isset($img_info['albumid']))
+      $album_id = 0; // 待分类图
 
     //if(!is_int($img_width) || $img_width < 1 || $img_width > 5000 ) {
-	//	$this->errmsg("image width(:$img_width) range(1-5000) is invalid.");
-	//	return;
-	//}
+    //	$this->errmsg("image width(:$img_width) range(1-5000) is invalid.");
+    //	return;
+    //}
 
-	//if(!is_int($img_height) || $img_height < 1 || $img_height > 5000 ) {
-	//	$this->errmsg("image height(:$img_height) range(1-5000) is invalid.");
-	//	return;
-	//}
+    //if(!is_int($img_height) || $img_height < 1 || $img_height > 5000 ) {
+    //	$this->errmsg("image height(:$img_height) range(1-5000) is invalid.");
+    //	return;
+    //}
 
-	$db = &$this->App()->db();
-	// check image exists
-	$sql_check_image_exists = "select src, id from ##__images_resource where `src`='{$img_src}' limit 0,1;";
+    $url = parse_url($page_url);
+    $from_host = $url['host'];
 
-	$img = $db->get_row($sql_check_image_exists);
-	$resource_id = 0;
-	// images_resource
-	if(empty($img)) {
-		// get remote image
-      $save_path = _IPATH.$this->Config('site.images_dir');
-      createfolders(_BIND_ROOT.$save_path);
-      $file_name = $this->uuid();
-      $image_data;
-      $result_code = $this->get_remote_image(
-      $img_src, $img_info['cookie'], $img_info['referrer'], $image_data);
+    $db = &$this->App()->db();
+    $res_id = 0;
+    $file_name = $this->uuid();
+    // check image exists
+    $img_res = $db->get_row("select src, id from ##__images_resource where `src`='{$img_src}' limit 0,1;"); 
+
+    // images_resource
+    if(empty($img_res)) {
+		  // get remote image      
+      $result_code = $this->get_remote_image
+        ($img_src, $img_info['cookie'] , $img_info['referrer'], $image_data); 
 
       if(0 != $result_code) {	  
         $this->errmsg('get image error, code:'.$result_code);
         return;
       }
-    
+
       // write image to disk
-      $cache_url = $save_path.'/'.$file_name;
-      $f = @fopen(_BIND_ROOT.$cache_url,'wb+');
-      if(!$f){
+      if(!$this->save_image_($file_name, $image_data)){
         $this->errmsg('server error, save file error!');
         return;
       }
-      $fw = @fwrite($f, $image_data);
-      @fclose($f);
-			// save thumb
-			$thumb_path = $this->Config('site.thumb_images_dir');
-			createfolders(_BIND_ROOT.$thumb_path);
-      // create thumb folders if not exists
-			$thumb_image =  new SimpleImage;
-      $thumb_image->load(_BIND_ROOT.$cache_url);
-      $img_width = $thumb_image->getWidth();
-      $img_height = $thumb_image->getHeight();
-	  $thumb_image->resizeToWidth(192);
-	  $thumb_image->save(_BIND_ROOT.$thumb_path.'/'.$file_name);
 
-	  // insert into resource table
-	  $fields = array(
-				'src' => $img_src,
-				'file_name' => $file_name,
-				'width' => $img_width,
-				'height' => $img_height,
-				'uname' => $theApp->get_user_info('name')
-	  );
+			// save thumb      
+      $info = $this->save_thumb_($file_name);
+      $img_width = $info['width'];
+      $img_height = $info['height'];
 
-	  $sql = $db->insertSQL('images_resource', $fields);
-	  $result = $db->execute($sql);
-      $resource_id = $db->get_insert_id();
-
-	  if(!$result) 
-	    $this->errmsg($db->get_error());
-	  } else {
-		$resource_id = $img['id'];
-		$sql_check_duplicate = "select resource_id from ##__users_images where resource_id = '{$resource_id}' and `from_protocol`='{$from_protocol}' and `from_domain`='{$from_domain}' and `from_page`='{$from_page}' limit 0,1;";
-
-		$result = $db->get_row($sql_check_duplicate);
-		if(!empty($result)) {
-		  $this->errmsg('该图片已经挖过了，不需要重复挖.');
-			return;
-		}		
-	  }
-
-	  // users_images
-	  $fields = array(
-		'resource_id' => $resource_id,
-		'album_id' => $album_id,
-		'uname' => $theApp->get_user_info('name'),
-		'title' => $img_title,
-        'from_protocol' => $from_protocol,
-		'from_domain' => $from_domain,
-		'from_page' => $from_page,
+      // insert into resource table
+      $fields = array(
+          'src' => $img_src,
+          'file_name' => $file_name,
+          'width' => $img_width,
+          'height' => $img_height,
+          'create_uid' => $theApp->get_user_info('uid')
       );
+
+      $sql = $db->insertSQL('images_resource', $fields);
+      $result = $db->execute($sql);
+      $res_id = $db->get_insert_id();
+
+      if(!$result) {
+        $this->errmsg($db->get_error());
+        return;
+      }
+    } else {
+      $res_id = $img_res['id'];
+      $sql_check_duplicate = "select res_id from ##__users_images where res_id = '{$res_id}' and `from_host`='{$from_host}' limit 0,1;";
+
+      $result = $db->get_row($sql_check_duplicate);
+      if(!empty($result)) {
+        $this->errmsg('该图片已经挖过了，不需要重复挖.');
+        return;
+      }		
+    }
+
+    // insert into users_images
+	  $fields = array(
+      'resource_id'   => $resource_id,
+      'album_id'      => $album_id,
+      'uid'           => $theApp->get_user_info('uid'),
+      'title'         => $img_title,
+      'from_host'     => $from_host,
+      'from_url'       =>$page_url,
+    );
 
 	  $sql = $db->insertSQL('users_images', $fields);
 	  $result = $db->execute($sql);
-      if(!$result) {
+    if(!$result) {
 	    $this->errmsg($db->get_error());
+      return;
 	  }
     
-	// get nid to notify client
-	$user_id = $theApp->get_user_info('uid');
-	$get_nid_sql = "select `nid` from ##__login_users where `uid`={$user_id} and `endpoint`='client' limit 0, 1;";
+    // get nid to notify client
+    $user_id = $theApp->get_user_info('uid');
+    $get_nid_sql = "select `nid` from ##__login_users where `uid`={$user_id} and `endpoint`='client' limit 0, 1;";
 
-	$login_info = $db->get_row($get_nid_sql);
+    $login_info = $db->get_row($get_nid_sql);
     if(empty($login_info) || empty($login_info['nid'])) {
-	  // no nid found
-	} else {
-	  $params = array('imgid' => $resource_id);
-	  $this->notify($login_info['nid'], $params);
-	}
+      // no nid found
+    } else {
+      $rc4 = new Crypt_RC4();
+      $rc4 -> setKey($this->Config('rc4key'));
+      $params = array('imgid' => $rc4->encrypt($file_name));
+      $this->notify($login_info['nid'], $params);
+    }
+  }
+
+  function save_image_($file_name, $image_data) {
+    $save_path = $this->App()->get_images_dir().'/'.$file_name;
+    $f = @fopen(_BIND_ROOT.$cache_url,'wb+');
+    if(!$f){
+      $this->errmsg('server error, save file error!');
+      return false;
+    }
+    $fw = @fwrite($f, $image_data);
+    @fclose($f);
+
+    return true;
+  }
+
+  function save_image_thumb($file_name) {
+    $image_file = $this->App()->get_images_dir().'/'.$file_name;
+
+		$thumb_image =  new SimpleImage;
+    $thumb_image->load($image_file);
+    $img_width = $thumb_image->getWidth();
+    $img_height = $thumb_image->getHeight();
+	  $thumb_image->resizeToWidth(192);
+    $thumb_image->save($this->App()->get_thumbs_dir().'/'.$file_name);
+
+    return array('width' => $img_width, 'height' => $img_height);
   }
 
   function uuid() {
@@ -268,34 +249,31 @@ class CLASS_MODULE_API extends CLASS_MODULE {
   }
 
   function get_remote_image($url, $cookie, $referer, &$output) {
-    //$ran = rand(1, 255);
-    //$ran1 = rand(1, 255);
-    //$ran2 = rand(1, 255);
-    //$ran3 = rand(60, 255);
-    //$ran3 = str_replace(array('192', '172', '127'), '', $ran3);
     //$ip = "$ran3.$ran2.$ran1.$ran";
     //$headerArr = array("CLIENT-IP:$ip", "X-FORWARDED-FOR:$ip");
     //$cookieJar = tempnam(_IROOT . './cookie', 'cookie.txt');
-	$user_agent = $_SERVER["HTTP_USER_AGENT"];
-	// "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.8) Gecko/20100722 Firefox/3.6.8"
+	  $user_agent = $_SERVER["HTTP_USER_AGENT"];
+	  // "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.8) 
+    // Gecko/20100722 Firefox/3.6.8"
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
-	curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
-	curl_setopt($curl, CURLOPT_FAILONERROR, TRUE);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($curl, CURLOPT_FAILONERROR, TRUE);
     //curl_setopt($curl, CURLOPT_HTTPHEADER , $headerArr);  //构造IP
 
-	curl_setopt($curl, CURLOPT_USERAGENT, $user_agent);
+	  curl_setopt($curl, CURLOPT_USERAGENT, $user_agent);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_TIMEOUT, 60);   //设定最大访问耗时
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, TRUE);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
 
-	if(!empty($cookie))
-	  curl_setopt($curl, CURLOPT_COOKIE , $cookie);
-	if(!empty($referer))
+    if(!empty($cookie))
+      curl_setopt($curl, CURLOPT_COOKIE , $cookie);
+    if(!empty($referer))
       curl_setopt ($curl, CURLOPT_REFERER, $referer);   //构造来路
 
-    //curl_setopt($curl, CURLOPT_COOKIEJAR, $cookieJar);//curl_setopt($curl, CURLOPT_COOKIEFILE, $cookieJar);
+    //curl_setopt($curl, CURLOPT_COOKIEJAR, $cookieJar);
+    //curl_setopt($curl, CURLOPT_COOKIEFILE, $cookieJar);
     //if ($method == 'post') {
     //  curl_setopt($curl, CURLOPT_POST, 1);
     //  curl_setopt($curl, CURLOPT_POSTFIELDS,$post);
@@ -355,10 +333,16 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       return;
     }
 
-	$album_id = intval($data['id'], 10);
+	  $album_id = intval($data['id'], 10);
 
-    $thumbdir = "http://".$_SERVER['SERVER_NAME'].$this->Config("site.thumb_images_dir");
-    $imagedir ="http://".$_SERVER['SERVER_NAME'].$this->Config("site.images_dir");
+    $thumbdir = "http://"
+      .$_SERVER['SERVER_NAME']
+      .$this->Config("site.thumb_images_dir");
+
+    $imagedir ="http://"
+      .$_SERVER['SERVER_NAME']
+      .$this->Config("site.images_dir");
+
     $db = &$this->App()->db();
 
     // 获取指定画集图像列表
@@ -414,13 +398,12 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 
   function notify($nid, $params) {
     $rpc_client = new QRPC("wayixia.com", 5555);
-	$data = array('nid'=>$nid);
-	$data['params'] = $params;
-    $res = $rpc_client->call('qnotify_service', 'call', $data);
+	  $data = array('nid'=>$nid);
+	  $data['params'] = $params;
+    $res = $rpc_client->vcall('qnotify_service', 'call', $data);
     //print_r($res);
     //$body = $res->body();
     //echo "$p0+$p1=".$body['data'];
-
   }
 }
 

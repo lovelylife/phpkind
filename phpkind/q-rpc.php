@@ -10,24 +10,23 @@ class QRPC_MESSAGE {
   public $channel;
   public $body;
   const message_request = 0;
-  const message_response= 1; 
+  const message_response= 1;
+  const message_request_void = 2;
   function __construct() {}
   function QRPC_MESSAGE() {  $this->__construct(); }
 
   // encode to binary string
   function to_binary() {
-    return @pack('lhlha*h', 
+    return pack('lhlha*h', 
       $this->type, 0xFE, 
       $this->channel, 0xFE,
       $this->body, 0xFE);
   }
 
   function from_binary($bstr) {
-    //var_dump($bstr);
     //echo "from_binary:".$bstr." end\n";
-    $arr = @unpack('ltype/h/lchannel/h/a*body', $bstr);
+    $arr = unpack('ltype/h/lchannel/h/a*body', $bstr);
     if($arr == false) {
-    //  echo "unpack error\n";
     } else { 
       //print_r($arr);
       $this->type = $arr['type'];
@@ -36,6 +35,7 @@ class QRPC_MESSAGE {
     }
   }
 };
+
 
 class QRPC_SERIALIZER {
   protected $body_;
@@ -93,8 +93,8 @@ class QRPC {
   function __construct($server, $port) {
     $this->server_ = $server;
     $this->port_ = $port; 
-    $this->sock_ = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-    $this->connection_ = @socket_connect($this->sock_, $server, $port);
+    $this->sock_ = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+    $this->connection_ = socket_connect($this->sock_, $server, $port);
     if(!$this->connection_) {
       socket_close($this->sock_);
     }
@@ -167,18 +167,26 @@ class QRPC {
     socket_write($this->sock_, $header, 4);  
     socket_write($this->sock_, $data, $length);
   }
+   
   function call($service_name, $method_name, $params) {
+    return $this->call__($service_name, $method_name, $params, false);
+  }
+
+  function vcall($service_name, $method_name, $params) {
+    return $this->call__($service_name, $method_name, $params, true);    
+  }
+
+  function call__($service_name, $method_name, $params, $noack) {
     $channel_id = $this->get_service($service_name);   
     $func_id = $this->get_func($service_name, $method_name);    
     //echo $func_id;
     if($func_id < 0) {
-      //trigger_error('rpc service('.$service_name.') or method('.$method_name.') is not exists', E_USER_ERROR);
 	  return false;
+      //trigger_error('rpc service('.$service_name.') or method('.$method_name.') is not exists', E_USER_ERROR);
     }
-
-    $msg_response = new QRPC_MESSAGE();
+    
     $msg_request  = new QRPC_MESSAGE();
-    $msg_request->type = QRPC_MESSAGE::message_request; 
+    $msg_request->type = ($noack)?QRPC_MESSAGE::message_request_void:QRPC_MESSAGE::message_request; 
     $msg_request->channel = $channel_id;
 
     $request = new QRPC_REQUEST;
@@ -186,12 +194,15 @@ class QRPC {
     $request->set_params($params);
     $msg_request->body = $request->to_string();
     $this->write_pkg($msg_request->to_binary());
-    $data = $this->read_pkg();
-    $msg_response->from_binary($data);
-    $response = new QRPC_RESPONSE;
-    $response->from_string($msg_response->body);
 
-    return $response;
+	if(!$noack) {
+		$msg_response = new QRPC_MESSAGE();
+	    $data = $this->read_pkg();
+		$msg_response->from_binary($data);
+		$response = new QRPC_RESPONSE;
+		$response->from_string($msg_response->body);
+		return $response;
+	}
   }
 
   function __toString() {
@@ -200,22 +211,6 @@ class QRPC {
     $str .="interfaces: " . json_encode($this->interfaces_) . "\n";
     return $str;
   }
-
-
 }
-
-/*
-$rpc_client = new QRPC("wayixia.com", 5555);
-
-$p0 = '0x911a158';
-$p1 = 55;
-//echo $rpc_client;
-$res = $rpc_client->call('qnotify_service', 'call', array('nid'=>$p0, 'p1'=>$p1));
-print_r($res);
-$body = $res->body();
-echo "$p0+$p1=".$body['data'];
-//$rpc_client->call('test_service', 'test', array());
-
-*/
 
 ?>

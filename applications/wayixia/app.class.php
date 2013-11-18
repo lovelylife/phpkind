@@ -102,8 +102,8 @@ class CLASS_WAYIXIA_APPLICATION extends CLASS_APPLICATION {
     return $this->db()->get_row($sql);
   }
 
-  function get_albums_sql($user_name) {
-    if(empty($user_name)) 
+  function get_albums_sql($user_id) {
+    if(empty($user_id)) 
       trigger_error("paramter is invalid", E_USER_ERROR);
 
 	$path = '';
@@ -114,8 +114,8 @@ class CLASS_WAYIXIA_APPLICATION extends CLASS_APPLICATION {
 	$sql_albums_list = "SELECT A.id AS album_id, A.albumname AS album_name, CONCAT('{$path}','/',R.file_name) AS file_name, MAX( I.id ) AS id\n"
     . "FROM ##__users_albums AS A\n"
     . "left JOIN ##__users_images AS I ON A.id=I.album_id\n"
-    . "left JOIN ##__images_resource AS R ON R.id=I.resource_id\n"
-    . "where A.uname='{$user_name}'\n"
+    . "left JOIN ##__images_resource AS R ON R.id=I.res_id\n"
+    . "where A.uid='{$user_id}'\n"
     . "GROUP BY A.id";
 
 	return $sql_albums_list;

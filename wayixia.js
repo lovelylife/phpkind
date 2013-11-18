@@ -622,9 +622,9 @@ function(){
               _login_user = false;
               check_login_dialog();
               return;
-            } else {
+            } else if(result == -100){
               _this.set_image_state(wing_box, 'warn');
-              // alert('哎呀，挖一下，失败了!('+resp.data+')')
+              //alert('哎呀，挖一下，失败了!('+resp.data+')')
             }
           } else {
             _this.set_image_state(wing_box, 'error');

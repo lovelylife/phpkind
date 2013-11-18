@@ -129,12 +129,12 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     $db = &$this->App()->db();
     $res_id = 0;
     $file_name = $this->uuid();
-    // check image exists
-    $img_res = $db->get_row("select src, id from ##__images_resource where `src`='{$img_src}' limit 0,1;"); 
+    // according to resources library check image resource exists
+    $img_res = $db->get_row("select id from ##__images_resource where `src`='{$img_src}' limit 0,1;");
 
     // images_resource
     if(empty($img_res)) {
-		  // get remote image      
+		  // get remote image
       $result_code = $this->get_remote_image
         ($img_src, $img_info['cookie'] , $img_info['referrer'], $image_data); 
 
@@ -157,10 +157,13 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       // insert into resource table
       $fields = array(
           'src' => $img_src,
+          'server' => $_SERVER['SERVER_NAME'],
           'file_name' => $file_name,
+          'file_type' => $info['type'],
+          'file_size' => $info['size'],
           'width' => $img_width,
           'height' => $img_height,
-          'create_uid' => $theApp->get_user_info('uid')
+          'creator_uid' => $theApp->get_user_info('uid')
       );
 
       $sql = $db->insertSQL('images_resource', $fields);
@@ -173,23 +176,25 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       }
     } else {
       $res_id = $img_res['id'];
-      $sql_check_duplicate = "select res_id from ##__users_images where res_id = '{$res_id}' and `from_host`='{$from_host}' limit 0,1;";
+      $sql_check_duplicate = 
+        "select res_id from ##__users_images where res_id = {$res_id} and `from_host`='{$from_host}' limit 0,1;";
 
       $result = $db->get_row($sql_check_duplicate);
       if(!empty($result)) {
-        $this->errmsg('该图片已经挖过了，不需要重复挖.');
+        $this->AjaxHeader(-100);
+        $this->AjaxData('该图片已经挖过了，不需要重复挖.');
         return;
       }		
     }
 
     // insert into users_images
 	  $fields = array(
-      'resource_id'   => $resource_id,
-      'album_id'      => $album_id,
-      'uid'           => $theApp->get_user_info('uid'),
-      'title'         => $img_title,
-      'from_host'     => $from_host,
-      'from_url'       =>$page_url,
+      'res_id'    => $res_id,
+      'album_id'  => $album_id,
+      'uid'       => $theApp->get_user_info('uid'),
+      'title'     => $img_title,
+      'from_host' => $from_host,
+      'from_url'  => $page_url,
     );
 
 	  $sql = $db->insertSQL('users_images', $fields);
@@ -209,16 +214,19 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     } else {
       $rc4 = new Crypt_RC4();
       $rc4 -> setKey($this->Config('rc4key'));
-      $params = array('imgid' => $rc4->encrypt($file_name));
+      $params = array(
+        'imgid' => $rc4->encrypt($file_name), 
+        'server'=> $_SERVER['SERVER_NAME'],
+        'albumid' => $album_id,
+      );
       $this->notify($login_info['nid'], $params);
     }
   }
 
   function save_image_($file_name, $image_data) {
-    $save_path = $this->App()->get_images_dir().'/'.$file_name;
-    $f = @fopen(_BIND_ROOT.$cache_url,'wb+');
+    $save_file = $this->App()->get_images_dir().'/'.$file_name;
+    $f = @fopen($save_file,'wb+');
     if(!$f){
-      $this->errmsg('server error, save file error!');
       return false;
     }
     $fw = @fwrite($f, $image_data);
@@ -227,17 +235,23 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     return true;
   }
 
-  function save_image_thumb($file_name) {
+  function save_thumb_($file_name) {
     $image_file = $this->App()->get_images_dir().'/'.$file_name;
 
-		$thumb_image =  new SimpleImage;
-    $thumb_image->load($image_file);
-    $img_width = $thumb_image->getWidth();
-    $img_height = $thumb_image->getHeight();
-	  $thumb_image->resizeToWidth(192);
-    $thumb_image->save($this->App()->get_thumbs_dir().'/'.$file_name);
+		$orginal_image =  new SimpleImage;
+    $orginal_image->load($image_file);
+    $img_width = $orginal_image->getWidth();
+    $img_height = $orginal_image->getHeight();
+    $img_mime = $orginal_image->getMime();
+    $img_size = filesize($image_file);
+	  $orginal_image->resizeToWidth(192);
+    $orginal_image->save($this->App()->get_thumbs_dir().'/'.$file_name);
 
-    return array('width' => $img_width, 'height' => $img_height);
+    return array('width' => $img_width, 
+      'height' => $img_height, 
+      'type'=> str_replace($img_mime, 'image/', ''),
+      'size' => $img_size,
+    );
   }
 
   function uuid() {
@@ -295,7 +309,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
   function get_album_list() {
     $theApp = &$this->App();
     $user_key = $theApp->get_user_info('user-key');
-    $user_name = $theApp->get_user_info('name');
+    $user_id = $theApp->get_user_info('uid');
     // 重复登录
     if(!$user_key || empty($user_key)) {
       $this->AjaxHeader(-2); // 未登录
@@ -304,7 +318,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     }
 
     // 获取画集列表
-    $sql = $theApp->get_albums_sql($user_name);
+    $sql = $theApp->get_albums_sql($user_id);
     $db = &$this->App()->db();
 
     $rs = array();
@@ -319,7 +333,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
   function get_album_image_list() {
     $theApp = &$this->App();
     $user_key = $theApp->get_user_info('user-key');
-    $user_name = $theApp->get_user_info('name');
+    $user_id = $theApp->get_user_info('uid');
     // 重复登录
     if(!$user_key || empty($user_key)) {
       $this->AjaxHeader(-2); // 未登录
@@ -328,36 +342,30 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     }
 	
 	  $data = &$_POST['data'];
+    /*
     if(!isset($data['id'])) {
       $this->AjaxData(array());
       return;
     }
+    (*/
 
-	  $album_id = intval($data['id'], 10);
-
-    $thumbdir = "http://"
-      .$_SERVER['SERVER_NAME']
-      .$this->Config("site.thumb_images_dir");
-
-    $imagedir ="http://"
-      .$_SERVER['SERVER_NAME']
-      .$this->Config("site.images_dir");
-
+	  $album_id = intval($_GET['id'], 10);
     $db = &$this->App()->db();
+
 
     // 获取指定画集图像列表
     // images data
-    $sql = "select R.file_name, R.file_size, R.file_type, R.width, R.height, U.id as id, U.from_domain, U.title, U.agent, U.create_date from ##__images_resource AS R, ##__users_images AS U where U.resource_id=R.id and U.album_id='{$album_id}' and U.uname='{$user_name}'  order by U.id DESC";
+    $sql = "select R.server, R.file_name, R.file_type, R.file_size, R.width, R.height, U.id as id, U.from_host, U.title, U.agent, U.create_date from ##__users_images AS U, ##__images_resource AS R where U.res_id=R.id and U.album_id='{$album_id}' and U.id='{$user_id}'  order by U.id DESC";
 
-    // $this->errmsg($sql);
-    // return;
+    $rc4 = new Crypt_RC4();
+    $rc4 -> setKey($this->Config('rc4key'));
     $images = array();
     $db->get_results($sql, $images);
+    $len = count($images);
+    for($i = 0; $i < $len; $i++)
+      $images[$i]['sign'] = $rc4->encrypt($images[$i]['file_name']);
+
     $this->AjaxData($images);
-	  $this->AjaxExtra(array(
-      'imagedir' => $imagedir,
-      'thumbdir' => $thumbdir
-	  ));
   }
 
   // add album
@@ -401,9 +409,6 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 	  $data = array('nid'=>$nid);
 	  $data['params'] = $params;
     $res = $rpc_client->vcall('qnotify_service', 'call', $data);
-    //print_r($res);
-    //$body = $res->body();
-    //echo "$p0+$p1=".$body['data'];
   }
 }
 

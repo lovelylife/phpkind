@@ -46,7 +46,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
 
 	  $sql.=" order by U.id DESC ";
 
-      echo $sql;
+
       $page_size = 50;
       $totalsize = $this->App()->db()->query_count($sql);
 

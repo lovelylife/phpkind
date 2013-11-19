@@ -101,7 +101,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     // 获取画集列表
     //$sql_albums_list = "select I.album_id as album_id, A.albumname as album_name, R.file_name AS file_name, MAX(I.id) AS id from ##__users_images I left join ##__users_albums as A on A.id=I.album_id left join ##__images_resource R on I.resource_id=R.id where I.album_id in (select id from ##__users_albums where `uname`='{$user_name}') group by album_id;";
 
-	$sql_albums_list = $theApp->get_albums_sql($user_name);
+	$sql_albums_list = $theApp->get_albums_sql($uid);
 
     $albums_list = array();
     $theApp->db()->get_results($sql_albums_list, $albums_list);

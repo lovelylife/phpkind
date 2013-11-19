@@ -97,8 +97,8 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $t->dump2template($image);
 
     // domain
-    $from_domain = $image['from_domain'];
-    $from_domain_images_sql = "select * from ##__images_resource AS R, ##__users_images AS U where  R.id=U.resource_id and U.album_id>0 and U.from_domain='{$from_domain}' limit 0, 8;";
+    $from_domain = $image['from_host'];
+    $from_domain_images_sql = "select * from ##__images_resource AS R, ##__users_images AS U where  R.id=U.resource_id and U.album_id>0 and U.from_host='{$from_host}' limit 0, 8;";
 
     $from_domain_images = array();
     $db->get_results($from_domain_images_sql, $from_domain_images);
@@ -106,7 +106,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
 
     // get album images
     $album_id = $image['album_id'];
-    $get_album_images_sql = "select * from ##__images_resource AS R, ##__users_images AS U where  R.id=U.resource_id and U.album_id='{$album_id}' limit 0, 8;";
+    $get_album_images_sql = "select * from ##__images_resource AS R, ##__users_images AS U where  R.id=U.res_id and U.album_id='{$album_id}' limit 0, 8;";
     $album_images = array();
     $db->get_results($get_album_images_sql, $album_images);
     $t->push_data('album_images', $album_images);

@@ -53,9 +53,9 @@ class CLASS_MODULE_API extends CLASS_MODULE {
   function preview() {
     // useralbums
     $sql = "SELECT id as value, albumname as text FROM  `##__users_albums`";
-    $user_name = $this->App()->get_user_info('name');
-    if(!empty($user_name)) {
-      $sql .= " where `uname`='{$user_name}'";
+    $uid = $this->App()->get_user_info('uid');
+    if(!empty($uid)) {
+      $sql .= " where `uid`='{$uid}'";
     }
     $albums = array();
     if(!$this->App()->db()->get_results($sql, $albums)) {
@@ -106,12 +106,12 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     }
     
     $img_src   = $img_info['srcUrl'];
-    $album_id  = $img_info['albumid'];
+    $album_id  = 0; // 待分类图
     $page_url  = $img_info['pageUrl'];  
     $img_title = $img_info['title'];
 
-    if(!isset($img_info['albumid']))
-      $album_id = 0; // 待分类图
+    if(isset($img_info['albumid']))
+      $album_id = intval($img_info['albumid'], 10); 
 
     //if(!is_int($img_width) || $img_width < 1 || $img_width > 5000 ) {
     //	$this->errmsg("image width(:$img_width) range(1-5000) is invalid.");
@@ -128,12 +128,14 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 
     $db = &$this->App()->db();
     $res_id = 0;
-    $file_name = $this->uuid();
+    $file_name = '';
+	  $file_type = '.jpg';
     // according to resources library check image resource exists
-    $img_res = $db->get_row("select id from ##__images_resource where `src`='{$img_src}' limit 0,1;");
+    $img_res = $db->get_row("select id, file_type, file_name from ##__images_resource where `src`='{$img_src}' limit 0,1;");
 
     // images_resource
     if(empty($img_res)) {
+      $file_name = $this->uuid();
 		  // get remote image
       $result_code = $this->get_remote_image
         ($img_src, $img_info['cookie'] , $img_info['referrer'], $image_data); 
@@ -153,13 +155,22 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       $info = $this->save_thumb_($file_name);
       $img_width = $info['width'];
       $img_height = $info['height'];
+      $file_type = $info['type'];
+
+      /*
+      if($info['size'] > (10 * 1024 * 1024) {
+        $this->AjaxHeader(-101);
+        $this->AjaxData('file is to large, not supported, (0M-10M).');
+        return;
+      }
+      */
 
       // insert into resource table
       $fields = array(
           'src' => $img_src,
           'server' => $_SERVER['SERVER_NAME'],
           'file_name' => $file_name,
-          'file_type' => $info['type'],
+          'file_type' => $file_type,
           'file_size' => $info['size'],
           'width' => $img_width,
           'height' => $img_height,
@@ -175,6 +186,8 @@ class CLASS_MODULE_API extends CLASS_MODULE {
         return;
       }
     } else {
+      $file_name = $img_res['file_name'];
+      $file_type = $img_res['file_type'];
       $res_id = $img_res['id'];
       $sql_check_duplicate = 
         "select res_id from ##__users_images where res_id = {$res_id} and `from_host`='{$from_host}' limit 0,1;";
@@ -205,8 +218,8 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 	  }
     
     // get nid to notify client
-    $user_id = $theApp->get_user_info('uid');
-    $get_nid_sql = "select `nid` from ##__login_users where `uid`={$user_id} and `endpoint`='client' limit 0, 1;";
+    $uid = $theApp->get_user_info('uid');
+    $get_nid_sql = "select `nid` from ##__login_users where `uid`={$uid} and `endpoint`='client' limit 0, 1;";
 
     $login_info = $db->get_row($get_nid_sql);
     if(empty($login_info) || empty($login_info['nid'])) {
@@ -215,7 +228,9 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       $rc4 = new Crypt_RC4();
       $rc4 -> setKey($this->Config('rc4key'));
       $params = array(
-        'imgid' => $rc4->encrypt($file_name), 
+        'sign' => $rc4->encrypt($file_name), 
+		    'file_type' => $file_type,
+		    'file_name' => $file_name,
         'server'=> $_SERVER['SERVER_NAME'],
         'albumid' => $album_id,
       );
@@ -249,8 +264,8 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 
     return array('width' => $img_width, 
       'height' => $img_height, 
-      'type'=> str_replace($img_mime, 'image/', ''),
-      'size' => $img_size,
+      'type'   => '.'.str_replace('image/', '', $img_mime),
+      'size'   => $img_size,
     );
   }
 
@@ -342,20 +357,20 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     }
 	
 	  $data = &$_POST['data'];
-    /*
+
     if(!isset($data['id'])) {
       $this->AjaxData(array());
       return;
     }
-    (*/
 
-	  $album_id = intval($_GET['id'], 10);
+
+	  $album_id = intval($data['id'], 10);
     $db = &$this->App()->db();
 
 
     // 获取指定画集图像列表
     // images data
-    $sql = "select R.server, R.file_name, R.file_type, R.file_size, R.width, R.height, U.id as id, U.from_host, U.title, U.agent, U.create_date from ##__users_images AS U, ##__images_resource AS R where U.res_id=R.id and U.album_id='{$album_id}' and U.id='{$user_id}'  order by U.id DESC";
+    $sql = "select R.server, R.file_name, R.file_type, R.file_size, R.width, R.height, U.id as id, U.from_host, U.title, U.agent, U.create_date from ##__users_images AS U, ##__images_resource AS R where U.res_id=R.id and U.album_id={$album_id} and U.uid={$user_id}  order by U.id DESC";
 
     $rc4 = new Crypt_RC4();
     $rc4 -> setKey($this->Config('rc4key'));

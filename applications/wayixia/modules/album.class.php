@@ -24,7 +24,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
   }
 
   function index() {
-    $user_name = $this->App()->get_user_info('name');
+    $uid = $this->App()->get_user_info('uid');
     $t = new CLASS_TEMPLATES($this->App());
     $t->load('user.album');
 
@@ -48,8 +48,9 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     $t->dump2template($album_info);
 
     // images data
-    $sql = "select R.file_name, R.width, R.height, U.id as id, U.from_domain, U.title, U.agent, U.create_date from ##__images_resource AS R, ##__users_images AS U where U.resource_id=R.id and U.album_id='{$album_id}' and U.uname='{$user_name}'  order by U.id DESC";
+    $sql = "select R.file_name, R.width, R.height, U.id as id, U.from_host, U.title, U.agent, U.create_date from ##__images_resource AS R, ##__users_images AS U where U.res_id=R.id and U.album_id={$album_id} and U.uid={$uid} order by U.id DESC";
     $images = array();
+
     $db->get_results($sql, $images);
 
     if(empty($images)) {
@@ -61,7 +62,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     $t->push('username', $user_name);
 
 		$sql = "SELECT id as value, albumname as text FROM  `##__users_albums`";
-	  $sql .= " where `uname`='{$user_name}'";
+	  $sql .= " where `uid`={$uid}";
 		$albums = array();
 		$db->get_results($sql, $albums);
 		$t->push_data('useralbums', $albums);
@@ -144,7 +145,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 			$sql = "UPDATE ##__users_albums set `albumname`='{$album_name}',`classname`='{$album_class}',`description`='{$description}' where `id`='{$album_id}'";
 		} else {
 			$fields = array(
-				'uname' => $this->App()->get_user_info('name'),
+				'uid' => $this->App()->get_user_info('uid'),
 				'albumname' => $album_name,
 				'classname' => $album_class,
 				'description'=>$description,
@@ -174,13 +175,13 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     // 删除前先备份
     $this->backup_delete_album($album_id);
     // 开始删除数据
-    $user_name = $this->App()->get_user_info('name');
+    $uid = $this->App()->get_user_info('uid');
     // 删除分类
-    $sql = "delete from ##__users_albums where `id`='{$album_id}' and `uname`='{$user_name}'";
+    $sql = "delete from ##__users_albums where `id`='{$album_id}' and `uid`={$uid};";
     $this->App()->db()->execute($sql);
     
     // 删除图片
-    $sql_delete_images = "delete from ##__users_images where `album_id`='{$album_id}' and `uname`='{$user_name}';";
+    $sql_delete_images = "delete from ##__users_images where `album_id`='{$album_id}' and `uid`={$uid};";
     $this->App()->db()->execute($sql_delete_images);
   }
 
@@ -201,8 +202,8 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 
     $db = &$this->App()->db();
     $ids = implode('\',\'', $pictures);
-    $user_name = $this->App()->get_user_info('name');
-    $sql = "update ##__users_images set `album_id`='{$album_id}' where `uname`='{$user_name}' and `id` in ('{$ids}')";
+    $uid = $this->App()->get_user_info('uid');
+    $sql = "update ##__users_images set `album_id`='{$album_id}' where `uid`={$uid} and `id` in ('{$ids}')";
     //$this->errmsg($sql);
     //return;
     $db->execute($sql);
@@ -213,9 +214,9 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     if($album_id == 0) 
       return true;
 
-    $user_name = $this->App()->get_user_info('name');
+    $uid = $this->App()->get_user_info('uid');
     $db = &$this->App()->db();
-    $sql = "select id from ##__users_albums where `id`='{$album_id}' and `uname`='{$user_name}' limit 0, 1;";
+    $sql = "select id from ##__users_albums where `id`='{$album_id}' and `uid`='{$uid}' limit 0, 1;";
 
     $album_info = $db->get_row($sql);
     return (!empty($album_info));

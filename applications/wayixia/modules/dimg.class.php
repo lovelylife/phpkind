@@ -27,12 +27,7 @@ function myxor($string, $key = '') {
 
 class CLASS_MODULE_DIMG extends CLASS_MODULE {
 
-  static $image_type = array(
-    IMAGETYPE_JPEG => 'image/jpeg',
-    IMAGETYPE_GIF  => 'image/gif',
-    IMAGETYPE_PNG  => 'image/png',
-    IMAGETYPE_BMP  => 'image/bmp',
-  );
+  
 
   public function __construct() {  parent::__construct(); }
   public function CLASS_MODULE_DIMG() { $this->__construct(); }
@@ -62,13 +57,13 @@ class CLASS_MODULE_DIMG extends CLASS_MODULE {
 
     $image_dir = _IPATH.$this->Config('site.images_dir');
     $img_path = _BIND_ROOT. $image_dir. '/' . $sign_decode;
-    $img = new QImage;
-    $img->load($img_path);
-    // Output the image to browser
-    header('Content-Type: '. $this->image_type[$img->image_type]);
-    $img->output();
-    $img->destroy();
+	$info = getimagesize($img_path);
 
+	header('Content-Type: '. $info['mime']);
+	header('Content-Length: '.filesize($img_path));
+	echo file_get_contents($img_path);
+	ob_clean();
+	flush();
   }
 }
 

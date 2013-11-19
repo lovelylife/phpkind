@@ -30,7 +30,7 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
     if($image_id == 0) {
       trigger_error('invalid image id', E_USER_ERROR);
     }
-    $sql_get_image = "select U.id AS id, R.file_name, R.width, R.height, U.from_domain, U.title, U.album_id  from ##__images_resource AS R, ##__users_images AS U where  R.id=U.resource_id and U.id={$image_id} limit 0,1;";
+    $sql_get_image = "select U.id AS id, R.file_name, R.width, R.height, U.from_host, U.title, U.album_id  from ##__images_resource AS R, ##__users_images AS U where  R.id=U.res_id and U.id={$image_id} limit 0,1;";
 
     //$sql_get_image = "select * from ##__users_images where id='{$image_id}' limit 0, 1;";
     $image_info = $db->get_row($sql_get_image);  
@@ -81,9 +81,9 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
     $title = $data['title'];
     $id = intval($data['id'], 10);
     $album_id = intval($data['album_id'], 10);
-    $uname = $this->App()->get_user_info('name');
+    $uid = $this->App()->get_user_info('uid');
     $db = $this->App()->db();
-    $sql = "UPDATE ##__users_images set `title`='{$title}',`album_id`='{$album_id}' where `id`='{$id}' and `uname`='{$uname}';";
+    $sql = "UPDATE ##__users_images set `title`='{$title}',`album_id`='{$album_id}' where `id`='{$id}' and `uid`='{$uid}';";
 
     if(!$db->execute($sql)) 
       $this->errmsg($db->get_error());

@@ -85,8 +85,8 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
 
   function display() {
     //$id = intval($_GET['id'], 10);
-    $id = $_GET['id'];
-    $sql = "select * from ##__images_resource AS R, ##__users_images AS U where  R.id=U.resource_id and U.album_id>0 and U.id='{$id}' limit 0,1;";
+    $id = intval($_GET['id'], 10);
+    $sql = "select * from ##__images_resource AS R, ##__users_images AS U where  R.id=U.res_id and U.album_id>0 and U.id={$id} limit 0,1;";
     $db = &$this->App()->db();
     $image = $db->get_row($sql);
     if(empty($image)) {
@@ -97,23 +97,23 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $t->dump2template($image);
 
     // domain
-    $from_domain = $image['from_host'];
-    $from_domain_images_sql = "select * from ##__images_resource AS R, ##__users_images AS U where  R.id=U.resource_id and U.album_id>0 and U.from_host='{$from_host}' limit 0, 8;";
+    $from_host = $image['from_host'];
+    $from_host_images_sql = "select * from ##__images_resource AS R, ##__users_images AS I where  R.id=I.res_id and I.album_id>0 and I.from_host='{$from_host}' limit 0, 8;";
 
-    $from_domain_images = array();
-    $db->get_results($from_domain_images_sql, $from_domain_images);
-    $t->push_data('domain_images', $from_domain_images);
+    $from_host_images = array();
+    $db->get_results($from_host_images_sql, $from_host_images);
+    $t->push_data('domain_images', $from_host_images);
 
     // get album images
-    $album_id = $image['album_id'];
-    $get_album_images_sql = "select * from ##__images_resource AS R, ##__users_images AS U where  R.id=U.res_id and U.album_id='{$album_id}' limit 0, 8;";
+    $album_id = intval($image['album_id'], 10);
+    $get_album_images_sql = "select * from ##__images_resource AS R, ##__users_images AS U where  R.id=U.res_id and U.album_id={$album_id} limit 0, 8;";
     $album_images = array();
     $db->get_results($get_album_images_sql, $album_images);
     $t->push_data('album_images', $album_images);
     //print_r($thumb_images);
 
     // get album info
-    $get_album_info_sql = "select UA.albumname, U.nickname from ##__users_albums as UA, ##__users AS U where UA.id='{$album_id}' and UA.uname=U.name limit 0,1;";
+    $get_album_info_sql = "select UA.albumname, U.nickname from ##__users_albums as UA, ##__users AS U where UA.id='{$album_id}' and UA.uid=U.uid limit 0,1;";
     $album_info = $db->get_row($get_album_info_sql);
     if(empty($album_info)) {
       $album_info = array(
@@ -122,7 +122,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     }
 
     // 取前一张和后一张图片
-    $sql_preview_next = "SELECT CASE WHEN SIGN(id-'$id')>0 THEN 'next' ELSE 'prev' END AS description, CASE WHEN SIGN(id-'$id')>0 THEN MIN(id) WHEN SIGN(id-'$id')<0 THEN MAX(id) END AS id FROM ##__users_images WHERE album_id='{$album_id}' and id <> '$id' GROUP BY SIGN(id - '$id') ORDER BY SIGN(id - '$id');";
+    $sql_preview_next = "SELECT CASE WHEN SIGN(id-'$id')>0 THEN 'next' ELSE 'prev' END AS description, CASE WHEN SIGN(id-'$id')>0 THEN MIN(id) WHEN SIGN(id-'$id')<0 THEN MAX(id) END AS id FROM ##__users_images WHERE album_id={$album_id} and id <> '$id' GROUP BY SIGN(id - '$id') ORDER BY SIGN(id - '$id');";
 
     $ids = array();
     $db->get_results($sql_preview_next, $ids);
@@ -139,32 +139,34 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
   function display_album() {
     $t = new CLASS_TEMPLATES($this->App());
     $db = &$this->App()->db();
-    $uname = $_GET['u'];
     $album_id = intval($_GET['aid'], 10);
     
-	// get album info
-    $get_album_info_sql = "select UA.albumname, U.nickname, UA.uname as uname from ##__users_albums as UA, ##__users AS U where UA.id='{$album_id}' and UA.uname=U.name limit 0,1;";
+	  // get album info
+    $get_album_info_sql = "select A.albumname, U.nickname, U.name as uname, U.uid as uid from ##__users_albums as A, ##__users AS U where A.id={$album_id} and A.uid=U.uid limit 0,1;";
     $album_info = $db->get_row($get_album_info_sql);
+    //print_r($album_info);
     if(empty($album_info)) {
-      $album_info = array(
-        'albumname' => '待分类专辑',
-      );
+      trigger_error('album is not exists.', E_USER_ERROR);
     }
 
+    $uid = intval($album_info['uid'], 10);
     $t->dump2template($album_info);
 
-	// album list
-	$get_albums_list = "select * from ##__users_albums where `uname`='{$uname}';";
-	$albums = array();
-	$db->get_results($get_albums_list, $albums);
-	$t->push_data('albums_data', $albums);
+	  // album list
+	  $get_albums_list = "select * from ##__users_albums where `uid`={$uid};";
+	  $albums = array();
+	  $db->get_results($get_albums_list, $albums);
 
-	$t->push('info_height', 320+count($albums)*35);
+	  //print_r($albums);
+	  $t->push_data('albums_data', $albums);
+	  $t->push('info_height', 320+(count($albums)+3)*35);
 
     // images data
-    $sql = "select R.file_name, R.width, R.height, U.id as id, U.from_domain, U.title from ##__images_resource AS R, ##__users_images AS U where U.resource_id=R.id and U.album_id>0 and U.album_id='{$album_id}' and U.uname='{$uname}'  order by U.id DESC";
+    $sql = "select R.file_name, R.width, R.height, I.id as id, I.from_host, I.title from ##__images_resource AS R, ##__users_images AS I where I.res_id=R.id and I.album_id>0 and I.album_id='{$album_id}' and I.uid={$uid}  order by I.id DESC";
+
     $images = array();
     $db->get_results($sql, $images);
+    //print_r($images);
 
     if(empty($images)) {
       $t->push('images_data', '[]');
@@ -205,13 +207,12 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
   function display_domain() {
     $t = new CLASS_TEMPLATES($this->App());
     $db = &$this->App()->db();
-    $from_domain = $_GET['d'];
-    if(empty($from_domain)) {
-      trigger_error("invalid domain", E_USER_ERROR);
-    }
+    $from_host = $_GET['d'];
+    if(empty($from_host)) 
+      trigger_error("invalid host", E_USER_ERROR);
 
     // images data
-    $sql = "select R.file_name, R.width, R.height, U.id as id, U.from_domain, U.title from ##__images_resource AS R, ##__users_images AS U where U.resource_id=R.id and U.album_id>0 and U.from_domain='{$from_domain}' order by U.id DESC";
+    $sql = "select R.file_name, R.width, R.height, U.id as id, U.from_host, U.title from ##__images_resource AS R, ##__users_images AS U where U.res_id=R.id and U.album_id>0 and U.from_host='{$from_host}' order by U.id DESC";
     $images = array();
     $db->get_results($sql, $images);
 
@@ -220,6 +221,8 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     } else {
       $t->push('images_data', json_encode($images));
     }
+
+	$t->push('from_host', $from_host);
 
     $t->render('display.domain');
   }

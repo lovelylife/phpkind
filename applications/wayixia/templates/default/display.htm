@@ -228,7 +228,7 @@ for(var i=0; i < tree_items.length; i++) {
       <DIV class="seg-title selectitem" id="tree_album">
           <p style="color: #333; margin-top: 0px; margin-bottom: 0px;">
             <em class="icon-calendar"></em>
-            <a href="{$app:path/}/u/{$fields:uname}/albums/{$fields:album_id}">
+            <a href="{$app:path/}/albums/{$fields:album_id}">
               {$fields:albumname}
             </a>
           </p>
@@ -254,7 +254,7 @@ for(var i=0; i < tree_items.length; i++) {
 
       <DIV class="seg-title normalitem" style="border-top: 1px solid #EEE;" id="tree_domain" >
           <p style="color: #333; margin-top: 0px; margin-bottom: 3px;">
-            <em class="icon-calendar"></em><a href="{$app:path/}/d/{$fields:from_domain}">来自{$fields:from_domain}的分享</a>
+            <em class="icon-calendar"></em><a href="{$app:path/}/d/{$fields:from_host}">来自{$fields:from_host}的分享</a>
           </p>
           <div class="arrow"></div>
       </DIV>
@@ -264,7 +264,7 @@ for(var i=0; i < tree_items.length; i++) {
             <div class="thumb-domain">
             <html:list id="album_images" datasrc="data://domain_images"> 
             <t:data>
-              <a href="{$app:path/}/d/{$fields:from_domain}" target="_self">
+              <a href="{$app:path/}/d/{$fields:from_host}" target="_self">
               <div class="thumb-domain-item" style="background:url({$app:path}{$cfg:site.thumb_images_dir/}/[field:file_name]) 50% 50% no-repeat">
               </div>
               </a>

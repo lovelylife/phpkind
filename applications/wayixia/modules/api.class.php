@@ -218,24 +218,17 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 	  }
     
     // get nid to notify client
-    $uid = $theApp->get_user_info('uid');
-    $get_nid_sql = "select `nid` from ##__login_users where `uid`={$uid} and `endpoint`='client' limit 0, 1;";
-
-    $login_info = $db->get_row($get_nid_sql);
-    if(empty($login_info) || empty($login_info['nid'])) {
-      // no nid found
-    } else {
-      $rc4 = new Crypt_RC4();
-      $rc4 -> setKey($this->Config('rc4key'));
-      $params = array(
+    $rc4 = new Crypt_RC4();
+    $rc4 -> setKey($this->Config('rc4key'));
+    $params = array(
         'sign' => $rc4->encrypt($file_name), 
 		    'file_type' => $file_type,
 		    'file_name' => $file_name,
         'server'=> $_SERVER['SERVER_NAME'],
         'albumid' => $album_id,
-      );
-      $this->notify($login_info['nid'], $params);
-    }
+    );
+
+    $this->App()->notify('new_image', $params);
   }
 
   function save_image_($file_name, $image_data) {
@@ -417,13 +410,6 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       $this->errmsg($db->get_error());
 
     $this->AjaxData($db->get_insert_id());
-  }
-
-  function notify($nid, $params) {
-    $rpc_client = new QRPC("wayixia.com", 5555);
-	  $data = array('nid'=>$nid);
-	  $data['params'] = $params;
-    $res = $rpc_client->vcall('qnotify_service', 'call', $data);
   }
 }
 

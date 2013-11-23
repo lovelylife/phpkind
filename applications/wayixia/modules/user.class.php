@@ -276,6 +276,11 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     case 'do-login':
       $this->do_login();
       break;
+
+    case 'do-login-nc':
+      $this->do_login_nc();
+      break;
+
     case 'check-username':
       if($this->user_check($_GET['username'])) {
         if($this->user_exists($_GET['username']))
@@ -347,21 +352,11 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
       $this->AjaxHeader(-3);
       return;
     }
-    
     // update fields
     $login_ip = getip();
+
     // update user login info
     $db->execute("update ##__users set `lastlogin_ip` = {$login_ip} where `name`='{$username}' limit 0,1;");
-    
-	// update login info
-    $fields = array(
-      'uid' =>$userinfo['uid'],
-      'login_ip' => $login_ip,
-      'nid' => $nid,
-      'endpoint' => $endpoint, 
-    ); 
-    $add_login_sql = $db->insertSQL('login_users', $fields);
-    $db->execute($add_login_sql." ON DUPLICATE KEY UPDATE `nid`='{$nid}'");
 
     // initialize user info 
     $theApp->set_user_info('user-key', session_id());
@@ -369,7 +364,33 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     foreach($userinfo as $key => $value ) {
       $theApp->set_user_info($key, $value);
     }
+  }
 
+  function do_login_nc() {
+    $theApp = &$this->App();
+    $user_key = $theApp->get_user_info('user-key');
+    // 未登录
+    if(empty($user_key) || session_id() != $user_key) {
+      $this->AjaxHeader(-1);
+      return;
+    }
+    
+    $endpoint = $_GET['endpoint'];
+    if(empty($endpoint)) {
+      $endpoint = 'browser';
+    }
+    $data = &$_POST['data'];
+    $nid = $data['nid'];
+    // update user login info
+    $fields = array(
+      'uid' => $theApp->get_user_info('uid'),
+      'login_ip' => getip(),
+      'nid' => $nid,
+      'endpoint' => $endpoint, 
+    ); 
+
+    $add_login_sql = $theApp->db()->insertSQL('login_users', $fields);
+    $theApp->db()->execute($add_login_sql." ON DUPLICATE KEY UPDATE `nid`='{$nid}'");
   }
 
   function register() {
@@ -470,6 +491,10 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     // echo '您已经成功退出';
   }
 
+  function do_logout_nc() {
+  
+  }
+
 	function forget_password() {
 	  try {
         $t = new CLASS_TEMPLATES($this->App());
@@ -489,8 +514,8 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
 		return;
 	  }
 
-      $db = &$this->App()->db();
-      // 检查邮件和用户名是否匹配和存在
+    $db = &$this->App()->db();
+    // 检查邮件和用户名是否匹配和存在
 	  $sql = "select uid from ##__users where `name`='{$username}' and `email`='{$email}' limit 0, 1;";
       $rs = array();
 	  if(!$db->get_results($sql, $rs)) {

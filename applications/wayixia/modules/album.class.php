@@ -133,16 +133,17 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 
 		$album_class = $data['album_class'];
 		$description = $data['description'];
-    
+    $album_id = intval($data['id'],10);
+
 		$db = $this->App()->db();
-		if($is_edit) {
-			$album_id = intval($data['id'],10);
+		if($is_edit) {			
 			if($album_id == 0) {
 			  $this->AjaxHeader(-3);
 		    $this->AjaxData('system album is not update');
 			}
 		  
 			$sql = "UPDATE ##__users_albums set `albumname`='{$album_name}',`classname`='{$album_class}',`description`='{$description}' where `id`='{$album_id}'";
+      $result = $db->execute($sql);
 		} else {
 			$fields = array(
 				'uid' => $this->App()->get_user_info('uid'),
@@ -151,11 +152,19 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 				'description'=>$description,
 			);    
 		  $sql = $db->insertSQL('users_albums', $fields);
-		}
-		
-    $result = $db->execute($sql);
+      $result = $db->execute($sql);
+      $album_id = $db->get_insert_id();
+		}		
+    
     if(!$result) 
       $this->errmsg($db->get_error());
+    
+    $this->App()->notify($is_edit?'album_update':'album_new', 
+      array(
+        'id' => $album_id, 
+        'name' => $album_name
+      )
+    );
 		// $this->AjaxData($sql);
   }
 
@@ -183,6 +192,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     // 删除图片
     $sql_delete_images = "delete from ##__users_images where `album_id`='{$album_id}' and `uid`={$uid};";
     $this->App()->db()->execute($sql_delete_images);
+    $this->App()->notify('album_delete', array('id' => $album_id));
   }
 
   function move() {

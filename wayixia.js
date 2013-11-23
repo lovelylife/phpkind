@@ -644,6 +644,7 @@ function(){
     strong_2.onclick = function() { 
       if(!check_login_dialog()) 
         return;
+	  _this.deactive();
       _this.open_image_window(inner_img.src);
     }
   }

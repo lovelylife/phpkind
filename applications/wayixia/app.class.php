@@ -140,6 +140,25 @@ class CLASS_WAYIXIA_APPLICATION extends CLASS_APPLICATION {
     
     return $d;
   }
+
+  function notify($action, $params) {
+    $uid = $this->get_user_info('uid');
+    // get nid to notify client
+    $get_nid_sql = "select `nid` from ##__login_users where `uid`={$uid} and `endpoint`='client' limit 0, 1;";
+
+    $login_info = $this->db()->get_row($get_nid_sql);
+    if(empty($login_info) || empty($login_info['nid'])) {
+      // no nid found
+    } else {
+      $rpc_client = new QRPC("wayixia.com", 5555);
+      $data = array(
+        'nid'=>$login_info['nid'],
+        'notify_action' => $action,
+        'params' => $params,
+      );
+      $rpc_client->vcall('qnotify_service', 'call', $data);
+    }
+  }
 }
 
 ?>

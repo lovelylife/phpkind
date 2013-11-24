@@ -79,7 +79,7 @@ Q.Ready(function() {
 
     Q.Ajax({
       command: '{$app:module}&action=delete-image&inajax=true',
-      data : {pictures: data},
+      data : {album_id: {$fields:album_id}, pictures: data},
       oncomplete : function(xmlhttp) {
         try {
           var resp = eval('('+xmlhttp.responseText+')');

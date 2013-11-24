@@ -217,18 +217,20 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       return;
 	  }
     
+    $id = $db->get_insert_id();
     // get nid to notify client
     $rc4 = new Crypt_RC4();
     $rc4 -> setKey($this->Config('rc4key'));
     $params = array(
-        'sign' => $rc4->encrypt($file_name), 
-		    'file_type' => $file_type,
-		    'file_name' => $file_name,
+        'id' => $id,
+        'album_id' => $album_id,        
+        'file_name' => $file_name,
+		    'file_type' => $file_type,		    
         'server'=> $_SERVER['SERVER_NAME'],
-        'albumid' => $album_id,
+        'sign' => $rc4->encrypt($file_name), 
     );
 
-    $this->App()->notify('new_image', $params);
+    $this->App()->notify('image_new', $params);
   }
 
   function save_image_($file_name, $image_data) {
@@ -341,7 +343,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
   function get_album_image_list() {
     $theApp = &$this->App();
     $user_key = $theApp->get_user_info('user-key');
-    $user_id = $theApp->get_user_info('uid');
+    $uid = $theApp->get_user_info('uid');
     // 重复登录
     if(!$user_key || empty($user_key)) {
       $this->AjaxHeader(-2); // 未登录
@@ -356,19 +358,23 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       return;
     }
 
-
 	  $album_id = intval($data['id'], 10);
     $db = &$this->App()->db();
 
 
     // 获取指定画集图像列表
     // images data
-    $sql = "select R.server, R.file_name, R.file_type, R.file_size, R.width, R.height, U.id as id, U.from_host, U.title, U.agent, U.create_date from ##__users_images AS U, ##__images_resource AS R where U.res_id=R.id and U.album_id={$album_id} and U.uid={$user_id}  order by U.id DESC";
+    $sql ="select R.server,R.file_name,R.file_type,R.file_size,R.width,R.height,
+    I.id as id, I.album_id, I.from_host, I.title, I.agent, I.create_date ";
+    $sql.=" from ##__users_images AS I, ##__images_resource AS R ";
+    $sql.=" where I.res_id=R.id and I.album_id={$album_id} and I.uid={$uid} ";
+    $sql.=" order by I.id DESC";
 
     $rc4 = new Crypt_RC4();
     $rc4 -> setKey($this->Config('rc4key'));
     $images = array();
     $db->get_results($sql, $images);
+
     $len = count($images);
     for($i = 0; $i < $len; $i++)
       $images[$i]['sign'] = $rc4->encrypt($images[$i]['file_name']);

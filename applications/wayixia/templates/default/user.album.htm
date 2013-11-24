@@ -114,6 +114,7 @@ function remove_selected_pics() {
   g_selected_count = 0;
 }
 
+
 function delete_pictures(pics) {
   if(pics.length < 1) {
     show_error_box('还没有选择图片哦!');
@@ -124,9 +125,14 @@ function delete_pictures(pics) {
     return false;
   }
 
+  var data=[];
+  for(var i=0; i < pics.length; i++) {
+    data.push(parseInt(pics[i], 10));
+  }
+  
   Q.Ajax({
     command: '{$app:app}&mod=imageeditor&action=delete-image&inajax=true',
-    data : {pictures:pics},
+    data : {album_id: g_current_album_id, pictures: data},
     oncomplete : 
       function(xmlhttp) {
         try {
@@ -226,11 +232,6 @@ Q.Ready(function() {
 
   Q.$('button_delete').onclick=function() {
     var pictures = get_selected_post_data();
-    if(pictures.length < 1) {
-      show_error_box('还没有选择图片哦!');
-      return false;
-    }
-
     delete_pictures(pictures);
   }
 

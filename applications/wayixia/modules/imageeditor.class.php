@@ -35,7 +35,6 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
     //$sql_get_image = "select * from ##__users_images where id='{$image_id}' limit 0, 1;";
     $image_info = $db->get_row($sql_get_image);  
     if(empty($image_info)) {
-      echo $sql_get_image;
       trigger_error('image is not exists', E_USER_ERROR);
     }
     $t->dump2template($image_info);
@@ -95,22 +94,26 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
 
   function delete_image() {
     $data = &$_POST['data'];
-    $pictures = $data['pictures'];
+    $ablum_id = intval($data['album_id'], 10);
+    $pictures = json_decode(&$data['pictures']);
 
     if(!is_array($pictures) || empty($pictures)) {
-      $this->errmsg('invalid parameter: pictures');
+      $this->errmsg('invalid parameter: pictures'); //
       return;
     }
 
     $db = &$this->App()->db();
     $ids = implode('\',\'', $pictures);
-    $uname = $this->App()->get_user_info('name');
-    $sql = "delete from ##__users_images where `uname`='{$uname}' and `id` in ('{$ids}')";
+    $uid = $this->App()->get_user_info('uid');
+    $sql = "delete from ##__users_images where `uid`='{$uid}' and `id` in ('{$ids}')";
     $db->execute($sql);
     if($db->affected_rows() < 0) {
       $this->AjaxHeader(-2);
       return;
     }
+
+    $this->App()->notify('image_delete', 
+      array('album_id'=>$album_id, 'images' => $pictures));
 	}
 }
 

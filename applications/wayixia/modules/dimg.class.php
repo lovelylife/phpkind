@@ -3,37 +3,14 @@ if(!defined('_IPATH')) {
     die('<h3>Forbidden</h3>');
 }
 
-class hash_decrpt {
-  static $hash_table = array();
 
-  function decode($encode_buffer) {
-    $decode_buffer;
-    
-  }
-
-  function encode($decode_buffer) {
-    $encode_buffer;
-  }
-}
-
-function myxor($string, $key = '') {
- if('' == $string) return '';
- if('' == $key) $key = 'dfsfasfasjhk';
- $len1 = strlen($string);
- $len2 = strlen($key);
- if($len1 > $len2) $key = str_repeat($key, ceil($len1 / $len2));
- return $string ^ $key;
-}
-
-class CLASS_MODULE_DIMG extends CLASS_MODULE {
-
-  
+class CLASS_MODULE_DIMG extends CLASS_MODULE {  
 
   public function __construct() {  parent::__construct(); }
   public function CLASS_MODULE_DIMG() { $this->__construct(); }
   
   function doMain($action) {
-    
+	  
     /*
     $s = '007022b0-c338-4e92-b460-e47421d34f70';
     $s = str_replace('-', '', $s);

@@ -125,9 +125,9 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 		
 		$data = &$_POST['data'];
 		$album_name = $data['album_name'];
-    if(empty($album_name)) {
+    if(empty($album_name) || !eregi("^[^\/\\:\*\?,\",<>\¦]+$", $album_name)) {
 			$this->AjaxHeader(-2);
-		  $this->AjaxData('album name is empty');
+		  $this->AjaxData('画集名称非法！'.$album_name);
 			return;
 		}
 
@@ -135,7 +135,13 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 		$description = $data['description'];
     $album_id = intval($data['id'],10);
 
+    $uid = $this->App()->get_user_info('uid');
+    if($this->album_is_duplicate($album_id, $uid, $album_name)) {
+      $this->errmsg("已经存在重复名称的画集!");
+      return;
+    }
 		$db = $this->App()->db();
+
 		if($is_edit) {			
 			if($album_id == 0) {
 			  $this->AjaxHeader(-3);
@@ -160,12 +166,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
       $this->errmsg($db->get_error());
     
     $this->App()->notify($is_edit?'album_update':'album_new', 
-      array(
-        'id' => $album_id, 
-        'name' => $album_name
-      )
-    );
-		// $this->AjaxData($sql);
+      array('album_id' => $album_id, 'album_name' => $album_name) );
   }
 
   function delete_album() {
@@ -214,9 +215,12 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     $ids = implode('\',\'', $pictures);
     $uid = $this->App()->get_user_info('uid');
     $sql = "update ##__users_images set `album_id`='{$album_id}' where `uid`={$uid} and `id` in ('{$ids}')";
-    //$this->errmsg($sql);
-    //return;
+
     $db->execute($sql);
+
+    $this->App()->notify('image_move', array(
+        'album_id' => $album_id,
+        'images' => $pictures));
   }
 
   function album_is_exists($album_id) {
@@ -226,10 +230,24 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 
     $uid = $this->App()->get_user_info('uid');
     $db = &$this->App()->db();
-    $sql = "select id from ##__users_albums where `id`='{$album_id}' and `uid`='{$uid}' limit 0, 1;";
+    $sql = "select id from ##__users_albums where `id`='{$album_id}' and `uid`={$uid} limit 0, 1;";
 
     $album_info = $db->get_row($sql);
     return (!empty($album_info));
+  }
+
+  function album_is_duplicate($album_id, $uid, $album_name) {
+     $db = &$this->App()->db();
+     $sql="select id from ##__users_albums where `uid`={$uid} and `albumname`='{$album_name}'";
+     if($album_id != 0)
+       $sql.=" and `id` !={$album_id}";
+
+     $sql.=" limit 0,1;";
+     $rs = $db->get_row($sql);
+
+     //echo $sql;
+
+     return (!empty($rs));
   }
 
   function backup_delete_album($album_id) {

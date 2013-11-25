@@ -122,7 +122,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     }
 
     // 取前一张和后一张图片
-    $sql_preview_next = "SELECT CASE WHEN SIGN(id-'$id')>0 THEN 'next' ELSE 'prev' END AS description, CASE WHEN SIGN(id-'$id')>0 THEN MIN(id) WHEN SIGN(id-'$id')<0 THEN MAX(id) END AS id FROM ##__users_images WHERE album_id={$album_id} and id <> '$id' GROUP BY SIGN(id - '$id') ORDER BY SIGN(id - '$id');";
+    $sql_preview_next = "SELECT CASE WHEN SIGN(id-'$id')>0 THEN 'next' ELSE 'prev' END AS description, CASE WHEN SIGN(id-'$id')>0 THEN MIN(id) WHEN SIGN(id-'$id')<0 THEN MAX(id) END AS id FROM ##__users_images WHERE album_id={$album_id} and id <> '$id' GROUP BY SIGN(id - '$id') ORDER BY SIGN('$id' - id );";
 
     $ids = array();
     $db->get_results($sql_preview_next, $ids);

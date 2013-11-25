@@ -80,9 +80,13 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
     $title = $data['title'];
     $id = intval($data['id'], 10);
     $album_id = intval($data['album_id'], 10);
+	$src_album_id = intval($data['src_album_id'], 10);
     $uid = $this->App()->get_user_info('uid');
     $db = $this->App()->db();
-    $sql = "UPDATE ##__users_images set `title`='{$title}',`album_id`='{$album_id}' where `id`='{$id}' and `uid`='{$uid}';";
+	
+    $sql = "UPDATE ##__users_images ";
+	$sql.= "set `title`='{$title}',`album_id`='{$album_id}' ";
+	$sql.= "where `id`='{$id}' and `uid`='{$uid}' and `album_id`={$src_album_id};";
 
     if(!$db->execute($sql)) 
       $this->errmsg($db->get_error());
@@ -90,13 +94,21 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
       $this->AjaxHeader(-2);
       return;
     }
+
+	$this->App()->notify('image_move', 
+      array(
+		'album_id' => $album_id,
+		'images' => array($id)));
+	}
   }
 
   function delete_image() {
     $data = &$_POST['data'];
     $ablum_id = intval($data['album_id'], 10);
-    $pictures = json_decode(&$data['pictures']);
-
+	$pictures = $data['pictures'];
+	if(!is_array($pictures))
+		$pictures = json_decode(&$data['pictures']);
+	
     if(!is_array($pictures) || empty($pictures)) {
       $this->errmsg('invalid parameter: pictures'); //
       return;
@@ -113,7 +125,7 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
     }
 
     $this->App()->notify('image_delete', 
-      array('album_id'=>$album_id, 'images' => $pictures));
+      array('images' => $pictures));
 	}
 }
 

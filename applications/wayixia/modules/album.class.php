@@ -170,10 +170,16 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
   }
 
   function delete_album() {
+    $uid = $this->App()->get_user_info('uid');
     $data = &$_POST['data'];
     $album_id = intval($data['id'], 10);
     if($album_id == 0) {
       $this->errmsg('system album is not be deleted!');
+      return;
+    }
+
+    if(!$this->album_is_empty($album_id, $uid)) {
+      $this->errmsg('album is not empty, need delete all images of this album!');
       return;
     }
 
@@ -185,7 +191,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     // 删除前先备份
     $this->backup_delete_album($album_id);
     // 开始删除数据
-    $uid = $this->App()->get_user_info('uid');
+    
     // 删除分类
     $sql = "delete from ##__users_albums where `id`='{$album_id}' and `uid`={$uid};";
     $this->App()->db()->execute($sql);
@@ -193,7 +199,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     // 删除图片
     $sql_delete_images = "delete from ##__users_images where `album_id`='{$album_id}' and `uid`={$uid};";
     $this->App()->db()->execute($sql_delete_images);
-    $this->App()->notify('album_delete', array('id' => $album_id));
+    $this->App()->notify('album_delete', array('album_id' => $album_id));
   }
 
   function move() {
@@ -248,6 +254,16 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
      //echo $sql;
 
      return (!empty($rs));
+  }
+
+  function album_is_empty($album_id, $uid) {
+    $uid = $this->App()->get_user_info('uid');
+    $db = &$this->App()->db();
+    $sql = "select id from ##__users_images where `album_id`='{$album_id}' and `uid`={$uid} limit 0, 1;";
+
+    $rs = $db->get_row($sql);
+
+    return empty($rs);
   }
 
   function backup_delete_album($album_id) {

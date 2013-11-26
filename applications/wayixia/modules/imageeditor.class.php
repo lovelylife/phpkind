@@ -99,7 +99,6 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
       array(
 		'album_id' => $album_id,
 		'images' => array($id)));
-	}
   }
 
   function delete_image() {
@@ -124,9 +123,8 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
       return;
     }
 
-    $this->App()->notify('image_delete', 
-      array('images' => $pictures));
-	}
+    $this->App()->notify('image_delete', array('images' => $pictures));
+  }
 }
 
 ?>

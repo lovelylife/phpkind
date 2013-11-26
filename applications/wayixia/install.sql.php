@@ -15,11 +15,6 @@ CREATE TABLE IF NOT EXISTS `{$prefix}admin` (
   PRIMARY KEY  (`uid`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
--- --------------------------------------------------------
-
---
--- 表的结构 `{$prefix}album_class`
---
 
 CREATE TABLE IF NOT EXISTS `{$prefix}album_class` (
   `name` varchar(32) NOT NULL,
@@ -27,22 +22,12 @@ CREATE TABLE IF NOT EXISTS `{$prefix}album_class` (
   PRIMARY KEY  (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
-
---
--- 表的结构 `{$prefix}distributed_server`
---
 
 CREATE TABLE IF NOT EXISTS `{$prefix}distributed_server` (
   `name` varchar(255) NOT NULL,
   `path` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
-
---
--- 表的结构 `{$prefix}images_resource`
---
 
 CREATE TABLE IF NOT EXISTS `{$prefix}images_resource` (
   `id` int(11) unsigned NOT NULL auto_increment,
@@ -59,11 +44,6 @@ CREATE TABLE IF NOT EXISTS `{$prefix}images_resource` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=606 ;
 
--- --------------------------------------------------------
-
---
--- 表的结构 `{$prefix}login_users`
---
 
 CREATE TABLE IF NOT EXISTS `{$prefix}login_users` (
   `uid` int(10) unsigned NOT NULL,
@@ -74,11 +54,6 @@ CREATE TABLE IF NOT EXISTS `{$prefix}login_users` (
   PRIMARY KEY  (`uid`,`endpoint`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
-
---
--- 表的结构 `{$prefix}system_count`
---
 
 CREATE TABLE IF NOT EXISTS `{$prefix}system_count` (
   `app` varchar(32) NOT NULL,
@@ -90,11 +65,6 @@ CREATE TABLE IF NOT EXISTS `{$prefix}system_count` (
   `data` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
-
---
--- 表的结构 `{$prefix}tags`
---
 
 CREATE TABLE IF NOT EXISTS `{$prefix}tags` (
   `name` varchar(32) NOT NULL default '',
@@ -105,11 +75,6 @@ CREATE TABLE IF NOT EXISTS `{$prefix}tags` (
   PRIMARY KEY  (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
-
---
--- 表的结构 `{$prefix}usergroup`
---
 
 CREATE TABLE IF NOT EXISTS `{$prefix}usergroup` (
   `group_id` int(4) NOT NULL auto_increment COMMENT '用户组ID',
@@ -118,11 +83,6 @@ CREATE TABLE IF NOT EXISTS `{$prefix}usergroup` (
   PRIMARY KEY  (`group_id`,`group_name`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
--- --------------------------------------------------------
-
---
--- 表的结构 `{$prefix}users`
---
 
 CREATE TABLE IF NOT EXISTS `{$prefix}users` (
   `uid` int(12) unsigned NOT NULL auto_increment COMMENT '用户ID',
@@ -144,12 +104,6 @@ CREATE TABLE IF NOT EXISTS `{$prefix}users` (
   PRIMARY KEY  (`uid`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=30 ;
 
--- --------------------------------------------------------
-
---
--- 表的结构 `{$prefix}users_albums`
---
-
 CREATE TABLE IF NOT EXISTS `{$prefix}users_albums` (
   `id` int(10) NOT NULL auto_increment,
   `classname` varchar(32) NOT NULL,
@@ -161,12 +115,6 @@ CREATE TABLE IF NOT EXISTS `{$prefix}users_albums` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=30 ;
 
--- --------------------------------------------------------
-
---
--- 表的结构 `{$prefix}users_forgetpwd`
---
-
 CREATE TABLE IF NOT EXISTS `{$prefix}users_forgetpwd` (
   `authkey` varchar(64) NOT NULL,
   `email` varchar(128) NOT NULL,
@@ -174,12 +122,6 @@ CREATE TABLE IF NOT EXISTS `{$prefix}users_forgetpwd` (
   `createtime` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  USING BTREE (`authkey`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='用于密码找回';
-
--- --------------------------------------------------------
-
---
--- 表的结构 `{$prefix}users_images`
---
 
 CREATE TABLE IF NOT EXISTS `{$prefix}users_images` (
   `id` int(12) unsigned zerofill NOT NULL auto_increment,
@@ -193,12 +135,6 @@ CREATE TABLE IF NOT EXISTS `{$prefix}users_images` (
   `agent` varchar(32) NOT NULL default 'chrome' COMMENT '整数则来自本站，字符串则表示来源插件类型',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=553 ;
-
--- --------------------------------------------------------
-
---
--- 表的结构 `{$prefix}users_openapi`
---
 
 CREATE TABLE IF NOT EXISTS `{$prefix}users_openapi` (
   `uid` int(12) NOT NULL,

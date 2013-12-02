@@ -102,19 +102,18 @@ return true;
 
 } 
 
-/*
 
-$mailcfg['server'] = 'smtp.126.com'; 
+/*
+$mailcfg['server'] = 'smtp.exmail.qq.com'; 
 $mailcfg['port'] = '25'; 
 
 $mailcfg['auth'] = 1; 
-$mailcfg['from'] = 'test <xxx@126.com>'; 
+$mailcfg['from'] = 'no-reply <no-reply@wayixia.com>'; 
 
-$mailcfg['auth_username'] = 'xxx'; 
-
-$mailcfg['auth_password'] = 'xxx'; 
+$mailcfg['auth_username'] = 'no-reply@wayixia.com';
+$mailcfg['auth_password'] = '51wayixia'; 
 $stmp=new smtp($mailcfg); 
-$mail=array('to'=>'qxm2005@126.com','subject'=>'测试标题','content'=>'邮件内容<a href="http://www.php.net">PHP面向对象</a>'); 
+$mail=array('to'=>'life.qm@gmail.com','subject'=>'测试标题','content'=>'邮件内容<a href="http://www.php.net">PHP面向对象</a>'); 
 if(!$stmp->send($mail)){ 
 echo $stmp->get_error(); 
 }else{ 

@@ -180,15 +180,15 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
   function display_all() {
     $t = new CLASS_TEMPLATES($this->App());
     $db = &$this->App()->db();
-    $uname = $_GET['u'];
-    $specify_user_info = $this->App()->specify_user_info($uname);
-    if(empty($specify_user_info)) {
-      trigger_error("user {$uname} is not exists", E_USER_ERROR);
+    $uid = intval($_GET['u'], 10);
+    $user_info = $this->App()->query_user_info($uid);
+    if(empty($user_info)) {
+      trigger_error("user {$uid} is not exists", E_USER_ERROR);
     }
-    $t->dump2template($specify_user_info);
+    $t->dump2template($user_info);
 
     // images data
-    $sql = "select R.file_name, R.width, R.height, U.id as id, U.from_domain, U.title from ##__images_resource AS R, ##__users_images AS U where U.resource_id=R.id and U.album_id>0 and U.uname='{$uname}' order by U.id DESC";
+    $sql = "select R.server, R.file_name, R.width, R.height, U.id as id, U.from_host, U.title from ##__images_resource AS R, ##__users_images AS U where U.res_id=R.id and U.album_id>0 and U.uid='{$uid}' order by U.id DESC";
     $images = array();
     $db->get_results($sql, $images);
 

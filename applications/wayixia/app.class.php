@@ -96,9 +96,9 @@ class CLASS_WAYIXIA_APPLICATION extends CLASS_APPLICATION {
   }
 
   // 查询指定用户的信息 id, uname, nickname
-  function specify_user_info($uname) {
+  function query_user_info($uid) {
     $sql = "select uid AS user_id, name AS user_name, nickname AS user_nickname ";
-    $sql.= "from ##__users where `name`='{$uname}' limit 0,1;";
+    $sql.= "from ##__users where `uid`='{$uid}' limit 0,1;";
     return $this->db()->get_row($sql);
   }
 

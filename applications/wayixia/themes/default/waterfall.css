@@ -173,6 +173,10 @@
 	color:#444
 }
 
+.wf-cld p.description {
+  word-wrap: break-word;
+}
+
 .convo {
 	margin:0 -15px;
 	padding:10px 15px;

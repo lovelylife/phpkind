@@ -15,8 +15,14 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
       'register','do-register', 'login', 'regular-login', 'vcode', 'forgetpwd', 'change-pwd'
     );
 
-    if(!in_array($action, $not_need_login)) {
+
+    if(!in_array($action, $not_need_login)) {      
       $this->App()->check_user_logon(true);
+    } else {
+      if($this->App()->check_user_logon(false)) {
+        $this->App()->goto_url("您已经登录过，3秒自动回到首页!", $this->App()->getUrlApp(), 3000);
+        return;
+      }
     }
 
     switch($action) 
@@ -45,7 +51,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
       $this->login('user.login');
       break;
 
-		case 'regular-login':
+    case 'regular-login':
 			$this->login('user.login.regular');
 			break;
 
@@ -88,8 +94,6 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     $t = new CLASS_TEMPLATES($this->App());
 		$t->load('user.home');
 
-		
-    //print_r($_SESSION);
     $t->push('lastlogin_time', $theApp->get_user_info('lastlogin_time'));
     $t->push('username', $user_name);
 
@@ -99,10 +103,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     createfolders($album_front_dir);
 
     // 获取画集列表
-    //$sql_albums_list = "select I.album_id as album_id, A.albumname as album_name, R.file_name AS file_name, MAX(I.id) AS id from ##__users_images I left join ##__users_albums as A on A.id=I.album_id left join ##__images_resource R on I.resource_id=R.id where I.album_id in (select id from ##__users_albums where `uname`='{$user_name}') group by album_id;";
-
-	$sql_albums_list = $theApp->get_albums_sql($uid);
-
+	  $sql_albums_list = $theApp->get_albums_sql($uid);
     $albums_list = array();
     $theApp->db()->get_results($sql_albums_list, $albums_list);
     
@@ -111,10 +112,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     } else {
       $t->push('images_data', json_encode($albums_list));
     }
-
     $t->push('albums_num', count($albums_list)+1);
-
-    // render page
     $t->display();
   }
 
@@ -160,7 +158,6 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
   }
 
   function avatar_upload_panel() {
-
     // default page
     $t = new CLASS_TEMPLATES($this->App());
     $t->load('user.avatar.upload');
@@ -222,13 +219,39 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
       }
   }
 
+  /**
+   * 检测链接是否是SSL连接
+   * @return bool
+   */
+  function is_SSL(){
+    if (!isset($_SERVER['HTTPS']))
+      return FALSE;
+    if ($_SERVER['HTTPS'] === 1){  //Apache
+      return TRUE;
+    } else if ($_SERVER['HTTPS'] === 'on') { //IIS
+      return TRUE;
+    } elseif ($_SERVER['SERVER_PORT'] == 443) { //其他
+      return TRUE;
+    }
+    return FALSE;
+  }
+
   function login($tpl) {
     try {
       // 已经登录
       if($this->App()->check_user_logon(false)) {
-        echo "您已经登录... <a href=\"".$this->App()->getUrlApp()."\">返回首页</a>";
+        $this->App()->goto_url("您已经登录... 3秒后自动返回<a href=\"".$this->App()->getUrlApp()."\">首页</a>", $this->App()->getUrlApp(), 3000);
+        return;
+      }     
+      
+      /* todo
+      // 检查SSL
+      if(!$this->is_ssl()) {
+        $https = "https://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];        header('location: '. $https);
         return;
       }
+      */
+
       $t = new CLASS_TEMPLATES($this->App());
 
       $login_type = $_GET['t'];
@@ -269,6 +292,13 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     }
   }
 
+  function logout() {
+    //$refer_url = $_SERVER['HTTP_REFERER'];
+    $refer_url = $this->App()->getUrlApp();
+    $this->do_logout_proc();    
+    header("location:{$refer_url}");
+  }
+
 ///////////////// ajax //////////////////////////////////////////////////////
 
   function doAjax($action) {
@@ -279,6 +309,14 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
 
     case 'do-login-nc':
       $this->do_login_nc();
+      break;
+
+    case 'do-logout':
+      $this->do_logout();
+      break;
+
+    case 'do-logout-nc':
+      $this->do_logout_nc();
       break;
 
     case 'check-username':
@@ -387,10 +425,12 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
       'login_ip' => getip(),
       'nid' => $nid,
       'endpoint' => $endpoint, 
-    ); 
+    );
 
     $add_login_sql = $theApp->db()->insertSQL('login_users', $fields);
     $theApp->db()->execute($add_login_sql." ON DUPLICATE KEY UPDATE `nid`='{$nid}'");
+
+    $theApp->set_user_info('nid', $nid);
   }
 
   function register() {
@@ -407,7 +447,6 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
 	  $username = $_POST['username'];
 	  $pwd = $_POST['password'];
 	  $repwd = $_POST['repassword'];
-	  $nickname = $_POST['username'];
 	  $email = $_POST['email'];
 	  $vcode = strtolower($_POST['vcode']);
 	  // db instance
@@ -446,7 +485,6 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
         'name' => $username,
         'pwd' => md5($pwd),
         'email' => $email,
-        'nickname' => $nickname,
       );
 	    $sql = $db->insertSQL('users', $fields);
 	    $result = $db->execute($sql);
@@ -463,11 +501,8 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     $t->render('user.register.completed');
   }
 
-  function logout() {
-    //$refer_url = $_SERVER['HTTP_REFERER'];
-    $refer_url = $this->App()->getUrlApp();
+  function do_logout_proc() {
     $this->App()->clear_user_info();
-
     // sinaweibo end_session
     if(isset($_SESSION['sinaweibo_token'])) {
       // sina weibo login
@@ -478,21 +513,31 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
         $_SESSION['sinaweibo_token']['access_token'] 
       );
 
-      $msg = $client->oauth->post("https://api.weibo.com/2/account/end_session.json");
+      $msg = $client->oauth->
+        post("https://api.weibo.com/2/account/end_session.json");
       unset($_SESSION['sinaweibo_token']);
       setcookie( 'weibojs_'.$client->client_id, null);
     }
 
+    // qq
     if(isset($_SESSION['qq_token'])) {
       unset($_SESSION['qq_token']);
     }
-    
-    header("location:{$refer_url}");
-    // echo '您已经成功退出';
+  }
+
+  function do_logout() {
+    // 先退出NC
+    $this->do_logout_nc();
+    // 清理环境
+    $this->do_logout_proc();
   }
 
   function do_logout_nc() {
-  
+    $nid = $this->App()->get_user_info('nid');
+    $db = &$this->App()->db();
+    $delete_nc = "DELETE FROM ##__login_users";
+    $delete_nc.= " WHERE `nid`='{$nid}' and `uid` ={$uid} and `endpoint`='client';";
+    $db->execute($delete_nc);
   }
 
 	function forget_password() {
@@ -513,10 +558,9 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
 	    $this->errmsg('用户名和邮箱不能为空');
 		return;
 	  }
-
     $db = &$this->App()->db();
     // 检查邮件和用户名是否匹配和存在
-	  $sql = "select uid from ##__users where `name`='{$username}' and `email`='{$email}' limit 0, 1;";
+	$sql = "select uid from ##__users where `name`='{$username}' and `email`='{$email}' limit 0, 1;";
       $rs = array();
 	  if(!$db->get_results($sql, $rs)) {
 	    trigger_error($db->get_error(), E_USER_ERROR);
@@ -666,7 +710,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
 
 	function vcode() {
 	  include(_KROOT.'/vcode.class.php');
-	  $image = new VCode('100','27','4');    //图片长度、宽度、字符个数
+	  $image = new VCode('100','36','4');    //图片长度、宽度、字符个数
       $image->outImg();
       $_SESSION['VCODE'] = $image->checkcode; //存贮验证码到 $_SESSION 中
 	}
@@ -700,7 +744,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
       || !preg_match("/^[a-zA-Z0-9_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]+$/", $username))
     {
       return false;
-    } elseif ( 20 < $strlen || $strlen < 8 ) {
+    } elseif ( 20 < $strlen || $strlen < 6 ) {
       return false;
     }
     return true;

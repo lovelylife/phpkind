@@ -75,6 +75,7 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
           $this->App()->clear_user_info();
         }
       } else {
+		/*
         // 创建wayixia用户
         $fields = array(
           'name' => 'sinaweibo-'.$openapi_uid,
@@ -86,10 +87,12 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
         // error
         if(!$db->execute($create_user_sql))
           trigger_error($db->get_error(), E_USER_ERROR);
-
+		
         // 绑定openapi
         $new_wayixia_uid = $wayixia_uid = $db->get_insert_id();
         $this->bind_openapi($new_wayixia_uid, $openapi_type, $openapi_uid);
+		*/
+		// goto openapi register panel
       }
       
       // 加载登录信息

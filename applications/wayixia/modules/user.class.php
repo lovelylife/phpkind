@@ -381,7 +381,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     }
 
     $pwd = md5($pwd);
-    $sql = "select uid, name, email, lastlogin_time, lastlogin_ip, nickname from ##__users ";
+    $sql = "select uid, name, email, lastlogin_time, lastlogin_ip from ##__users ";
     $sql.= "where `name`='{$username}' and `pwd`='{$pwd}' limit 0,1;";
     $db = &$this->App()->db();
     $userinfo = $db->get_row($sql);

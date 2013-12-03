@@ -1,13 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title> 挖一下，密码重置 Powered By PHPKind</title>
+<title> 重置密码 - 挖一下</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- 使用QLib控件是必须包含样式表 -->
 <link rel="stylesheet" type="text/css" href="{$app:qlib/}/ui.css" />
-<link rel="stylesheet" type="text/css" href="{$themes:path/}/all.css" />
-<link rel="stylesheet" type="text/css" href="{$themes:path/}/style.css" />
-<link rel="stylesheet" type="text/css" href="{$themes:path/}/registeruser.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
+
+<style>
+#authkey, #pwd, #repwd {
+  width: 300px;
+  height: 30px;
+}
+
+#authkey {
+  width: 500px;
+  height: 30px;
+}
+
+#reset-pwd {
+	width: 305px;
+}
+
+</style>
 
 <script src="{$app:qlib}/Q.js">
 <!--
@@ -120,20 +140,32 @@ function alpha() {
 //-->
 </script>
 
-</head>
-
 <body>
-<div class="regtop">
-	<ul>
-		<li><a href="{$app:app}">首页</a></li>
-		<li><a href="{$app:app}&mod=user&action=register">注册</a></li>
-		<li><a href="{$app:app}&mod=user&action=login">登录</a></li>
-	</ul>
-</div>
-<div class="regtitle">
-	<strong>密码重置</strong>
-</div>
-<div class="regmain" style="height:300px;" id="panel-1">
+
+{#template user.menubar/}
+
+<div id="wrapper" class="skin01" style="margin-top: 40px;"> 
+<div class="bground"> 
+  <div id="content">  
+  <div id="cnthld" class="beibao" style="display: block;"> 
+  <ul class="content-tab"> 
+  <li class="beibao-tab">
+    <a id="my-beibao" href="#" class="tab-title songti tabbtn" hidefocus="">
+    <span class="tab-title-tag"></span>重置密码
+    </a>  
+  </li>
+  </ul> 
+  <div class="cnthld-main clearfix">
+    <div class="loadingtpl">LOADING...</div> 
+	<div class="col leftside"> 
+	  <div class="plzhld" data-fill="tab_content">
+	    <br><br>
+		<div class="regmain">
+			<div class="right" style="display:none;;">
+				
+			</div>
+			<div class="left" style="font-size:14px; margin-left: 25px;">
+				<div class="regmain" style="height:300px;" id="panel-1">
 <input id="username" type=hidden value="{$get:u/}" size="50"/>
 验证码：<br/><br/>
 <input disabled id="authkey" type=text value="{$get:authkey/}" size="50"/>
@@ -143,22 +175,30 @@ function alpha() {
 <br/><br/>
 确认新密码: <br/><br/>
 <input id="repwd" type=text value="" />
-<br/><br/>
-<button id="reset-pwd"> 重 置 </button>
-<br/><br/>
+<br/><br/><br/>
+<button id="reset-pwd" class="uploadBtn small"> 重 置 </button>
+<br/>
 <!-- error msg -->
-<div id="error" style="border:1px solid #EEE;line-height:30px;text-indent:5px;color:red;"></div>
+<div id="error" style="line-height:30px;color:red;"></div>
 </div>
 </div>
-<div class="regmain" style="height:300px;" id="panel-2">
+<div class="regmain" style="height:300px; " id="panel-2">
 验证码已过期或无效，请重新申请!
 </div>
+          
+			</div>
+		</div>
+	  </div>
+	  <div class="leftside-shadow"></div> 
+	</div> 
+  </div>
+  </div> 
+  </div> 
+  
+  <div id="foot"> <div class="mod-footer"> <div class="bottom-line2"> <p>© WAYIXIA.COM <em class="s-bottom-copyright">&nbsp;&nbsp;&nbsp;&nbsp;</em></p> </div></div> </div> </div> 
 
-<!--用户中心底部-->
-<div class="footer">
-	<span class="copyright">Powered by <a href="http://wayixia.com">wayixia.com</a> Copyright &copy;2013-2015 </span>
+  <a class="mod-go-top-btn" href="#" onclick="return false" style="display: none; position: fixed; bottom: 5px; right: 66.5px;"></a> 
 </div>
-<!--//用户中心底部-->
 
 </body>
 </html>

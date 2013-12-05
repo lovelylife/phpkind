@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> 绑定账号 - wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
+
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
+<style>
+#form-username, #form-password, #form-repassword, #form-email  {
+  width: 300px;
+  height: 30px;
+}
+
+#submit-button {
+  width: 305px;
+}
+</style>
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+-->
+</script>
+
+<script type="text/javascript" language="javascript">
+<!--
+
+function check_submit_button() {
+   var arr = [
+   'msg-username',
+   'msg-password', 
+   'msg-repassword',
+   'msg-email',
+   ];
+   var disabled = false;
+   for(var i=0; i<arr.length; i++) {
+     if(Q.$(arr[i]).innerHTML != '') {
+     disabled = true;
+     break;
+   }
+   }
+   Q.$('submit-button').disabled = disabled;
+}
+
+Q.Ready(function(){
+  Q.$("form-username").onblur = function(){
+    if(!this.value) {
+      Q.$("msg-username").innerHTML = "请输入用户名";
+      check_submit_button();
+    } else {
+      var username = this.value;
+      Q.Ajax({
+        command: "{$app:app}&mod=user&action=check-username&inajax=true&username="+username,
+        oncomplete: function (xmlhttp){//成功
+          try {
+            var resp = eval('('+xmlhttp.responseText+')');
+          if(resp.header != 0) {
+            Q.$("msg-username").innerHTML = resp.data;
+          } else {
+            Q.$("msg-username").innerHTML = '';
+          }
+          } catch (e) {
+                    Q.$("msg-username").innerHTML = xmlhttp.responseText;
+          }
+          check_submit_button();
+        }
+        });
+    }
+  };
+
+  Q.$("form-password").onblur = function(){
+    if(!this.value){
+      Q.$("msg-password").innerHTML = "请输入登录密码";
+    }else{
+      Q.$("msg-password").innerHTML = "";
+    }
+    if(this.value!=Q.$("form-repassword").value && Q.$("form-repassword").value){
+      Q.$("msg-repassword").innerHTML = ("两次密码不一致");
+    }else{
+      Q.$("msg-repassword").innerHTML = "";
+    }
+        check_submit_button();
+  };
+
+  Q.$("form-repassword").onblur = function(){
+    if(!this.value){
+      Q.$("msg-repassword").innerHTML = ("请确认登录密码");
+    }else if(this.value!=Q.$("form-password").value){
+      Q.$("msg-repassword").innerHTML = ("两次密码不一致");
+    }else{
+      Q.$("msg-password").innerHTML = "";
+    }
+    check_submit_button();
+  };
+
+  Q.$("form-email").onblur = function(){
+    if(!this.value){
+    Q.$("msg-email").innerHTML = "请输入邮件地址";
+    check_submit_button();
+    } else {
+    var email = this.value;
+    Q.Ajax({
+      command: "{$app:app}&mod=user&action=check-email&inajax=true&email="+email,
+      oncomplete: function (xmlhttp){//成功
+        try {
+          var resp = eval('('+xmlhttp.responseText+')');
+        if(resp.header != 0) {
+          Q.$("msg-email").innerHTML = resp.data;
+        } else {
+          Q.$("msg-email").innerHTML = '';
+        }
+        } catch (e) {
+              Q.$("msg-email").innerHTML = xmlhttp.responseText;
+        }
+        check_submit_button();
+      }
+    });
+    }
+  };
+
+});
+-->
+</script>
+</head>
+
+<body>
+
+{#template user.menubar/}
+
+<div id="wrapper" class="skin01" style="margin-top: 40px;"> 
+<div class="bground"> 
+  <div id="content">  
+  <div id="cnthld" class="beibao" style="display: block;"> 
+  <ul class="content-tab"> 
+  <li class="beibao-tab">
+    <a id="my-beibao" href="#" class="tab-title songti tabbtn" hidefocus="">
+    <span class="tab-title-tag"></span>绑定账号
+    </a>  
+  </li>
+  <!--li class="settings-tab">
+    <a id="my-settings" href="#" class="tab-title songti tabbtn" hidefocus="">
+      <span class="tab-title-tag">我的</span>设置
+    </a>  
+  </li>
+  <li class="tieba-tab"><a id="tiebatab" href="#" class="tab-title songti tabbtn" hidefocus="" data-click="tieba"><span class="tab-title-tag"></span>贴吧</a> </li-->
+  </ul> 
+  <div class="cnthld-main clearfix">
+    <div class="loadingtpl">LOADING...</div> 
+  <div class="col leftside"> 
+    <div class="plzhld" data-fill="tab_content">
+      <br><br>
+        <div class="regmain">
+     <div align="left" style="width: 500px; margin-left: 25px; font-size: 14px; line-height: 40px;">
+      <form name="form2" action="{$app:module}&action=do-bind-register" method="post">
+      <input type="hidden" name="fmdo" value="user" />
+      <input type="hidden" name="dopost" value="regok" />
+      <div>
+        <p>昵称<br />
+        <input name="username" type="text" id="form-username" size="30" maxlength="30" value="{$fields:name}"/>
+          <span class="msg" id="msg-username"></span>
+        </p>
+        <p>
+          <td>电子邮件<br /><input name="email" type="text" id="form-email" size="30" maxlength="32" /> 
+          <span class="msg" id="msg-email"></span></td>
+        </p>
+        <p>
+          密码 <br />
+          <input name="password" type="password" id="form-password" size="30" maxlength="30" /> 
+          <span class="msg" id="msg-password"></span>
+        </p>
+        <p>
+          确认密码<br /><input name="repassword" type="password" id="form-repassword" size="30" maxlength="30" /> 
+          <span class="msg" id="msg-repassword"></span>
+        </p>
+        
+        <!--p>
+          验证码
+        </p>
+        <p><input name="vcode" type="text" id="form-vcode" size="8" maxlength="4"  style="height: 30px;"/>
+        &nbsp; <input type="text" ReadOnly style="background: #FFF url({$app:app}&mod=user&action=vcode) left center no-repeat; width: 110px; height:36px; border-width:0;"/>
+          <span class="msg" id="msg-vcode"></span>
+        </p>
+        <p>
+          <input type="checkbox"/> 
+          <span>
+            <a href="#">同意并接受《挖一下服务条款及使用规则》 </a>
+          </span>
+        </p-->
+        <p>
+          <br/>
+          <button id='submit-button' class="uploadBtn small" disabled/> 注 册 </button>
+          <br/><br/><br/>
+        </p>
+          </div>
+      </form>
+      </div>
+    </div>
+    </div>
+    <div class="leftside-shadow"></div> 
+  </div> 
+  </div>
+  </div> 
+  </div> 
+  
+  <div id="foot"> <div class="mod-footer"> <div class="bottom-line2"> <p>© WAYIXIA.COM <em class="s-bottom-copyright">&nbsp;&nbsp;&nbsp;&nbsp;</em></p> </div></div> </div> </div> 
+
+  <a class="mod-go-top-btn" href="#" onclick="return false" style="display: none; position: fixed; bottom: 5px; right: 66.5px;"></a> 
+</div>
+
+</body>
+</html>

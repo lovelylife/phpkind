@@ -46,18 +46,17 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
 
   function get_sinaweibo_open_id() {
     $openapi_info = array();
-    $o = new SaeTOAuthV2( 
+    $o = new SaeTOAuthV2(
       $this->Config('openapi.sinaweibo.WB_AKEY') , 
       $this->Config('openapi.sinaweibo.WB_SKEY')
     );
     
-    try
-    {
+    try {
       if (!isset($_GET['code']))
         throw new Exception("invalid code");      
       
       $token = array();
-      $keys = array();
+      $keys  = array();
       $keys['code'] = $_GET['code'];
       $keys['redirect_uri'] = $this->Config('openapi.sinaweibo.callback');
       try {
@@ -69,21 +68,22 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
       if ($token) {
         $_SESSION['sinaweibo_token'] = $token;
 	setcookie( 'weibojs_'.$o->client_id, http_build_query($token) );
-
+        // get open api information
 	$client = new SaeTClientV2( 
           $this->Config('openapi.sinaweibo.WB_AKEY') , 
           $this->Config('openapi.sinaweibo.WB_SKEY') ,
-          $_SESSION['sinaweibo_token']['access_token'] 
+          $token['access_token'] 
         );
 	
-	$uid_get = $client->get_uid();
-	print_r($uid_get);
-        $openapi_uid = $uid_get['uid'];
+	$uid = $client->get_uid();
+        $openapi_uid = $uid['uid'];
         $user_message = $client->show_user_by_id( $openapi_uid); //根据ID获取用户等基本信息
         $nickname = $user_message['name'];
         // 开发接口对应的id
         $open_id = 'sinaweibo-'.$openapi_uid;
-        $openapi_info['id'] = $open_id;
+
+        // return 
+	$openapi_info['id'] = $open_id;
 	$openapi_info['name'] = $nickname;
       }
     } catch(Exception $e) {
@@ -94,17 +94,14 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
   }
 
   
-  function login_openapi($openapi) {
+  function login_openapi($open_id, $name) {
     try
     {
-        $open_id = $openapi['id'];
-	$name    = $openapi['name'];
         // 检查openapi授权的用户是否已经在wayixia上注册过
         // 如果未注册过，注册openapi到wayixia且同时登录wayixia系统
         // 否则检测当前已经登录
         $wayixia_uid = $this->get_wayixia_uid($open_id);
         if($wayixia_uid > 0) {
-      
           // 如果已经注册，再检测是否是当前已登录wayixia账号
           $need_login = true;
           if($this->App()->check_user_logon(false)) {
@@ -131,14 +128,13 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
         } else {
           // openapi register panel
           $env = array();
-          $env['name'] = $nickname;
+          $env['name'] = $name;
 	  $env['open_id'] = $open_id;
 	  $env['refer'] = $_GET['refer'];
 	  $evn['login_type'] = $_GET['t'];
           $this->bind_register($env);
-          echo "bind_register";
 	}
-      }
+      
     } catch(Exception $e) {
        $this->App()->goto_url("登录失败...<a href='javascript:history.back();'/>返回</a>", $refer, -1 );
     }
@@ -312,7 +308,7 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
 
   function bind_register($info) {
     try {
-      print_r($info);    
+      //print_r($info);    
       $t = new CLASS_TEMPLATES($this->App());
       $t->dump2template($info);
       $t->render('openapi.bind.register');

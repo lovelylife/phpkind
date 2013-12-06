@@ -29,20 +29,36 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
     }
   }
 
-
   function sinaweibo() {
+    // get open id
+    try {
+      $openapi = $this->get_sinaweibo_open_id(); 
+      if(empty($openapi)) {
+        throw new Exception("authorize failed!");
+      }
+
+      $this->login_openapi($openapi['id'], $openapi['name']);
+    } catch(Exception $e) {
+       $this->App()->goto_url("登录失败...<a href='javascript:history.back();'/>返回</a>", $_GET['refer'], -1 );
+    }
+  
+  }
+
+  function get_sinaweibo_open_id() {
+    $openapi_info = array();
     $o = new SaeTOAuthV2( 
       $this->Config('openapi.sinaweibo.WB_AKEY') , 
       $this->Config('openapi.sinaweibo.WB_SKEY')
     );
+    
     try
     {
-      if (!isset($_REQUEST['code']))
+      if (!isset($_GET['code']))
         throw new Exception("invalid code");      
       
       $token = array();
       $keys = array();
-      $keys['code'] = $_REQUEST['code'];
+      $keys['code'] = $_GET['code'];
       $keys['redirect_uri'] = $this->Config('openapi.sinaweibo.callback');
       try {
         $token = $o->getAccessToken( 'code', $keys ) ;
@@ -58,7 +74,7 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
           $this->Config('openapi.sinaweibo.WB_AKEY') , 
           $this->Config('openapi.sinaweibo.WB_SKEY') ,
           $_SESSION['sinaweibo_token']['access_token'] 
-  );
+        );
 	
 	$uid_get = $client->get_uid();
 	print_r($uid_get);
@@ -67,7 +83,22 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
         $nickname = $user_message['name'];
         // 开发接口对应的id
         $open_id = 'sinaweibo-'.$openapi_uid;
+        $openapi_info['id'] = $open_id;
+	$openapi_info['name'] = $nickname;
+      }
+    } catch(Exception $e) {
+      $openapi_info = array();
+    }
 
+    return $openapi_info;
+  }
+
+  
+  function login_openapi($openapi) {
+    try
+    {
+        $open_id = $openapi['id'];
+	$name    = $openapi['name'];
         // 检查openapi授权的用户是否已经在wayixia上注册过
         // 如果未注册过，注册openapi到wayixia且同时登录wayixia系统
         // 否则检测当前已经登录
@@ -101,7 +132,9 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
           // openapi register panel
           $env = array();
           $env['name'] = $nickname;
-          $env['open_id'] = $open_id;
+	  $env['open_id'] = $open_id;
+	  $env['refer'] = $_GET['refer'];
+	  $evn['login_type'] = $_GET['t'];
           $this->bind_register($env);
           echo "bind_register";
 	}

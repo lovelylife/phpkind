@@ -16,6 +16,7 @@ return array(
   _KROOT.'/q-rpc.php',
   _KROOT.'/smtp.class.php',
   '/rc4crypt.class.php',
+  '/function.php',
 );
 
 ?>

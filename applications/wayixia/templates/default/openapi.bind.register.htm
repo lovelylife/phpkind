@@ -1,7 +1,8 @@
+{#dict src="ui.dictionary"}
 <!DOCTYPE html>
 <html>
 <head>
-<title> 绑定账号 - wayixia.com</title>
+<title> 创建账号 - wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
@@ -11,9 +12,14 @@
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
 <style>
-#form-username, #form-password, #form-repassword, #form-email  {
+#form_username {
   width: 300px;
   height: 30px;
+}
+
+#form_gender {
+  width: 305px;
+  height:36px;
 }
 
 #submit-button {
@@ -31,10 +37,49 @@ import utils.ajax;
 <script type="text/javascript" language="javascript">
 <!--
 
+var alpha_object = new alpha();
+
+function error(msg) {
+  Q.$("error").style.opacity = 1;
+  Q.$("error").innerHTML = msg;
+  setTimeout(function() {
+	alpha_object.push(Q.$("error"));
+	alpha_object.play();
+  }, 3000); 
+}
+
+function alpha() {
+  var _this = this;
+
+  this.data = [];
+  this.play = function() {
+	if(_this.data.length == 0) {
+	   return;
+	}
+	e = _this.data[0];
+	var op = parseFloat(e.style.opacity, 10);
+	op = op - 0.1;
+	if(op >= 0.1) {
+	  e.style.opacity = op;
+	} else {
+	  e.style.opacity = 0.0;
+	  _this.data.shift();
+	}
+	setTimeout(function() { _this.play();}, 40);
+  }
+
+  this.push = function(e) {
+    
+	_this.data.push(e);
+  }
+
+  this.completed = function() {return _this.data.length == 0; };
+}
+
 function check_submit_button() {
    var arr = [
    'msg-username',
-   'msg-email',
+   'msg-gender',
    ];
    var disabled = false;
    for(var i=0; i<arr.length; i++) {
@@ -47,9 +92,9 @@ function check_submit_button() {
 }
 
 Q.Ready(function(){
-  Q.$("form-username").onblur = function(){
+  Q.$("form_username").onblur = function(){
     if(!this.value) {
-      Q.$("msg-username").innerHTML = "请输入用户名";
+      Q.$("msg-username").innerHTML = "请输入昵称";
       check_submit_button();
     } else {
       var username = this.value;
@@ -72,31 +117,43 @@ Q.Ready(function(){
     }
   };
 
-  Q.$("form-email").onblur = function(){
-    if(!this.value){
-    Q.$("msg-email").innerHTML = "请输入邮件地址";
-    check_submit_button();
+  Q.$("form_gender").onblur = Q.$('form_gender').onchange = function() {
+    if(!(this.value == 0 || this.value == 1)) {
+      Q.$("msg-gender").innerHTML = "请选择性别";
     } else {
-    var email = this.value;
-    Q.Ajax({
-      command: "{$app:app}&mod=user&action=check-email&inajax=true&email="+email,
-      oncomplete: function (xmlhttp){//成功
-        try {
-          var resp = eval('('+xmlhttp.responseText+')');
-        if(resp.header != 0) {
-          Q.$("msg-email").innerHTML = resp.data;
-        } else {
-          Q.$("msg-email").innerHTML = '';
-        }
-        } catch (e) {
-              Q.$("msg-email").innerHTML = xmlhttp.responseText;
-        }
-        check_submit_button();
-      }
-    });
+      Q.$("msg-gender").innerHTML = "";
     }
+    check_submit_button();
   };
 
+
+  Q.$('submit-button').onclick = function() {
+    // check data 
+    var data = {
+      'name' : Q.$('form_username').value,
+      'open_id': Q.$('form_open_id').value,
+      'login_type': Q.$('form_login_type').value,
+      'sex': Q.$('form_username').value,
+    };
+
+    Q.Ajax({
+      command: "{$app:module}&action=do-bind-register&inajax=true",
+      data: data,
+      oncomplete : function(xmlhttp) {
+          try {
+            var resp = eval('('+xmlhttp.responseText+')');
+            if(resp.header != 0) {
+              error(resp.data);
+            } else {
+              Q.$("msg-username").innerHTML = '';
+            }
+          } catch (e) {
+            error(xmlhttp.responseText);
+          }
+          check_submit_button();
+      } 
+    }); 
+  };
 });
 -->
 </script>
@@ -107,7 +164,7 @@ Q.Ready(function(){
 {#template user.menubar/}
 
 <div id="wrapper" class="skin01" style="margin-top: 40px;"> 
-<div class="bground"> 
+<div: class="bground"> 
   <div id="content">  
   <div id="cnthld" class="beibao" style="display: block;"> 
   <ul class="content-tab"> 
@@ -116,12 +173,6 @@ Q.Ready(function(){
       <span class="tab-title-tag"></span>创建账号
     </a>  
   </li>
-  <!--li class="settings-tab">
-    <a id="my-settings" href="#" class="tab-title songti tabbtn" hidefocus="">
-      <span class="tab-title-tag">我的</span>设置
-    </a>  
-  </li>
-  <li class="tieba-tab"><a id="tiebatab" href="#" class="tab-title songti tabbtn" hidefocus="" data-click="tieba"><span class="tab-title-tag"></span>贴吧</a> </li-->
   </ul> 
   <div class="cnthld-main clearfix">
     <div class="loadingtpl">LOADING...</div> 
@@ -130,25 +181,32 @@ Q.Ready(function(){
       <br><br>
         <div class="regmain">
      <div align="left" style="width: 500px; margin-left: 25px; font-size: 14px; line-height: 40px;">
-      <form name="form2" action="{$app:module}&action=do-bind-register" method="post">
-      <input type="hidden" name="fmdo" value="user" />
-      <input type="hidden" name="dopost" value="regok" />
-      <div>
-        <p>昵称<br />
-        <input name="username" type="text" id="form-username" size="30" maxlength="30" value="{$fields:name}"/>
-          <span class="msg" id="msg-username"></span>
+       <input type="hidden" id="form_refer" value="{$fields:refer}" />
+       <input type="hidden" id="form_open_id" value="{$fields:open_id}" />
+       <input type="hidden" id="form_login_type" value="{$fields:login_type}" />
+       <div>
+         <p>昵称<br />
+         <input type="text" id="form_username" size="30" maxlength="30" value="{$fields:name}"/>
+           <span class="msg" id="msg-username"></span>
+         </p>
+         <p>
+           性别<br />
+	   <html:select id="form_gender" datasrc="dict://dicGender"> 
+             <option value="-1" selected>未选择</option>
+             <t:data>
+             <option value="[field:value]">[field:text]</option>
+             </t:data>
+	   </html:select> 
+           <span class="msg" id="msg-gender"></span>
+         </p>
+         <p>
+           <br/>
+           <button id='submit-button' class="uploadBtn small" disabled/> 创 建 </button>
+           <br/>
+           <span id="error" style=" margin-top:3px;color:red;">&nbsp;</span>
+           <br /><br />
         </p>
-        <p>
-          <td>电子邮件<br /><input name="email" type="text" id="form-email" size="30" maxlength="32" /> 
-          <span class="msg" id="msg-email"></span></td>
-        </p>
-        
-        <p>
-          <br/>
-          <button id='submit-button' class="uploadBtn small" disabled/> 创 建 </button>
-          <br/><br/><br/>
-        </p>
-          </div>
+      </div>
       </form>
       </div>
     </div>

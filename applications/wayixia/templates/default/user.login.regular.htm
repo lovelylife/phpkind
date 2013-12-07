@@ -132,46 +132,6 @@ function dologin() {
   ajax_login();
   return false;
 }
-
-var alpha_object = new alpha();
-
-function error(msg) {
-  Q.$("error").style.opacity = 1;
-  Q.$("error").innerHTML = msg;
-  setTimeout(function() {
-	alpha_object.push(Q.$("error"));
-	alpha_object.play();
-  }, 3000); 
-}
-
-function alpha() {
-  var _this = this;
-
-  this.data = [];
-  this.play = function() {
-	if(_this.data.length == 0) {
-	   return;
-	}
-	e = _this.data[0];
-	var op = parseFloat(e.style.opacity, 10);
-	op = op - 0.1;
-	if(op >= 0.1) {
-	  e.style.opacity = op;
-	} else {
-	  e.style.opacity = 0.0;
-	  _this.data.shift();
-	}
-	setTimeout(function() { _this.play();}, 40);
-  }
-
-  this.push = function(e) {
-    
-	_this.data.push(e);
-  }
-
-  this.completed = function() {return _this.data.length == 0; };
-}
-
 //-->
 </script>
 

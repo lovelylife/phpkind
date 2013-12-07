@@ -23,12 +23,12 @@ $_PHPKIND_ENVS['_modulesDir'] = '/modules';
 
 //! 允许访问的应用程序列表
 $_PHPKIND_ENVS['_allowedApps'] = array(
-    'wayixia',
-	'cms',
-	'cdmusic',
-	'command',
-	'samples',
-	'collector',
+  'wayixia',
+  'cms',
+  'cdmusic',
+  'command',
+  'samples',
+  'collector',
 );
 
 //! 默认应用程序

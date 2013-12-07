@@ -107,6 +107,97 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
     return $openapi_info;
   }
 
+  function qq() {
+     // get open id
+    try {
+      $openapi = $this->get_sinaweibo_open_id(); 
+      if(empty($openapi)) 
+        throw new Exception("authorize failed!");
+      $this->login_openapi($openapi['id'], $openapi['name']);
+    } catch(Exception $e) {
+       $this->App()->goto_url("登录失败...<a href='javascript:history.back();'/>返回</a>", $_GET['refer'], -1 );
+    }
+    $appid = $this->Config('openapi.qq.appid');
+    $o_qq = new Oauth2();
+    $token = $o_qq->get_access_token(
+      $appid, 
+      $this->Config('openapi.qq.appkey'),
+      $_GET['code'],
+      $_GET['refer']
+    );
+
+    $openapi_uid = $o_qq->get_open_id($token);
+    if ($token) {
+      $_SESSION['qq_token'] = array('access_token'=>$token);
+      $_SESSION['qq_token']['open_id'] = $openapi_uid;
+      $client = new QClient($appid, $openapi_uid, $token);
+      $ret = $client->get_user_info();
+      $nickname = "unamed";
+      if($ret['ret'] == 0) 
+      $nickname = $ret['nickname'];
+      $openapi_type = 'tq';
+      
+      // db instance
+      $db = $this->App()->db();
+      
+      // open id for wayixia
+      $open_id = 'tq-'.$openapi_uid;
+
+      // 检查openapi授权的用户是否已经在wayixia上注册过
+      // 如果未注册过，注册openapi到wayixia且同时登录wayixia系统
+      // 否则检测当前已经登录
+      $wayixia_uid = $this->get_wayixia_uid($openid);
+      if($wayixia_uid >= 0) {
+        // 如果已经注册，再检测是否是当前已登录wayixia账号
+        if($this->App()->check_user_logon(false)) {
+          $this->App()->clear_user_info();
+        }
+      } else {
+        /*
+        // 创建wayixia用户
+        $fields = array(
+          'name' => 'tq-'.$openapi_uid,
+          'nickname' => $nickname,
+          'pwd' => '',
+          'email' => '',
+        );
+        $create_user_sql = $db->insertSQL('users', $fields);
+        // error
+        if(!$db->execute($create_user_sql))
+          trigger_error($db->get_error(), E_USER_ERROR);
+
+        // 绑定openapi
+        $new_wayixia_uid = $wayixia_uid = $db->get_insert_id();
+        $this->bind_openapi($new_wayixia_uid, $openapi_type, $openapi_uid);
+        */
+        // open api register panel
+        $env = array();
+        $env['name'] = $nickname;
+        $evn['open_id'] = $open_id;
+        $this->bind_register($env);
+        return;
+      }
+      
+      // 加载登录信息
+      $code = $this->login_wayixia($wayixia_uid);
+      if($code < 0)
+      {
+        trigger_error('login failed. code: '.$code, E_USER_ERROR);
+      }
+      $refer = $_GET['refer'];
+      $login_type = intval($_GET['t'], 10);
+      //echo $refer;
+      if(1 != $login_type)
+        $this->App()->goto_url("登录成功...", $refer, 3000);
+      else 
+        $this->App()->goto_url("<script>alert('登录成功...');window.close()</script>", $refer, 3000);
+    } else {
+      $this->App()->goto_url("登录失败...<a href='javascript:history.back();'/>返回</a>", $refer, -1 );
+    }
+    
+    return $result;
+  }
+
   
   function login_openapi($open_id, $name) {
     try {
@@ -126,7 +217,7 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
 	  }
 	}
 	if($need_login) {
-    	  if(!$this->login_wayixia($wayixia_uid, $open_id)) {
+    	  if(0 != $this->login_wayixia($wayixia_uid)) {
 	    throw new Exception("login failed");
 	  }
 	}
@@ -147,7 +238,7 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
         $this->bind_register($env);
       }
     } catch(Exception $e) {
-       $this->App()->goto_url("登录失败(".$e->getMesssage().")...<a href='javascript:history.back();'/>返回</a>", $refer, -1 );
+       $this->App()->goto_url("登录失败(".$e->getMessage().")...<a href='javascript:history.back();'/>返回</a>", $refer, -1 );
     }
   }
 
@@ -214,7 +305,7 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
       }
       
       // 加载登录信息
-      $code = $this->login_wayixia_user($wayixia_uid, $openapi_type, $openapi_uid);
+      $code = $this->login_wayixia($wayixia_uid);
       if($code < 0)
       {
         trigger_error('login failed. code: '.$code, E_USER_ERROR);
@@ -240,25 +331,25 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
 
     // db instance
     $db = &$this->App()->db();
-    $openapi_fields = array(
+    $fields = array(
       'uid' => $uid,
       'open_id'=> $open_id,
     );
     
-    $sql = $db->insertSQL('users_openapi', $openapi_fields);
-    if(!$db->execute($create_openapi_sql))
+    $sql = $db->insertSQL('users_openapi', $fields);
+    if(!$db->execute($sql))
       trigger_error($db->get_error(), E_USER_ERROR);
 
     return true;
   }
 
   // 登录wayixia系统
-  function login_wayixia_user($wayixia_uid) 
+  function login_wayixia($wayixia_uid) 
   {
     $db = &$this->App()->db();
-    $sql  = "select uid, name, email, lastlogin_time, lastlogin_ip, nickname ";
+    $sql  = "select uid, name, email, lastlogin_time, lastlogin_ip ";
     $sql .= "from ##__users ";
-    $sql .= "where `uid`='{$wayixia_uid}' limit 0,1;";
+    $sql .= "where `uid`={$wayixia_uid} limit 0,1;";
     $user_info = $db->get_row($sql);
 
     if(empty($user_info))
@@ -322,13 +413,27 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
     }
     
     if(!name_is_valid($name)) {
-      $this->errmsg("昵称格式不正确（格式：数字字母中文和下划线，长度必须大于6）";
+      $this->errmsg("昵称格式不正确（格式：数字字母中文和下划线，长度必须大于6）");
       return;
     }
 
+    $db = &$this->App()->db();
+
     // 创建挖一下用户
     // 绑定open_id新创建的挖一下账号
-  }
+    $fields = array(
+      'name' => $name,
+      'pwd' => '',
+    );
+    $create_user_sql = $db->insertSQL('users', $fields);
+    // error
+    if(!$db->execute($create_user_sql))
+      trigger_error($db->get_error(), E_USER_ERROR);
+
+    // 绑定openapi
+    $new_wayixia_uid = $wayixia_uid = $db->get_insert_id();
+    $this->bind_openapi($new_wayixia_uid, $open_id);
+  }      
 
   function set_open_cookie($v) {
     $_SESSION['open_token'] = $v;

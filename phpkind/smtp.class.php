@@ -111,7 +111,7 @@ $mailcfg['auth'] = 1;
 $mailcfg['from'] = 'no-reply <no-reply@wayixia.com>'; 
 
 $mailcfg['auth_username'] = 'no-reply@wayixia.com';
-$mailcfg['auth_password'] = '51wayixia'; 
+$mailcfg['auth_password'] = ''; 
 $stmp=new smtp($mailcfg); 
 $mail=array('to'=>'life.qm@gmail.com','subject'=>'测试标题','content'=>'邮件内容<a href="http://www.php.net">PHP面向对象</a>'); 
 if(!$stmp->send($mail)){ 

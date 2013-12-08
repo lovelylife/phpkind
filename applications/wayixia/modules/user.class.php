@@ -553,27 +553,27 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     $email = $data['email'];
     if(empty($username) || empty($email)) {
       $this->errmsg('用户名和邮箱不能为空');
-    return;
+      return;
     }
     $db = &$this->App()->db();
     // 检查邮件和用户名是否匹配和存在
-  $sql = "select uid from ##__users where `name`='{$username}' and `email`='{$email}' limit 0, 1;";
-      $rs = array();
+    $sql = "select uid from ##__users where `name`='{$username}' and `email`='{$email}' limit 0, 1;";
+    $rs = array();
     if(!$db->get_results($sql, $rs)) {
       trigger_error($db->get_error(), E_USER_ERROR);
     }
 
     if(empty($rs)) {
       $this->errmsg("用户不存在或者邮箱输入错误!");
-    return;
+      return;
     }
 
-      // 插入一条密码找回记录，并发送邮件到该邮箱
+    // 插入一条密码找回记录，并发送邮件到该邮箱
     // 生成key
     $fields = array(
       'name' => $username,
-    'email'=> $email,
-    'authkey' => getserialid(64)
+      'email'=> $email,
+      'authkey' => getserialid(64)
     );
       
     $sql = $db->insertSQL('users_forgetpwd', $fields);
@@ -583,7 +583,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
       trigger_error($db->get_error()."\n".$sql, E_USER_ERROR);
     }
 
-      // 删除以前的所有请求，使之无效
+    // 删除以前的所有请求，使之无效
     $sql_clear_old = "DELETE FROM `##__users_forgetpwd` WHERE `email` = '{$email}' and `createtime` < CURRENT_TIMESTAMP();";
 
     if(!$db->execute($sql_clear_old)) {
@@ -591,24 +591,24 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     }
 
     // 发送邮件
-      // read mail reset pwd template
-      $t = new CLASS_TEMPLATES($this->App());
+    // read mail reset pwd template
+    $t = new CLASS_TEMPLATES($this->App());
     $t->push('username', $username);
     $t->push('key', $fields['authkey']);
       $mail_context = $t->parse('mail.reset.pwd');
       
       $mail=array(
-      'to'=>$email, 
-      'subject'=>'[挖一下] 密码重置邮件 ',
-      'content'=>$mail_context); 
-      if(!$this->send_mail($mail)) {
-      $this->errmsg('邮件发送失败.');
-    return;
-    }
+        'to'=>$email, 
+        'subject'=>'[挖一下] 密码重置邮件 ',
+	'content'=>$mail_context);
+      $err = ''; 
+      if(!$this->send_mail($mail, $err)) {
+        $this->errmsg('邮件发送失败('.$err.').');
+        return;
+      }
 
       // print sucess
       $short_email = substr($email, 0, 5)."******";
-
       $this->AjaxData("<h3>密码重置邮件已经发送到邮箱 <font color=red>{$short_email}</font> ，请注意查收!</h3>");
   }
 
@@ -748,7 +748,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     return !(empty($rs));
   }
 
-  function send_mail($mail) {
+  function send_mail($mail, &$err) {
     $mailcfg = array();
     $mailcfg['server'] = $this->Config('email.smtpserver');
     $mailcfg['port'] = '25'; 
@@ -758,7 +758,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     $mailcfg['auth_password'] = $this->Config('email.pwd'); 
     $smtp_instance=new smtp($mailcfg); 
     if(!$smtp_instance->send($mail)){
-      echo ($smtp_instance->get_error());
+      $err = $smtp_instance->get_error();
       return false;
     }
 

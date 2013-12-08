@@ -118,7 +118,7 @@ if($S_AJAX_MODE) {
 	$data = $_POST['postdata'];
 
 	// 去掉单引号转义，否则json_decode无法工作
-	if(MAGIC_QUOTES_GPC) {
+	if(!MAGIC_QUOTES_GPC) {
 		$data = stripcslashes($data);
 	}
 	

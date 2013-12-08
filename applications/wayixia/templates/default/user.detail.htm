@@ -24,7 +24,7 @@ import ui.calendar;
 <!--
 
 function enable_controls(enabled) {
-  Q.$('form_nickname').disabled = !enabled;
+  Q.$('form_name').disabled = !enabled;
   Q.$('form_gender').disabled = !enabled;
   Q.$('form_bothday').disabled = !enabled;
   Q.$('form_description').disabled = !enabled;
@@ -34,7 +34,7 @@ function enable_controls(enabled) {
 function get_form_data() {
   var data = {};
   data.uid = Q.$('form_uid').value;
-  data.nickname = Q.$('form_nickname').value;
+  data.name = Q.$('form_name').value;
   data.gender = Q.$('form_gender').value;
   data.bothday = Q.$('form_bothday').value;
   data.description = Q.$('form_description').value;
@@ -93,14 +93,14 @@ Q.Ready(function() {
 <div id="wrapper" class="skin01" style="margin-top: 40px;"> 
 <div class="bground"> 
   <!--div id="head"> 
-	{#template user.infoheader}
+  {#template user.infoheader}
   </div--> 
   <div id="content">  
   <div id="cnthld" class="settings" style="display: block;"> 
   <ul class="content-tab"> 
   <li class="beibao-tab">
     <a id="my-beibao" href="{$app:module}&action=home" class="tab-title songti tabbtn" hidefocus="">
-	  <span class="tab-title-tag">我的</span>画集
+    <span class="tab-title-tag">我的</span>画集
     </a>  
   </li>
   <li class="settings-tab">
@@ -115,23 +115,23 @@ Q.Ready(function() {
   </li>
   </ul> 
   <div class="cnthld-main clearfix">
-	<div class="col leftside"> 
+  <div class="col leftside"> 
     <div class="plzhld" data-fill="tab_content">
     <div class="action-bar">
     <p>带 <b style="color:red;">*</b> 项为必填项 </p>
     </div>
     <div style="padding-left:20px;padding-top:10px; line-height: 40px;">
-			<p> 昵称：<br>
+      <p> 昵称：<br>
         <input 
-          name="nickname" 
+          name="name" 
           type="text" 
-          id="form_nickname" size="30" maxlength="30"
-          value="{$fields:nickname}"
+          id="form_name" size="30" maxlength="30"
+          value="{$fields:name}"
         />
         <input type="hidden" value="{$fields:uid}" id="form_uid"/>
-        <span class="msg" id="msg-nickname"></span>
-			</p>
-			<p> 性别：<br>
+        <span class="msg" id="msg-name"></span>
+      </p>
+      <p> 性别：<br>
         <html:select 
           id="form_gender" 
           datasrc="dict://dicGender" 
@@ -145,8 +145,8 @@ Q.Ready(function() {
          </t:data>
         </html:select>
 
-				<span class="msg" id="msg-gender"></span>
-			</p>
+        <span class="msg" id="msg-gender"></span>
+      </p>
       <p> 出生年月:<br>
         <input 
           name="both" 
@@ -168,15 +168,15 @@ Q.Ready(function() {
         </p>
     </div>
 
-	  </div>
-	  <br><br><br><br>
-	  </div> 
-	
-	  <div class="leftside-shadow"></div> 
-	</div> 
-	<!--div class="col rightside"> 
-	  <div class="plzhld p1" data-fill="friend_content"></div> 
-	</div--> 
+    </div>
+    <br><br><br><br>
+    </div> 
+  
+    <div class="leftside-shadow"></div> 
+  </div> 
+  <!--div class="col rightside"> 
+    <div class="plzhld p1" data-fill="friend_content"></div> 
+  </div--> 
   </div>
   </div> 
   </div> 

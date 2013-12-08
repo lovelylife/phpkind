@@ -121,7 +121,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     $theApp = &$this->App();
     $uid = $theApp->get_user_info('uid');
 
-    $sql = "select uid, nickname, gender, bothday, description ";
+    $sql = "select uid, name, gender, bothday, description ";
     $sql.= "from ##__users ";
     $sql.= "where `uid`='{$uid}' limit 0, 1;";
 
@@ -144,7 +144,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     $theApp = &$this->App();
 
     $user_key = $theApp->get_user_info('user-key');
-    $user_name = $theApp->get_user_info('name');
+    $user_id = $theApp->get_user_info('uid');
     if(empty($user_key)) {
       header('Location:'.$theApp->getUrlApp());
       return;
@@ -153,14 +153,16 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     $t = new CLASS_TEMPLATES($this->App());
     $t->load('user.avatar');
     $t->push('lastlogin_time', $theApp->get_user_info('lastlogin_time'));
-    $t->push('username', $user_name);
+    $t->push('uid', $user_id);
     $t->display();
   }
 
   function avatar_upload_panel() {
     // default page
+    $user_id = $this->App()->get_user_info('uid');
     $t = new CLASS_TEMPLATES($this->App());
     $t->load('user.avatar.upload');
+    $t->push('uid', $user_id); 
     
     if(isset($_GET['doupload'])) {
       $result = 'ok';
@@ -179,11 +181,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
         $size_bytes = $_FILES['user_file']['size'];
         if($size[0] >= 200 && $size[1] >= 200 && $size_bytes < (2048*1024)) {
           // get avatar_file_name
-          $extesion_array = split('/', $media_type);
-          $extension = $extesion_array[1];
-          $user_name = $this->App()->get_user_info('name');
-          
-          $avatar_file_name = $this->Config('site.avatar').'/orignal.'.$user_name.'.'.$extension;
+          $avatar_file_name = $this->Config('site.avatar').'/orignal.'.$user_id;
           createfolders(_IROOT.$this->Config('site.avatar'));
           // get file
           if (move_uploaded_file(
@@ -254,7 +252,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
 
       $t = new CLASS_TEMPLATES($this->App());
 
-      $login_type = $_GET['t'];
+      $login_type = $_GET['logintype'];
       $refer_url = $_SERVER['HTTP_REFERER'];
       if(!empty($_GET['refer'])) {
         $refer_url = $_GET['refer'];
@@ -262,7 +260,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
 
       // sina weibo login
       include_once(_IROOT.'/phpweibosdk/saetv2.ex.class.php' );
-      $sina_weibo_callback = $this->Config('openapi.sinaweibo.callback').'&t='.$login_type.'&refer='.$refer_url;
+      $sina_weibo_callback = $this->Config('openapi.sinaweibo.callback').'&logintype='.$login_type.'&refer='.$refer_url;
       $o = new SaeTOAuthV2( 
       $this->Config('openapi.sinaweibo.WB_AKEY') , 
       $this->Config('openapi.sinaweibo.WB_SKEY') );
@@ -272,7 +270,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
 
       // QQ ////////////////////////////////////////////////////////////
       include_once(_IROOT.'/phpqqsdk/qq.sdk.class.php');
-      $qq_callback = $this->Config('openapi.qq.callback').'&t='.$login_type.'&refer='.$refer_url;
+      $qq_callback = $this->Config('openapi.qq.callback').'&logintype='.$login_type.'&refer='.$refer_url;
       $o_qq = new Oauth2();
       $qq_login_url = $o_qq->get_authorized_url(
         $this->Config('openapi.qq.appid'), 
@@ -818,16 +816,13 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
       return;
     }
 
-    $user_name = $this->App()->get_user_info('name');
+    $user_id = $this->App()->get_user_info('uid');
     $config_avatar = $this->Config('site.avatar');
     $avatar_file_name = $config_avatar.'/'.$data['img'];
-    // $this->AjaxData(_IROOT.$avatar_file_name);
-    $avatar_92_filename = _IROOT.$config_avatar.'/user92.'.$user_name.'.jpg';
-    $avatar_48_filename = _IROOT.$config_avatar.'/user48.'.$user_name.'.jpg';
 
     // load orignal image, according to main rect  create the full image;
-    if(is_dir(_IROOT.$avatar_file_name) || !file_exists(_IROOT.$avatar_file_name)) {
-      $this->errmsg('invalid avatar image. hack action!');
+    if(!file_exists(_IROOT.$avatar_file_name)) {
+      $this->errmsg('invalid avatar image. hack action!'._IROOT.$avatar_file_name);
       return;
     }
 
@@ -836,6 +831,9 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
       $this->errmsg('invalid image file.');
       return;
     }
+
+    $avatar_92_filename = _IROOT.$config_avatar.'/user92.'.$user_id.'.jpg';
+    $avatar_48_filename = _IROOT.$config_avatar.'/user48.'.$user_id.'.jpg';
     
     $clip_image = new QImage();
     $clip_image->create($select_rect['width'], $select_rect['height']);
@@ -865,7 +863,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     // 保存用户信息
     $data = &$_POST['data'];
     $uid = intval($data['uid'], 10);
-    $nickname = $data['nickname'];
+    $name = $data['name'];
     $gender = intval($data['gender'], 10);
     $bothday = $data['bothday'];
     $description = $data['description'];
@@ -891,7 +889,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     }
 
     $fields = array(
-      'nickname' => $nickname,
+      'name' => $name,
       'gender' => $gender,
       'bothday' => $bothday,
       'description' => $description,

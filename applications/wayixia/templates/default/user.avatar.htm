@@ -20,7 +20,7 @@
   position: relative;
 }
 
-#preview_128 {
+#preview_128, #preview_128_current {
   width: 92px;
   height: 92px;
   position: relative;
@@ -31,7 +31,7 @@
   height: 48px;
 }
 
-#preview_128 img, #preview_48 img {
+#preview_128 img, #preview_48 img, #preview_128_current img {
   position: absolute;
   left:0;
   top:0;
@@ -163,12 +163,12 @@ var axis_y  = 0;
 
 // 生成指定len长度的随机字符串
 function RoundStr(len) {
-	var str = '';
-	var roundArray = 'abcdef1234567890'.split('');
-	for(var i=0; i < len; i++) {
-		str += '' + roundArray[Math.round( Math.random()* (roundArray.length - 1))];
-	}
-	return str;
+  var str = '';
+  var roundArray = 'abcdef1234567890'.split('');
+  for(var i=0; i < len; i++) {
+    str += '' + roundArray[Math.round( Math.random()* (roundArray.length - 1))];
+  }
+  return str;
 }
 
 function loadimage(url) {
@@ -183,22 +183,23 @@ function loadimage(url) {
 
 function check_error(img) {
   if(!img.is) {
-    img.src = '{$themes:path}/icon48.png';
+    img.src = '{$themes:path}/upload_avatar.png';
+    //img.src = '{$themes:path}/icon48.png';
   }
   img.is = true;
 }
 
 // handle event listen
 var BindHandler = function(object, func) {
-	return function() {
-		return func.apply(object, arguments);
-	};
+  return function() {
+    return func.apply(object, arguments);
+  };
 };
  
 var BindAsEventHandler = function(object, func) {
-	return function(event) {
-		return func.call(object, (event || window.event));
-	};
+  return function(event) {
+    return func.call(object, (event || window.event));
+  };
 };
 
 Q.ImageSelector = Q.KLASS();
@@ -695,7 +696,7 @@ function ajax_save_avatar() {
       {
         var resp = eval('('+xmlhttp.responseText+')');
         if(resp.header == 0) {
-          alert('ok:'+resp.data);
+          alert('成功保存头像!');
         } else {
           alert(resp.data);
         }
@@ -789,7 +790,7 @@ Q.Ready(function(){
     }
   }
 
-  loadimage('{$themes:path}/upload_avatar.png');
+  loadimage('{$cfg:site.avatar}/orignal.{$fields:uid}');
 
 });
 
@@ -840,20 +841,26 @@ Q.Ready(function(){
         </div>
       </div>
     <div class="regmain">
-		<div class="right"  style="border:0px solid #CCC; background: #FFF;">
-			<div id="preview_128" class="avatar_preview">
-              <img id="preview_128_image" src="{$cfg:site.avatar}/{$fields:uid}128x128.jpg" 
-                onerror="check_error(this);"/>
-            </div>
-            <span class="msg" id="msg-username"></span>
-					<p> <br>
-            <div id="preview_48" class="avatar_preview">
-              <img id="preview_48_image" src="{$cfg:site.avatar}/{$fields:uid}48x48.jpg" 
-                onerror="check_error(this);" style="position:absolute;"/>
-            </div>
-            <span class="msg" id="msg-username"></span>
-          </p>
-			</div>
+    <div class="right"  style="border:0px solid #CCC; background: #FFF;">
+      <div id="preview_128_current" class="avatar_preview">
+        <img id="preview_128_image_current" src="{$cfg:site.avatar}/user92.{$fields:uid}.jpg" onerror="check_error(this);"/>
+      </div>
+      <br />
+      <br />
+      预览
+      <hr />
+      <span class="msg" id="msg-name"></span>
+      <div id="preview_128" class="avatar_preview">
+        <img id="preview_128_image" src="{$cfg:site.avatar}/user128.{$fields:uid}.jpg" onerror="check_error(this);"/>
+      </div>
+      <span class="msg" id="msg-name"></span>
+      <p> <br>
+        <div id="preview_48" class="avatar_preview">
+          <img id="preview_48_image" src="{$cfg:site.avatar}/user48.{$fields:uid}.jpg" onerror="check_error(this);" style="position:absolute;"/>
+        </div>
+        <span class="msg" id="msg-name"></span>
+      </p>
+      </div>
       <div class="left" style="text-indent:20px; line-height:30px;">
         <p></p>
         <p>
@@ -893,13 +900,13 @@ Q.Ready(function(){
           <br/>
           <div id="debug" style="height: 100px; overflow-y:auto;"></div>
         </p>
-			</div>
-		</div>
-	  </div>
-	  <br><br><br><br>
-	  </div>
-	  <div class="leftside-shadow"></div> 
-	</div> 
+      </div>
+    </div>
+    </div>
+    <br><br><br><br>
+    </div>
+    <div class="leftside-shadow"></div> 
+  </div> 
 
   </div>
   </div> 

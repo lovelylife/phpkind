@@ -440,7 +440,7 @@ function(){
     if(!_login_user) {
       // must login
       var wnd = _this.open_window(
-          "http://wayixia.com/index.php?app=wayixia&mod=user&action=login&t=1", 
+          "http://wayixia.com/index.php?app=wayixia&mod=user&action=login&logintype=close", 
           {width:580, height:250}
       );
 

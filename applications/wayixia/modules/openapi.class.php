@@ -21,9 +21,6 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
     case 'sinaweibo':
       $this->sinaweibo();
       break;
-    case 'sinaweibolist':
-      $this->sinaweibolist();
-      break;
     case 'qq':
       $this->qq();
       break;
@@ -108,15 +105,19 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
   }
 
   function qq() {
-     // get open id
+    // get open id
     try {
-      $openapi = $this->get_sinaweibo_open_id(); 
+      $openapi = $this->get_qq_open_id(); 
       if(empty($openapi)) 
         throw new Exception("authorize failed!");
       $this->login_openapi($openapi['id'], $openapi['name']);
     } catch(Exception $e) {
        $this->App()->goto_url("登录失败...<a href='javascript:history.back();'/>返回</a>", $_GET['refer'], -1 );
     }
+  }
+
+  function get_qq_open_id() {
+    $openapi_info = array();
     $appid = $this->Config('openapi.qq.appid');
     $o_qq = new Oauth2();
     $token = $o_qq->get_access_token(
@@ -128,77 +129,18 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
 
     $openapi_uid = $o_qq->get_open_id($token);
     if ($token) {
-      $_SESSION['qq_token'] = array('access_token'=>$token);
-      $_SESSION['qq_token']['open_id'] = $openapi_uid;
+      $this->set_open_cookie($token);
+      $_SESSION['open_type'] = 'qq';
       $client = new QClient($appid, $openapi_uid, $token);
       $ret = $client->get_user_info();
-      $nickname = "unamed";
-      if($ret['ret'] == 0) 
-      $nickname = $ret['nickname'];
-      $openapi_type = 'tq';
-      
-      // db instance
-      $db = $this->App()->db();
-      
-      // open id for wayixia
-      $open_id = 'tq-'.$openapi_uid;
-
-      // 检查openapi授权的用户是否已经在wayixia上注册过
-      // 如果未注册过，注册openapi到wayixia且同时登录wayixia系统
-      // 否则检测当前已经登录
-      $wayixia_uid = $this->get_wayixia_uid($openid);
-      if($wayixia_uid >= 0) {
-        // 如果已经注册，再检测是否是当前已登录wayixia账号
-        if($this->App()->check_user_logon(false)) {
-          $this->App()->clear_user_info();
-        }
-      } else {
-        /*
-        // 创建wayixia用户
-        $fields = array(
-          'name' => 'tq-'.$openapi_uid,
-          'nickname' => $nickname,
-          'pwd' => '',
-          'email' => '',
-        );
-        $create_user_sql = $db->insertSQL('users', $fields);
-        // error
-        if(!$db->execute($create_user_sql))
-          trigger_error($db->get_error(), E_USER_ERROR);
-
-        // 绑定openapi
-        $new_wayixia_uid = $wayixia_uid = $db->get_insert_id();
-        $this->bind_openapi($new_wayixia_uid, $openapi_type, $openapi_uid);
-        */
-        // open api register panel
-        $env = array();
-        $env['name'] = $nickname;
-        $evn['open_id'] = $open_id;
-        $this->bind_register($env);
-        return;
-      }
-      
-      // 加载登录信息
-      $code = $this->login_wayixia($wayixia_uid);
-      if($code < 0)
-      {
-        trigger_error('login failed. code: '.$code, E_USER_ERROR);
-      }
-      $refer = $_GET['refer'];
-      $login_type = intval($_GET['t'], 10);
-      //echo $refer;
-      if(1 != $login_type)
-        $this->App()->goto_url("登录成功...", $refer, 3000);
-      else 
-        $this->App()->goto_url("<script>alert('登录成功...');window.close()</script>", $refer, 3000);
-    } else {
-      $this->App()->goto_url("登录失败...<a href='javascript:history.back();'/>返回</a>", $refer, -1 );
+      if($ret['ret'] == 0)
+        $openapi_info['name'] = $ret['nickname'];
+      $openapi_info['id'] = 'tq-'.$openapi_uid;
     }
     
-    return $result;
+    return $openapi_info;
   }
-
-  
+ 
   function login_openapi($open_id, $name) {
     try {
       // 检查openapi授权的用户是否已经在wayixia上注册过
@@ -240,88 +182,6 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
     } catch(Exception $e) {
        $this->App()->goto_url("登录失败(".$e->getMessage().")...<a href='javascript:history.back();'/>返回</a>", $refer, -1 );
     }
-  }
-
-  function qq() {
-    $appid = $this->Config('openapi.qq.appid');
-    $o_qq = new Oauth2();
-    $token = $o_qq->get_access_token(
-      $appid, 
-      $this->Config('openapi.qq.appkey'),
-      $_GET['code'],
-      $_GET['refer']
-    );
-
-    $openapi_uid = $o_qq->get_open_id($token);
-    if ($token) {
-      $_SESSION['qq_token'] = array('access_token'=>$token);
-      $_SESSION['qq_token']['open_id'] = $openapi_uid;
-      $client = new QClient($appid, $openapi_uid, $token);
-      $ret = $client->get_user_info();
-      $nickname = "unamed";
-      if($ret['ret'] == 0) 
-      $nickname = $ret['nickname'];
-      $openapi_type = 'tq';
-      
-      // db instance
-      $db = $this->App()->db();
-      
-      // open id for wayixia
-      $open_id = 'tq-'.$openapi_uid;
-
-      // 检查openapi授权的用户是否已经在wayixia上注册过
-      // 如果未注册过，注册openapi到wayixia且同时登录wayixia系统
-      // 否则检测当前已经登录
-      $wayixia_uid = $this->get_wayixia_uid($openid);
-      if($wayixia_uid >= 0) {
-        // 如果已经注册，再检测是否是当前已登录wayixia账号
-        if($this->App()->check_user_logon(false)) {
-          $this->App()->clear_user_info();
-        }
-      } else {
-        /*
-        // 创建wayixia用户
-        $fields = array(
-          'name' => 'tq-'.$openapi_uid,
-          'nickname' => $nickname,
-          'pwd' => '',
-          'email' => '',
-        );
-        $create_user_sql = $db->insertSQL('users', $fields);
-        // error
-        if(!$db->execute($create_user_sql))
-          trigger_error($db->get_error(), E_USER_ERROR);
-
-        // 绑定openapi
-        $new_wayixia_uid = $wayixia_uid = $db->get_insert_id();
-        $this->bind_openapi($new_wayixia_uid, $openapi_type, $openapi_uid);
-        */
-        // open api register panel
-        $env = array();
-        $env['name'] = $nickname;
-        $evn['open_id'] = $open_id;
-        $this->bind_register($env);
-        return;
-      }
-      
-      // 加载登录信息
-      $code = $this->login_wayixia($wayixia_uid);
-      if($code < 0)
-      {
-        trigger_error('login failed. code: '.$code, E_USER_ERROR);
-      }
-      $refer = $_GET['refer'];
-      $login_type = intval($_GET['t'], 10);
-      //echo $refer;
-      if(1 != $login_type)
-        $this->App()->goto_url("登录成功...", $refer, 3000);
-      else 
-        $this->App()->goto_url("<script>alert('登录成功...');window.close()</script>", $refer, 3000);
-    } else {
-      $this->App()->goto_url("登录失败...<a href='javascript:history.back();'/>返回</a>", $refer, -1 );
-    }
-    
-    return $result;
   }
 
   function bind_openapi($uid, $open_id) 
@@ -433,6 +293,11 @@ class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
     // 绑定openapi
     $new_wayixia_uid = $wayixia_uid = $db->get_insert_id();
     $this->bind_openapi($new_wayixia_uid, $open_id);
+    $result = $this->login_wayixia($new_wayixia_uid);
+    if(0 != $result) {
+      $this->errmsg("创建账号失败(code: ".$result.")");
+      return;
+    }
   }      
 
   function set_open_cookie($v) {

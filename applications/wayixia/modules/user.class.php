@@ -752,7 +752,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     $mailcfg = array();
     $mailcfg['server'] = $this->Config('email.smtpserver');
     $mailcfg['port'] = '25'; 
-    $mailcfg['auth'] = $this->Config('email.auth')?1:0; 
+    $mailcfg['auth'] = ($this->Config('email.auth')==1)?1:0; 
     $mailcfg['from'] = $this->Config('email.from'); 
     $mailcfg['auth_username'] = $this->Config('email.user'); 
     $mailcfg['auth_password'] = $this->Config('email.pwd'); 

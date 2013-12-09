@@ -162,7 +162,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
 	  $t->push('info_height', 320+(count($albums)+3)*35);
 
     // images data
-    $sql = "select R.file_name, R.width, R.height, I.id as id, I.from_host, I.title from ##__images_resource AS R, ##__users_images AS I where I.res_id=R.id and I.album_id>0 and I.album_id='{$album_id}' and I.uid={$uid}  order by I.id DESC";
+    $sql = "select R.file_name, R.width, R.height, I.id as id, I.from_host, I.title from ##__images_resource R, ##__users_images I where I.res_id=R.id and I.album_id>0 and I.album_id='{$album_id}' order by I.id DESC";
 
     $images = array();
     $db->get_results($sql, $images);

@@ -13,14 +13,14 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     $this->App()->check_user_logon();
 
     switch($action) {
-		case 'edit':
-			$this->edit_panel();
-		  break;
-		case 'index':
-		default:
-			$this->index();
-			break;
-		}
+    case 'edit':
+      $this->edit_panel();
+      break;
+    case 'index':
+    default:
+      $this->index();
+      break;
+    }
   }
 
   function index() {
@@ -32,7 +32,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     $album_id = intval($_GET['id'], 10);
     if($album_id != 0) {
       // get albums info
-      $sql_get_album = "select * from ##__users_albums where id='{$album_id}' order by create_time desc limit 0, 1;";
+      $sql_get_album = "select * from ##__users_albums where id='{$album_id}' and uid={$uid} order by create_time desc limit 0, 1;";
 
       $album_info = $db->get_row($sql_get_album);
       if(empty($album_info)) {
@@ -48,7 +48,9 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     $t->dump2template($album_info);
 
     // images data
-    $sql = "select R.file_name, R.width, R.height, U.id as id, U.from_host, U.title, U.agent, U.create_date from ##__images_resource AS R, ##__users_images AS U where U.res_id=R.id and U.album_id={$album_id} and U.uid={$uid} order by U.id DESC";
+    $sql = "select R.file_name, R.width, R.height, U.id as id, U.from_host, U.title, U.agent, U.create_date ";
+    $sql.= "from ##__images_resource R, ##__users_images U ";
+    $sql.= "where U.res_id=R.id and U.album_id={$album_id} order by U.id DESC";
     $images = array();
 
     $db->get_results($sql, $images);
@@ -61,39 +63,39 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 
     $t->push('username', $user_name);
 
-		$sql = "SELECT id as value, albumname as text FROM  `##__users_albums`";
-	  $sql .= " where `uid`={$uid}";
-		$albums = array();
-		$db->get_results($sql, $albums);
-		$t->push_data('useralbums', $albums);
+    $sql = "SELECT id as value, albumname as text FROM  `##__users_albums`";
+    $sql .= " where `uid`={$uid}";
+    $albums = array();
+    $db->get_results($sql, $albums);
+    $t->push_data('useralbums', $albums);
 
-		$t->display();
+    $t->display();
   }
 
-	function edit_panel() {
-	  $t = new CLASS_TEMPLATES($this->App());
-		$t->load('user.album.settings');
+  function edit_panel() {
+    $t = new CLASS_TEMPLATES($this->App());
+    $t->load('user.album.settings');
 
-		$db = &$this->App()->db();
-		$album_id = intval($_GET['id'], 10);
-		if($album_id != 0) {
-		  // get albums info
-		  $sql_get_album = "select * from ##__users_albums where id='{$album_id}' limit 0, 1;";
-		  $album_info = $db->get_row($sql_get_album);
-		  if(empty($album_info)) 
-		    die('invalid album');
-		} else {
-		  $album_info = array(
-			  'albumname' => '待分类',
-				'id' => 0
-			);
-		}
+    $db = &$this->App()->db();
+    $album_id = intval($_GET['id'], 10);
+    if($album_id != 0) {
+      // get albums info
+      $sql_get_album = "select * from ##__users_albums where id='{$album_id}' limit 0, 1;";
+      $album_info = $db->get_row($sql_get_album);
+      if(empty($album_info)) 
+        die('invalid album');
+    } else {
+      $album_info = array(
+        'albumname' => '待分类',
+        'id' => 0
+      );
+    }
 
-		$t->dump2template($album_info);
-		$user_name = $this->App()->get_user_info('name');
+    $t->dump2template($album_info);
+    $user_name = $this->App()->get_user_info('name');
     $t->push_data('username', $user_name);
-		$t->display();
-	}
+    $t->display();
+  }
 
 //////////////////////// ajax ///////////////////////////////
 
@@ -103,7 +105,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
       $this->AjaxHeader(-2); // 未登录
       $this->AjaxData('not logon');
       return;
-	  }
+    }
 
     switch($action) {
     case 'create-new':
@@ -122,17 +124,17 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
   }
 
   function edit($is_edit) {
-		
-		$data = &$_POST['data'];
-		$album_name = $data['album_name'];
+    
+    $data = &$_POST['data'];
+    $album_name = $data['album_name'];
     if(empty($album_name) || !eregi("^[^\/\\:\*\?,\",<>\¦]+$", $album_name)) {
-			$this->AjaxHeader(-2);
-		  $this->AjaxData('画集名称非法！'.$album_name);
-			return;
-		}
+      $this->AjaxHeader(-2);
+      $this->AjaxData('画集名称非法！'.$album_name);
+      return;
+    }
 
-		$album_class = $data['album_class'];
-		$description = $data['description'];
+    $album_class = $data['album_class'];
+    $description = $data['description'];
     $album_id = intval($data['id'],10);
 
     $uid = $this->App()->get_user_info('uid');
@@ -140,27 +142,27 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
       $this->errmsg("已经存在重复名称的画集!");
       return;
     }
-		$db = $this->App()->db();
+    $db = $this->App()->db();
 
-		if($is_edit) {			
-			if($album_id == 0) {
-			  $this->AjaxHeader(-3);
-		    $this->AjaxData('system album is not update');
-			}
-		  
-			$sql = "UPDATE ##__users_albums set `albumname`='{$album_name}',`classname`='{$album_class}',`description`='{$description}' where `id`='{$album_id}'";
+    if($is_edit) {    	
+      if($album_id == 0) {
+        $this->AjaxHeader(-3);
+        $this->AjaxData('system album is not update');
+      }
+      
+      $sql = "UPDATE ##__users_albums set `albumname`='{$album_name}',`classname`='{$album_class}',`description`='{$description}' where `id`='{$album_id}'";
       $result = $db->execute($sql);
-		} else {
-			$fields = array(
-				'uid' => $this->App()->get_user_info('uid'),
-				'albumname' => $album_name,
-				'classname' => $album_class,
-				'description'=>$description,
-			);    
-		  $sql = $db->insertSQL('users_albums', $fields);
+    } else {
+      $fields = array(
+        'uid' => $this->App()->get_user_info('uid'),
+        'albumname' => $album_name,
+        'classname' => $album_class,
+        'description'=>$description,
+      );    
+      $sql = $db->insertSQL('users_albums', $fields);
       $result = $db->execute($sql);
       $album_id = $db->get_insert_id();
-		}		
+    }    
     
     if(!$result) 
       $this->errmsg($db->get_error());
@@ -250,7 +252,6 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 
      $sql.=" limit 0,1;";
      $rs = $db->get_row($sql);
-
      //echo $sql;
 
      return (!empty($rs));
@@ -260,7 +261,6 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     $uid = $this->App()->get_user_info('uid');
     $db = &$this->App()->db();
     $sql = "select id from ##__users_images where `album_id`='{$album_id}' and `uid`={$uid} limit 0, 1;";
-
     $rs = $db->get_row($sql);
 
     return empty($rs);
@@ -273,28 +273,28 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     $sql = "select * from {$tablename} where `album_id`='{$album_id}'";
     $rs = array();
     $db->get_results($sql, $rs);
-		$bakfilename = $this->App()->getAppRoot().$this->App()->getDataPath()."/deleted_album_{$album_id}_".rndstr(16).".txt";
+    $bakfilename = $this->App()->getAppRoot().$this->App()->getDataPath()."/deleted_album_{$album_id}_".rndstr(16).".txt";
 
-		if(!file_exists($bakfilename)) {
-				createfolders(dirname($bakfilename));
-		}
+    if(!file_exists($bakfilename)) {
+        createfolders(dirname($bakfilename));
+    }
 
     // write album info
     $album_info = $db->get_row("select * from ##__users_albums where `id`='{$album_id}'");
 
-		$bakStr = $db->insertSQL("##__users_albums", $album_info, false);
+    $bakStr = $db->insertSQL("##__users_albums", $album_info, false);
     $bakStr = str_replace("\n","\\n",str_replace("\r","\\r",$bakStr))."\r\n";
     foreach($rs as $item) {
       //正常情况
-				$line = $db->insertSQL($tablename, $item, false);
-			  $bakStr .= str_replace("\n","\\n",str_replace("\r","\\r",$line))."\r\n";
+      $line = $db->insertSQL($tablename, $item, false);
+      $bakStr .= str_replace("\n","\\n",str_replace("\r","\\r",$line))."\r\n";
     }
 
     if( $bakStr != "" ) {
-				$fp = fopen($bakfilename,"w");
-				fwrite($fp, $bakStr);
-				fclose($fp);
-		}
+      $fp = fopen($bakfilename,"w");
+      fwrite($fp, $bakStr);
+      fclose($fp);
+    }
   }
 }
 

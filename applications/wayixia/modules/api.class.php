@@ -351,14 +351,14 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       return;
     }
 	
-	  $data = &$_POST['data'];
+    $data = &$_POST['data'];
 
     if(!isset($data['id'])) {
       $this->AjaxData(array());
       return;
     }
 
-	  $album_id = intval($data['id'], 10);
+    $album_id = intval($data['id'], 10);
     $db = &$this->App()->db();
 
 
@@ -366,8 +366,8 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     // images data
     $sql ="select R.server,R.file_name,R.file_type,R.file_size,R.width,R.height,
     I.id as id, I.album_id, I.from_host, I.title, I.agent, I.create_date ";
-    $sql.=" from ##__users_images AS I, ##__images_resource AS R ";
-    $sql.=" where I.res_id=R.id and I.album_id={$album_id} and I.uid={$uid} ";
+    $sql.=" from ##__users_images AS I, ##__images_resource AS R, ##__users_albums A ";
+    $sql.=" where I.res_id=R.id and I.album_id={$album_id} and A.id=I.album_id and A.uid={$uid} ";
     $sql.=" order by I.id DESC";
 
     $rc4 = new Crypt_RC4();

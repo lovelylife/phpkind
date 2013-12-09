@@ -19,7 +19,7 @@
 }
 
 #get-pwd {
-	width: 305px;
+  width: 305px;
 }
 </style>
 <script src="{$app:qlib}/Q.js">
@@ -38,30 +38,28 @@ Q.$('get-pwd').onclick = function() {
   var email = Q.$('email').value;
   if(!name || !email) {
     error('用户名和邮箱地址不能为空');
-	return;
+    return;
   }
 
   Q.Ajax({
     command: '{$app:module}&action=do-forgot-pwd&inajax=true',
-	data : {name:name, email:email},
-	oncomplete : function(xmlhttp) {
-	  try {
-		var resp = eval('('+xmlhttp.responseText+')');
-		if(resp.header != 0) {
-		  error(resp.data);
-		} else {
-		  Q.$("forget-2").innerHTML = resp.data;
-
-		  Q.$("forget-1").style.display = 'none';
-	      Q.$("forget-2").style.display = '';
-		}
-	  } catch (e) {
+    data : {name:name, email:email},
+    oncomplete : function(xmlhttp) {
+      try {
+        var resp = eval('('+xmlhttp.responseText+')');
+        if(resp.header != 0) {
+          error(resp.data);
+        } else {
+          Q.$("forget-2").innerHTML = resp.data;
+          Q.$("forget-1").style.display = 'none';
+          Q.$("forget-2").style.display = '';
+        }
+      } catch (e) {
         error(xmlhttp.responseText);
-	  }
-	}
+      }
+    }
   });
 }
-
 
 Q.$("forget-2").style.display = 'none';
 
@@ -73,8 +71,8 @@ function error(msg) {
   Q.$("error").style.opacity = 1;
   Q.$("error").innerHTML = msg;
   setTimeout(function() {
-	alpha_object.push(Q.$("error"));
-	alpha_object.play();
+  alpha_object.push(Q.$("error"));
+  alpha_object.play();
   }, 3000); 
 }
 
@@ -83,24 +81,24 @@ function alpha() {
 
   this.data = [];
   this.play = function() {
-	if(_this.data.length == 0) {
-	   return;
-	}
-	e = _this.data[0];
-	var op = parseFloat(e.style.opacity, 10);
-	op = op - 0.1;
-	if(op >= 0.1) {
-	  e.style.opacity = op;
-	} else {
-	  e.style.opacity = 0.0;
-	  _this.data.shift();
-	}
-	setTimeout(function() { _this.play();}, 40);
+  if(_this.data.length == 0) {
+     return;
+  }
+  e = _this.data[0];
+  var op = parseFloat(e.style.opacity, 10);
+  op = op - 0.1;
+  if(op >= 0.1) {
+    e.style.opacity = op;
+  } else {
+    e.style.opacity = 0.0;
+    _this.data.shift();
+  }
+  setTimeout(function() { _this.play();}, 40);
   }
 
   this.push = function(e) {
     
-	_this.data.push(e);
+  _this.data.push(e);
   }
 
   this.completed = function() {return _this.data.length == 0; };
@@ -128,48 +126,44 @@ function alpha() {
   </ul> 
   <div class="cnthld-main clearfix">
     <div class="loadingtpl">LOADING...</div> 
-	<div class="col leftside"> 
-	  <div class="plzhld" data-fill="tab_content">
-	    <br><br>
-		<div class="regmain">
-			<div class="right" style="display:none;;">
-				
-			</div>
-			<div class="left" style="font-size:14px;">
-				<table cellpadding="0" cellspacing="0" border="0" width="500" style="margin-left:20px;">
-					<tr>
-						<td>
+  <div class="col leftside"> 
+    <div class="plzhld" data-fill="tab_content">
+      <br><br>
+    <div class="regmain">
+      <div class="right" style="display:none;;">
+        
+      </div>
+      <div class="left" style="font-size:14px;">
+         <div id="forget-1" style="width:500px;margin-left:25px;">
+           <p>
               用户名：<br><br>
-							<input id="name" type=text value="{$fields:authkey/}" />
-							<span class="msg" id="msg-username"></span>
-						</td>
-					</tr>
-					<tr>
-            <td>
-              电子邮件：<br><br>
+              <input id="name" type=text value="{$fields:authkey/}" />
+              <span class="msg" id="msg-username"></span>
+           </p>
+           <p>
+	   <br/>电子邮件：<br><br>
             <input id="email" type=text value="{$fields:authkey/}" />
-						<span class="msg" id="msg-password"></span></td>
-					</tr>
-          <tr>
-						<td>
-			  <br/>
-              <button id="get-pwd" class="uploadBtn small">找回密码</button>
-              <br/><br/>
-              <!-- error msg -->
-              <div id="error" style="border:1px solid #EEE;line-height:30px;text-indent:5px;color:red; opacity:0;"></div>
-              </div>
-              <div class="regmain" style="height:300px;display:none;" id="forget-2">
+            <span class="msg" id="msg-password"></span></td>
+          </p>
+          <p>
+            <br/>
+            <br/>
+            <button id="get-pwd" class="uploadBtn small">找回密码</button>
+            <br/><br/>
+            <!-- error msg -->
+            <div id="error" style="border:1px solid #EEE;line-height:30px;text-indent:5px;color:red; opacity:0;"></div>
+            </div>
+            </p>
+        </div>
+        <div style="width:500px;margin-left: 25px;height:300px;font-size: 18px;display:none;" id="forget-2">
               密码重置邮件已经发送到邮箱，请注意查收!
-              </div>
-            </td>
-					</tr>
-				</table>
+        </div>
           
-			</div>
-		</div>
-	  </div>
-	  <div class="leftside-shadow"></div> 
-	</div> 
+      </div>
+    </div>
+    </div>
+    <div class="leftside-shadow"></div> 
+  </div> 
   </div>
   </div> 
   </div> 

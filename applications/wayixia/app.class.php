@@ -97,8 +97,8 @@ class CLASS_WAYIXIA_APPLICATION extends CLASS_APPLICATION {
 
   // 查询指定用户的信息 id, uname, nickname
   function query_user_info($uid) {
-    $sql = "select uid AS user_id, name AS user_name, nickname AS user_nickname ";
-    $sql.= "from ##__users where `uid`='{$uid}' limit 0,1;";
+    $sql = "select uid AS user_id, name AS user_name ";
+    $sql.= "from ##__users where uid={$uid} limit 0,1;";
     return $this->db()->get_row($sql);
   }
 
@@ -106,12 +106,12 @@ class CLASS_WAYIXIA_APPLICATION extends CLASS_APPLICATION {
     if(empty($user_id)) 
       trigger_error("paramter is invalid", E_USER_ERROR);
 
-	$path = '';
-	//if(isdebug()) {
-		$path = "http://".$_SERVER['SERVER_NAME'].$this->Config("site.thumb_images_dir");
-	//}
+    $path = '';
+    //if(isdebug()) {
+      $path = "http://".$_SERVER['SERVER_NAME'].$this->Config("site.thumb_images_dir");
+    //}
 
-	$sql_albums_list = "SELECT A.id AS album_id, A.albumname AS album_name, CONCAT('{$path}','/',R.file_name) AS file_name, MAX( I.id ) AS id\n"
+    $sql_albums_list = "SELECT A.id AS album_id, A.albumname AS album_name, CONCAT('{$path}','/',R.file_name) AS file_name, MAX( I.id ) AS id\n"
     . "FROM ##__users_albums AS A\n"
     . "left JOIN ##__users_images AS I ON A.id=I.album_id\n"
     . "left JOIN ##__images_resource AS R ON R.id=I.res_id\n"

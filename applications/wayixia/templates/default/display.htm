@@ -240,7 +240,7 @@ for(var i=0; i < tree_items.length; i++) {
             <div class="thumb-domain">
             <html:list id="domain_list" datasrc="data://album_images"> 
             <t:data>
-              <a href="{$app:path/}/is/[field:id]" target="_self">
+              <a href="{$app:path/}/pins/[field:id]" target="_self">
               <div class="thumb-domain-item" style="background:url({$app:path}{$cfg:site.thumb_images_dir/}/[field:file_name]) 50% 50% no-repeat">
               </div>
               </a>
@@ -264,7 +264,7 @@ for(var i=0; i < tree_items.length; i++) {
             <div class="thumb-domain">
             <html:list id="album_images" datasrc="data://domain_images"> 
             <t:data>
-              <a href="{$app:path/}/d/{$fields:from_host}" target="_self">
+              <a href="{$app:path/}/sites/{$fields:from_host}" target="_self">
               <div class="thumb-domain-item" style="background:url({$app:path}{$cfg:site.thumb_images_dir/}/[field:file_name]) 50% 50% no-repeat">
               </div>
               </a>

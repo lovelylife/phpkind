@@ -161,117 +161,6 @@ function check_image_width(img) {
     <div class="wf-main" id="wf-main">
     </div>
     <div class="clear"></div>
-    <!--div id="left-column">
-      <div style="background: #FFF; height:45px;margin-top: 1px; border-bottom: #F1F1F1;line-height: 45px;font-size: 15px;">
-        <dt style="float: left; width: 88px; ">
-        <img src="{$cfg:site.avatar}/user48.{$fields:uname}.jpg" 
-        style="border:1px solid #CCC; width:48px;margin:20px;" onerror="check_error(this);">
-        </dt>
-        <dd style="margin-left: 88px;line-height: 32px; height: 32px;">
-          <p style="padding-top:12px; ">
-          <h3 style="font-size: 18px;">{$fields:uname}</h3>
-          </p>
-          <p style="color: #333;">
-          <span>{$fields:title}</span>
-          </p>
-        </dd>
-      </div>
-      <div class="clear"></div>
-    </div>
-    <div id="right-column">
-      <DIV style="border:0; background: #FFF;font-size: 16px;height: 45px; line-height: 45px;text-indent: 20px;padding-top: 5px;">
-          <p style="color: #333; margin-top: 3px; margin-bottom: 5px;">
-            <em class="icon-calendar"></em>来自{$fields:from_domain}
-          </p>
-      </DIV>
-      <dl class="tbox" style="border:0;margin-top:0;">
-        <dd>
-          <ul class="module">
-          <style>
-            .thumb-domain {
-              width: 312px;
-              height: 148px;
-              padding-left: 2px;
-              background: #FFFFFF;
-            }
-
-            .thumb-domain .thumb-domain-item {
-              float: left;
-              width: 73px;
-              height: 73px;
-              margin: 5px 5px 0px 0;
-              background: #FFF;
-              overflow: hidden;
-            }
-
-            .thumb-domain-item:hover img {
-              opacity: 0.7;
-            }
-          </style>
-            <div class="thumb-domain">
-            <html:list id="domain_list" datasrc="data://domain_images"> 
-            <t:data>
-              <div class="thumb-domain-item">
-              <a href="{$app:path/}/is/[field:id]" target="_self">
-              <img src="{$app:path}{$cfg:site.thumb_images_dir/}/[field:file_name]"
-              width="100%" onload="check_image_width(this)"/>
-              </a>
-              </div>
-            </t:data>
-            </html:list>
-            </div>
-          </ul>
-          <div style="clear:both; height: 10px;">
-        </dd>
-      </dl>
-
-      <DIV style="border:0; background: #FFF;font-size: 16px;height: 45px; line-height: 45px;text-indent: 20px;padding-top: 5px;">
-          <p style="color: #333; margin-top: 3px; margin-bottom: 5px;">
-            <em class="icon-calendar"></em>{$fields:albumname}
-          </p>
-      </DIV>
-      <dl class="tbox" style="border:0;margin-top:0;">
-        <dd>
-          <ul class="module">
-          <style>
-            .thumb-domain {
-              width: 312px;
-              height: 148px;
-              padding-left: 2px;
-              background: #FFFFFF;
-            }
-
-            .thumb-domain .thumb-domain-item {
-              float: left;
-              width: 73px;
-              height: 73px;
-              margin: 5px 5px 0px 0;
-              background: #FFF;
-              overflow: hidden;
-            }
-
-            .thumb-domain-item:hover img {
-              opacity: 0.7;
-            }
-          </style>
-            <div class="thumb-domain">
-            <html:list id="album_images" datasrc="data://album_images"> 
-            <t:data>
-              <div class="thumb-domain-item">
-              <a href="{$app:path/}/is/[field:id]" target="_self">
-              <img src="{$app:path}{$cfg:site.thumb_images_dir/}/[field:file_name]"
-              width="100%" onload="check_image_width(this)"/>
-              </a>
-              </div>
-            </t:data>
-            </html:list>
-            </div>
-          </ul>
-          <div style="clear:both; height: 10px;">
-        </dd>
-      </dl>
-    </div>
-    <div class="clear"></div-->
   </div>
   <div class="clear"></div>
   <div id="footer" class="tableheader">
@@ -283,14 +172,6 @@ function check_image_width(img) {
 <br><br>
 
 <span id="wf-template">
-<!--div class="box wf-cld"-->
-  <div class="hidden">
-	<a href="">
-      
-    </a>
-    采集到
-    <a href=""></a>
-  </div>
   <div class="actions hidden">
     <div class="right">
       <a href="" onclick="return false;" class="like btn btn11 wbtn">
@@ -313,12 +194,10 @@ function check_image_width(img) {
   <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
   <div class="convo attribution clearfix">
     <p class="NoImage">
-      <a href="{$app:path}/is/[[id]]" target="_self">[[from_domain]]
+      <a href="{$app:path}/pins/[[id]]" target="_self">[[owner]]
       </a>
     </p>
   </div>
-  <div style="display:none;" class="comments muted"></div>
-<!--/div-->
 </span>
 
 <script type="text/javascript">

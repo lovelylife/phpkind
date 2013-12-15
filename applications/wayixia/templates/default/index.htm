@@ -3,14 +3,12 @@
 <head>
 <title> 挖一下，让更多人分享~ - www.wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta property="qc:admins" content="354076571110116375" />
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/layout.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css" />
 <style>
 #wf-template {
 	display:none;
@@ -76,37 +74,40 @@ import utils.tween;
 </head>
 
 <body  style="background:#f7f5f5;">
-{#template index.menu/}
+<!--{  #template index.menu/ }-->
+{#template user.menubar/}
 <br><br>
+<br><br>
+<div class="main-width" align="left">
+  <div class="btn-group time-limit">
+    <a href="http://www.haotui.com/picture/24/" class="btn btn-primary">最近24小时</a>
+    <a href="http://www.haotui.com/picture/8/" class="btn btn-default">最近8小时</a>
+    <a href="http://www.haotui.com/picture/7/" class="btn btn-default">7日内</a>
+    <a href="http://www.haotui.com/picture/30/" class="btn btn-default">30日内</a>
+    <a href="http://www.haotui.com/picture/9999/" class="btn btn-default">推荐用户</a>
+  </div>
+</div>
+<br>
 
 <div class="wf-main" id="wf-main">
-    <div class="box wf-cld">
-	<a href="{$app:path}/helper/whatis" style="font-size:14px;">什么是挖一下?</a>
-	<br><br>
-	<a href="{$app:path}/helper/install">
-	<span class="uploadBtn small" style="width:195px;color:#333;">
-	<span> 开始使用 >> </span></span>
-	</a>
-	<br><br>
-	</div>
+  <!--div class="box wf-cld">
+    <a href="{$app:path}/helper/whatis" style="font-size:14px;">什么是挖一下?</a>
+    <br><br>
+    <a href="{$app:path}/helper/install">
+      <span class="uploadBtn small" style="width:195px;color:#333;">
+      <span> 开始使用 >> </span></span>
+    </a>
+    <br><br>
+  </div-->
 </div>
 <div class="wf-main" align="left">
-	<div class="pager">
-		<span class="disabled"> &lt;  Prev</span>
-		<!--span class="current">1</span>
-		<a href="#">2</a>
-		<a href="#">3</a>
-		<a href="#">4</a>
-		<a href="#">5</a>
-		<a href="#">6</a>
-		<a href="#">7</a>...<a href="#">199</a>
-		<a href="#">200</a>
-		<a href="#">Next  &gt; </a-->
-		{$fields:pager}
-	</div>
+  <div class="pager">
+    <span class="disabled"> &lt;  Prev</span>
+    {$fields:pager}
+  </div>
 
 	
-	<div id="footer" class="tableheader">
+  <div id="footer" class="tableheader">
     <p>
       Powered By <a href="http://wayixia.com">wayixia.com</a>. All Rights Reservered. <a href="http://www.miitbeian.gov.cn/">沪ICP备13019405号</a>
     </p>
@@ -114,52 +115,16 @@ import utils.tween;
 </div>
 
 <span id="wf-template">
-<!--div class="box wf-cld"-->
-  <div class="hidden">
-	<a href="">
-      karlh
-    </a>
-    采集到
-    <a href="">自然美</a>
-  </div>
-  <div class="actions hidden">
-    <div class="right">
-      <a data-id="39605487" href="/#" onclick="return false;" class="like btn btn11 wbtn">
-         <strong><em></em>赞</strong><span></span>
-	  </a>
-    </div>
-    <div class="left">
-      <a data-id="39605487" title="快速转采" href="/#" onclick="return false;" class="thunderpin btn btn11 wbtn">
-        <strong><em></em></strong><span></span>
-      </a>
-      <a onclick=""
-         href="/#" class="repin btn btn11 wbtn">
-        <strong>转采</strong><span></span>
-      </a>
-    </div>
-  </div>
-  <a href="{$app:path/}/is/[[id]]" target="_self" class="img  x">
+  <a href="{$app:path/}/pins/[[id]]" target="_self" class="img x">
     <img src="{$app:path}{$cfg:site.thumb_images_dir/}/[[file_name]]" width=[[width]] height=[[height]] alt="">
   </a>
   <p class="description">[[title]]</p>
   <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
   <div class="convo attribution clearfix">
     <p class="NoImage">
-      <a href="{$app:path/}/is/[[id]]" target="_blank">[[from_host]]
-      </a>
+      <a href="{$app:path/}/pins/[[id]]" target="_blank">[[owner]]</a>
     </p>
   </div>
-  <div style="display:none;" class="comments muted"></div>
-  <div style="display: none;" class="write convo clearfix">
-    <a href="http:" title="" class="img x">
-      <!--img src=""-->
-    </a>
-    <form action="" method="POST">
-      <textarea placeholder="添加评论或把采集@给好友" class="GridComment"></textarea>
-      <a href="#" onclick="return false;" class="grid_comment_button"></a>
-    </form>
-  </div>
-<!--/div-->
 </span>
 
 <script type="text/javascript">
@@ -179,34 +144,20 @@ function store(arr) {
   }
 }
 
-/*
-var g_waterfall = null;
-
-// test 
- var html = "xxxx<a>[[url]]</a>[[url]]yyyyyyy";
- var arr = [{url:'http://baidu.com'}];
-
- var output = html.replace(/\[\[(\w+)\]\]/ig, 
-	function(w,w2,w3,w4) {
-		return arr[0][w2];
-	}
- );
-
- alert(output);
-*/
 
 var images_data = {$fields:images_data/};
 var g_store = new store(images_data);
 
 function getScrollTop(){     
-         var scrollTop=0;     
-         if(document.documentElement&&document.documentElement.scrollTop){     
-           scrollTop=document.documentElement.scrollTop;     
-         }else if(document.body){     
-           scrollTop=document.body.scrollTop;     
-         }     
-         return scrollTop;     
-       }     
+  var scrollTop=0;     
+  if(document.documentElement&&document.documentElement.scrollTop){     
+    scrollTop=document.documentElement.scrollTop;     
+  } else if(document.body){     
+    scrollTop=document.body.scrollTop;     
+  }     
+
+  return scrollTop;     
+}     
 
 Q.Ready(function(){
 
@@ -218,22 +169,19 @@ Q.Ready(function(){
 	"animate" : new alpha(),
   });
 
-
-
   g_waterfall.append(g_store.pop(10));
 
   var nav = Q.$('nav');
   var nav_menu = Q.$('nav_wrapper');
   Q.addEvent(window, 'scroll', 
     function() {
-	  var pos = Q.absPosition(nav);
-	  if(pos.top <= getScrollTop()) {
-	    //console.log(pos.top);
-		nav_menu.className = 'main_in_wrapper floating';
-	  } else {
-	    nav_menu.className = 'main_in_wrapper';
-	  }
-	}
+      var pos = Q.absPosition(nav);
+      if(pos.top <= getScrollTop()) {
+        nav_menu.className = 'main_in_wrapper floating';
+      } else {
+        nav_menu.className = 'main_in_wrapper';
+      }
+    }
   , false)
 });
 
@@ -241,3 +189,4 @@ Q.Ready(function(){
 </script>
 </body>
 </html>
+

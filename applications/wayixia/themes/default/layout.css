@@ -30,14 +30,11 @@ ul,ol {list-style-type:none;}
 						   browsers */
 }
 
-#main {
-	max-width: 980px;	/* max resolution - 25px to accomadate for the vertical
-						   scrollbar */
-	min-width: 980px;	/* min resolution - 25px */
-	margin: 0 auto;		/* auto horizontal margins will cause the layout to be
-						   horizontally centered (usually) */
+.main-width {
+	max-width: 990px;	/* max resolution - 25px to accomadate for the vertical  scrollbar */
+	min-width: 990px;	/* min resolution - 25px */
+	margin: 0 auto;		/* auto horizontal margins will cause the layout to be horizontally centered (usually) */
 	font-size:13px;
-
 }
 
 #book {
@@ -45,31 +42,6 @@ ul,ol {list-style-type:none;}
 							   in very low resolution */
 	border: solid 1px #ccc;
 	background-color: #fff;
-}
-
-#masthead,
-#footer {
-	border-top: solid 0px #ccc;
-	margin: 1em;
-	padding: 1px 0.5em;
-}
-
-#masthead {
-	padding: 1em;
-	margin-bottom: 0;
-	background-image: url(../images/flair3.png);
-	background-repeat: no-repeat;
-	background-position: 100% 20%;
-}
-
-#masthead h1 {
-	font-size: 1em;
-	margin: 0;
-}
-
-#masthead h2 {
-	font-size: 2em;
-	margin: 0;
 }
 
 #main-menu {

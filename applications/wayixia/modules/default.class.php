@@ -37,7 +37,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
       $tag = $_GET['tag'];
 
       $sql = "select ";
-      $sql.= "R.file_name, R.width, R.height, U.id as id, U.from_host, U.title ";
+      $sql.= "R.file_name, R.width, R.height, U.id as id, U.uid as owner, U.title ";
       $sql.= " from ##__images_resource AS R, ##__users_images AS U ";
 	  $sql.= " where U.res_id=R.id and U.album_id!=0 ";
 	  // where condition
@@ -58,7 +58,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
         "tpl" => "/index/".urlencode($tag)."/{pid}",
       );
 
-			// 实例化分页类,初始化构造函数中的总条目数和每页显示条目数
+      // 实例化分页类,初始化构造函数中的总条目数和每页显示条目数
       $pager = new CLASS_PAGE($cfg);
       
       $sql .= $pager->getSQLPage();
@@ -113,7 +113,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     //print_r($thumb_images);
 
     // get album info
-    $get_album_info_sql = "select UA.albumname, U.nickname from ##__users_albums as UA, ##__users AS U where UA.id='{$album_id}' and UA.uid=U.uid limit 0,1;";
+    $get_album_info_sql = "select UA.albumname, U.name as nickname from ##__users_albums as UA, ##__users AS U where UA.id='{$album_id}' and UA.uid=U.uid limit 0,1;";
     $album_info = $db->get_row($get_album_info_sql);
     if(empty($album_info)) {
       $album_info = array(
@@ -127,7 +127,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $ids = array();
     $db->get_results($sql_preview_next, $ids);
     for($i=0; $i < count($ids); $i++) {
-      $t->push($ids[$i]['description'], '<a href="'._IPATH.'/is/'.$ids[$i]['id'].'" class="'.$ids[$i]['description'].' x "></a>');
+      $t->push($ids[$i]['description'], '<a href="'._IPATH.'/pins/'.$ids[$i]['id'].'" class="'.$ids[$i]['description'].' x "></a>');
     }
     //print_r($ids);
     //print_r($album_info);
@@ -142,7 +142,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $album_id = intval($_GET['aid'], 10);
     
 	  // get album info
-    $get_album_info_sql = "select A.albumname, U.nickname, U.name as uname, U.uid as uid from ##__users_albums as A, ##__users AS U where A.id={$album_id} and A.uid=U.uid limit 0,1;";
+    $get_album_info_sql = "select A.albumname, U.name as uname, U.uid as uid from ##__users_albums as A, ##__users AS U where A.id={$album_id} and A.uid=U.uid limit 0,1;";
     $album_info = $db->get_row($get_album_info_sql);
     //print_r($album_info);
     if(empty($album_info)) {
@@ -212,7 +212,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
       trigger_error("invalid host", E_USER_ERROR);
 
     // images data
-    $sql = "select R.file_name, R.width, R.height, U.id as id, U.from_host, U.title from ##__images_resource AS R, ##__users_images AS U where U.res_id=R.id and U.album_id>0 and U.from_host='{$from_host}' order by U.id DESC";
+    $sql = "select R.file_name, R.width, R.height, U.id as id, U.uid as owner, U.title from ##__images_resource AS R, ##__users_images AS U where U.res_id=R.id and U.album_id>0 and U.from_host='{$from_host}' order by U.id DESC";
     $images = array();
     $db->get_results($sql, $images);
 

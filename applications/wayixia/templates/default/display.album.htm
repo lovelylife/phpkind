@@ -6,7 +6,6 @@
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/layout.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css"/>
@@ -47,9 +46,9 @@
 
 .share_count {
   float:left;
-	width:50px;
-	overflow:visible;
-	background-image:url({$themes:path}/count.gif); 
+  width:50px;
+  overflow:visible;
+  background-image:url({$themes:path}/count.gif); 
     background-position:0px 0px;
     font-weight: bold;
     height: 32px;
@@ -60,8 +59,8 @@
     display:block;
 }
 a.share_count:hover{
-	background-image:url({$themes:path}/count.gif); 
-  	background-position:0px -32px; 
+  background-image:url({$themes:path}/count.gif); 
+    background-position:0px -32px; 
 }
 
 .share_count span{
@@ -84,7 +83,7 @@ a.share_count:hover{
 <style>
 
 #wf-template {
-	display:none;
+  display:none;
 }
 
 .pic {
@@ -173,35 +172,38 @@ function check_image_width(img) {
         </dd>
       </dl>
       <div class="user-profile">
-			  <div class="profile-basic">
-				<dl style="padding:5px 0;">
-				  <dt>
-					<img src="{$app:path}{$cfg:site.avatar}/user92.{$fields:uname}.jpg" class="normalFace" style="border:1px solid #CCC; width:100%;" onerror="check_error(this);">
-					</dt>
-				  <dd class="name"><a href="#" title="修改个人信息" >{$fields:nickname/}</a></dd>
-				  <dd class="company">	</dd>
-				  <dd></dd>
-				  <dd class="privacy-set">
-					
-					<a href="#" >&nbsp;&nbsp;</a>
-					
-				  </dd>
-				</dl>
-			  </div>
-			  <div>
-				<html:list
-					id="mydatamenu" 
-					datasrc="data://albums_data" 
-					keySelected="name"
-					valueSelected="{$v:tag}"
-					maskSelected="curr"
-				>
-					<t:data><a href="{$app:path/}/albums/[field:id]" >
-					<span class="uploadBtn small" style="width:195px;color:#333;margin: 3px 0px; text-indent: 10px;text-align:left;">
-						<span> [field:albumname] </span></span></a></t:data>
-				</html:list>
-			  </div>
-			</div>
+        <div class="profile-basic">
+        <dl style="padding:5px 0;">
+          <dt>
+          <img src="{$app:path}{$cfg:site.avatar}/user92.{$fields:uname}.jpg" class="normalFace" style="border:1px solid #CCC; width:100%;" onerror="check_error(this);">
+          </dt>
+          <dd class="name"><a href="#" title="修改个人信息" >{$fields:nickname/}</a></dd>
+          <dd class="company">  </dd>
+          <dd></dd>
+          <dd class="privacy-set">
+          
+          <a href="#" >&nbsp;&nbsp;</a>
+          
+          </dd>
+        </dl>
+        </div>
+        <div>
+        <html:list
+          id="mydatamenu" 
+          datasrc="data://albums_data" 
+          keySelected="name"
+          valueSelected="{$v:tag}"
+          maskSelected="curr"
+        >
+        <t:data>
+        <a href="{$app:path/}/albums/[field:id]" >
+            <span class="uploadBtn small" style="width:195px;color:#333;margin: 3px 0px; text-indent: 10px;text-align:left;">
+            <span> [field:albumname] </span></span>
+          </a>
+	</t:data>
+        </html:list>
+        </div>
+      </div>
         <br><br>
       </div>
     </div>
@@ -330,7 +332,7 @@ function check_image_width(img) {
 <span id="wf-template">
 <!--div class="box wf-cld"-->
   <div class="hidden">
-	<a href="">
+  <a href="">
       
     </a>
     采集到
@@ -340,7 +342,7 @@ function check_image_width(img) {
     <div class="right">
       <a href="" onclick="return false;" class="like btn btn11 wbtn">
          <strong><em></em>赞</strong><span></span>
-	  </a>
+    </a>
     </div>
     <div class="left">
       <a title="快速转采" href="" onclick="return false;" class="thunderpin btn btn11 wbtn">
@@ -374,11 +376,11 @@ function store(arr) {
 
   this.pop = function(len) {
     var arr = [];
-	while(len >= 0 && _this.data.length > 0) {
-	  arr.push(_this.data.shift());
-	  len--;
-	}
-	return arr;
+  while(len >= 0 && _this.data.length > 0) {
+    arr.push(_this.data.shift());
+    len--;
+  }
+  return arr;
   }
 }
 var g_waterfall = null;
@@ -397,10 +399,10 @@ function getScrollTop(){
 
 Q.Ready(function(){
   g_waterfall = new Waterfall({
-	"container":"wf-main",
-	"colWidth":238,
-	"colCount":4,
-	"template":Q.$('wf-template').innerHTML,
+  "container":"wf-main",
+  "colWidth":238,
+  "colCount":4,
+  "template":Q.$('wf-template').innerHTML,
   });
 
 

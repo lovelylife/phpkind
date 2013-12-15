@@ -6,9 +6,9 @@
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/layout.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
 <style>
 
@@ -187,7 +187,6 @@ Q.Ready(function(){
   <!--li class="tieba-tab"><a id="tiebatab" href="#" class="tab-title songti tabbtn" hidefocus="" data-click="tieba"><span class="tab-title-tag"></span>贴吧</a> </li-->
   </ul> 
   <div class="cnthld-main clearfix">
-    <div class="loadingtpl">LOADING...</div> 
 	<div class="col leftside"> 
 	  <div class="plzhld" data-fill="tab_content">
 	    <div class="action-bar"> <p>共有<b color="red">{$fields:albums_num}</b>个画集  &nbsp;&nbsp;&nbsp; </p>
@@ -253,15 +252,6 @@ Q.Ready(function(){
   </div>
 
 </textarea>
-
-<span id="debug">
-
-</span>
-  <!--div style="position:absolute;right:15px;bottom:0;padding:10px 0;" class="write clearfix">
-     <a href="" onclick="" class="like btn btn11 wbtn"><strong><em></em>编辑</strong><span></span>
-	 </a>    
-     <a onclick=""
-         href="" class="repin btn btn11 wbtn"><strong>查看</strong><span></span></a>
-  </div-->
+<span id="debug"></span>
 </body>
 </html>

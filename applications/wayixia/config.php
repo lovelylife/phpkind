@@ -70,14 +70,15 @@ return array (
     'attachments' => '/attach',
     'filters' => 'jpg,jpeg,gif,png,rar,zip,doc,xls',
   ),
-  'email' => 
+  'email' =>
   array (
-    'smtpserver' => 'relay-hosting.secureserver.net',
-    'auth' => 0,
-    'user' => 'wayxiatest',
-    'pwd' => '123456123456',
-    'from' => 'wayxiatest@126.com',
+    'smtpserver' => 'smtp.exmail.qq.com',
+    'auth' => 1,
+    'user' => 'no-reply@wayixia.com',
+    'pwd' => '32A58339194C0E6F',
+    'from' => '[挖一下]<no-reply@wayixia.com>',
   ),
+  
 );
 
 ?>

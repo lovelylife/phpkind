@@ -6,9 +6,9 @@
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/layout.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
 <style>
 <!--
@@ -827,7 +827,6 @@ Q.Ready(function(){
   </ul> 
   <div class="cnthld-main clearfix">
   <div class="col leftside"> 
-    <div class="loadingtpl">LOADING...</div> 
     <div class="plzhld" data-fill="tab_content">
       <div class="action-bar">
         <p>
@@ -835,8 +834,8 @@ Q.Ready(function(){
         </p>
         <iframe id="upload_iframe" src="{$app:module}&action=avatar-upload-panel&callback=loadimage" width="0" height="0" style="width:0px; height:0;visibility:hidden;"></iframe>
         <div style="position:absolute; right:0; bottom:0; width:300px; height: 48px; line-height: 50px;text-align:right;margin-right: 15px;">
-              <span id="upload_file" class="uploadBtn small">上传头像</span>
-              <span id="image_save" class="uploadBtn small">保存头像</span>
+              <button id="upload_file" class="uploadBtn small">上传头像</button>
+              <button id="image_save" class="uploadBtn small">保存头像</button>
             </div>
         </div>
       </div>

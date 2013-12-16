@@ -30,10 +30,9 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 
     $db = &$this->App()->db();
     $album_id = intval($_GET['id'], 10);
-    if($album_id != 0) {
+    if(is_numeric($album_id) && $album_id !=0 ) {
       // get albums info
-      $sql_get_album = "select * from ##__users_albums where id='{$album_id}' and uid={$uid} order by create_time desc limit 0, 1;";
-
+      $sql_get_album = "select * from ##__users_albums where id={$album_id} and uid={$uid} order by create_time desc limit 0, 1;";
       $album_info = $db->get_row($sql_get_album);
       if(empty($album_info)) {
         die('invalid album');
@@ -50,7 +49,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     // images data
     $sql = "select R.file_name, R.width, R.height, U.id as id, U.from_host, U.title, U.agent, U.create_date ";
     $sql.= "from ##__images_resource R, ##__users_images U ";
-    $sql.= "where U.res_id=R.id and U.album_id={$album_id} order by U.id DESC";
+    $sql.= "where U.res_id=R.id and U.album_id={$album_id} && U.uid={$uid} order by U.id DESC";
     $images = array();
 
     $db->get_results($sql, $images);

@@ -5,11 +5,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/layout.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
 
 <script src="{$app:qlib}/Q.js">
@@ -188,9 +187,9 @@ function check_width() {
             <span class="msg" id="msg-username"></span>
           </p>
           <p> <br>
-            <span class="uploadBtn small" id='button-save'>保 存</span>
-            <span class="uploadBtn small" id='button-delete'>删 除</span>
-            <span class="uploadBtn small" id='button-back'>返 回</span>
+            <button class="uploadBtn small" id='button-save'>保 存</button>
+            <button class="uploadBtn small" id='button-delete'>删 除</button>
+            <button class="uploadBtn small" id='button-back'>返 回</button>
           </p>
         </div>
       </div>

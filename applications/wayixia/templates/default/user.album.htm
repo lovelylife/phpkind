@@ -6,9 +6,9 @@
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/layout.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
 <style>
 
@@ -351,7 +351,6 @@ Q.Ready(function(){
   <!--li class="tieba-tab"><a id="tiebatab" href="#" class="tab-title songti tabbtn" hidefocus="" data-click="tieba"><span class="tab-title-tag"></span>贴吧</a> </li-->
   </ul> 
   <div class="cnthld-main clearfix">
-    <div class="loadingtpl">LOADING...</div> 
     <div class="col leftside" style=""> 
       <div class="plzhld" data-fill="tab_content">
         <div class="action-bar"> 
@@ -359,10 +358,10 @@ Q.Ready(function(){
           <a href="{$app:app}&mod=user&action=home">我的画集 </a> >> 
           <b style="color:red;">{$fields:albumname}</b> </p>
           <div style="position:absolute; right:0; bottom:0; width:300px; height: 48px; line-height: 50px;text-align:right;margin-right: 15px;">
-            <span id="button_bat_mode" class="uploadBtn small">批量处理图片</span>
-            <span id="button_move" class="uploadBtn small">移动至...</span>
-            <span id="button_delete" class="uploadBtn small">删除</span>
-            <span id="button_complete" class="uploadBtn small">完成</span>
+            <button id="button_bat_mode" class="uploadBtn small">批量处理图片</button>
+            <button id="button_move" class="uploadBtn small">移动至...</button>
+            <button id="button_delete" class="uploadBtn small">删除</button>
+            <button id="button_complete" class="uploadBtn small">完成</button>
           </div>
         </div>
         <br>

@@ -64,7 +64,6 @@ function check_error(img) {
   if(img.iserror) {
     return;
   }
-  console.log("error:"+img);
   img.iserror = true;
   img.src='{$themes:path}/album-empty.png';
   img.width=200;
@@ -163,9 +162,6 @@ Q.Ready(function(){
 
 <div id="wrapper" class="skin01" style="margin-top: 40px;"> 
 <div class="bground"> 
-  <!--div id="head"> 
-	{#template user.infoheader}
-  </div--> 
   <div id="content">  
   <div id="cnthld" class="beibao" style="display: block;"> 
   <ul class="content-tab"> 
@@ -184,7 +180,6 @@ Q.Ready(function(){
       <span class="tab-title-tag">设置</span>头像
     </a>  
   </li>
-  <!--li class="tieba-tab"><a id="tiebatab" href="#" class="tab-title songti tabbtn" hidefocus="" data-click="tieba"><span class="tab-title-tag"></span>贴吧</a> </li-->
   </ul> 
   <div class="cnthld-main clearfix">
 	<div class="col leftside"> 
@@ -196,12 +191,6 @@ Q.Ready(function(){
 		</div>
 		<br>
 		<div class="wf-main" id="wf-main" style="margin-left:20px;">
-		<!--div class="box wf-cld">
-			<div class="info1 clearFix">
-			<p class="pic"><img src="{$fields:album}"></p>
-			<p class="xx"><a href="http://weibo.com/qlibs">{$fields:username/}</a></p>
-			<div class="line"></div>
-			</div-->
 		</div>
 	  </div>
 	  <br><br><br><br>
@@ -209,23 +198,11 @@ Q.Ready(function(){
 	  
 	  <div class="leftside-shadow"></div> 
 	</div> 
-	<!--div class="col rightside"> 
-	  <div class="plzhld p1" data-fill="friend_content"></div> 
-	</div--> 
   </div>
   </div> 
   </div> 
   
-  <div id="foot"> <div class="mod-footer"> <div class="bottom-line2"> <p>© WAYIXIA.COM <em class="s-bottom-copyright">&nbsp;&nbsp;&nbsp;&nbsp;</em></p> </div></div> </div> </div> 
-  
-  <!--div class="mod-right-nav nav-normal" id="navhld" style="display: block;">
-  <div class="plzhld">
-    <div class="right-nav-issues" id="1000002" style="display: block;"> 
-      <span class="question-mark"></span> 
-      <a href="http://qingting.baidu.com/index?pid=17" class="issues" target="_blank">意见反馈</a> 
-    </div>
-  </div>
-  </div-->
+  <div id="foot"> <p>© WAYIXIA.COM <em class="s-bottom-copyright">&nbsp;&nbsp;&nbsp;&nbsp;</em></p> </div> </div> 
   <a class="mod-go-top-btn" href="#" onclick="return false" style="display: none; position: fixed; bottom: 5px; right: 66.5px;"></a> 
 </div>
 
@@ -247,11 +224,8 @@ Q.Ready(function(){
       [[album_name]]</a>
     </p>
   </div>
-  <div style="display:none;" class="comments muted">
-  
-  </div>
-
 </textarea>
+
 <span id="debug"></span>
 </body>
 </html>

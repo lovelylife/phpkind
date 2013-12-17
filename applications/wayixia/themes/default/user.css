@@ -358,11 +358,11 @@ height: 40px; text-align:center;line-height:40px;
 
 .nav-menu {
 	height:40px;
-	background:url(logo-small.png) left -2px no-repeat;
+/*background:url(logo-small.png) left -2px no-repeat;*/
 }
 
 .nav-menu ul {
-	float:right;
+
 }
 
 .nav-menu ul li.nav_item {
@@ -436,6 +436,57 @@ height: 40px; text-align:center;line-height:40px;
 }
 
 /* user setting drop menu end */
+
+/* start button drop menu */
+.start-button {
+  position: relative;;
+  width: 300px;
+  padding: 0;
+  background: url(logo-small.png) -3px -43px no-repeat;
+}
+
+.start-button:hover {
+  width:300px;
+  background: url(logo-small.png) -3px top no-repeat;
+  margin-left: 2px;
+}
+
+.start-button a, .start-button:visited {
+  display:block;
+}
+
+.start-button dt {
+  display: none;
+}
+
+.start-button:hover dt {
+  background: #FFF;
+  display: block;
+  width: 100px;
+  position:absolute;
+  right: 0; 
+  top: 38px;
+  margin-left: 2px;
+  box-shadow:0 1px 3px rgba(0,0,0,.3);
+  -moz-box-shadow:0 1px 3px rgba(0,0,0,.3);
+  -webkit-box-shadow:0 1px 3px rgba(0,0,0,.3)
+}
+
+.start-button dt dl a, .start-button dt dl a:visited {
+  color: #999;
+  font-weight:bold;
+  display:block;
+  text-indent: 10px;
+}
+
+.start-button dt dl a:hover {
+  color: #000;
+  background: #F1F1F1;
+  display:block;
+  text-decoration: none;  
+}
+
+/* start button drop menu end */
 
 .login-buttons {
   background: #FFF;

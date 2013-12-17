@@ -2,25 +2,26 @@
 <div class="main-width" style="z-index:3;">
   <div class="nav-menu" style="height:40px;">
     <ul id="user-menu">
+      <li class="nav_item start-button"><a href="{$app:app}" title="首页">&nbsp;</a></li>
 <?php 
     $name = $theApp->get_user_info('name');
     if(empty($name)) {
 ?>  
-      <li class="nav_item"><a href="{$app:app}">首页</a></li>
-      <li class="nav_item"><a href="{$app:app}&mod=user&action=register">注册</a></li>
-      <li class="nav_item"><a href="{$app:app}&mod=user&action=regular-login" >登录</a></li>
+      <li class="nav_item" style="float:right;"><a href="{$app:app}&mod=user&action=register">注册</a></li>
+      <li class="nav_item" style="float:right;"><a href="{$app:app}&mod=user&action=regular-login" >登录</a></li>
 <?php
     } else {
 ?>
-      <li class="nav_item"><a href="{$app:app}&mod=user&action=home"><b><?php echo $name;?></b></a></li>
-      <li class="nav_item user-setting" style="padding-right: 0; ">
+      <li class="nav_item user-setting" style="padding-right: 0; float:right;">
         <a href="test">
           <dt>
             <dl><a href="{$app:app}&mod=user&action=home"> 个人中心 </a></dl>       
+            <dl><a href="{$app:app}&mod=user&action=avatar"> 设置头像 </a></dl>       
             <dl><a href="{$app:app}&mod=user&action=logout">退出</a></dl>
           </dt>
         </a>
       </li>
+      <li class="nav_item" style="float:right;"><a href="{$app:app}&mod=user&action=home"><b><?php echo $name;?></b></a></li>
 <?php 
     }
 ?>

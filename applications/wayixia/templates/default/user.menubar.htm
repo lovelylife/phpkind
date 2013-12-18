@@ -1,8 +1,16 @@
 <div id="user-title-bar">
-<div class="main-width" style="z-index:3;">
+<!--div id="user-title-bar-background"></div-->	
+<div class="main-width">
   <div class="nav-menu" style="height:40px;">
     <ul id="user-menu">
-      <li class="nav_item start-button"><a href="{$app:app}" title="首页">&nbsp;</a></li>
+      <li class="nav_item start-button">
+        <a href="{$app:app}" title="返回首页">&nbsp;
+          <!--dt>
+            <dl style="height: 200px;"><a href="{$app:app}&mod=user&action=home"> 个人中心 </a></dl>       
+            <dl style="position:absolute;left:0;right:0;bottom:0;background:#FAFAFA;border-top:1px #F5F2F2 solid;text-align:right;"><a href="{$app:app}&mod=user&action=home"> 个人中心 </a></dl>       
+	  </dt-->
+        </a>
+      </li>
 <?php 
     $name = $theApp->get_user_info('name');
     if(empty($name)) {

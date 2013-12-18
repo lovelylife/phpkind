@@ -346,15 +346,28 @@ height: 40px; text-align:center;line-height:40px;
 	left:0;top:0;right:0; 
 	height: 38px;
 	line-height:38px; 
-	background:#59677f;
 	z-index:999999999999991;
+	background:#59677f;
+	opacity: 0.9;
 	color:#FFF;
-	cursor:default;
-	opacity: 0.89;
 	text-align:left;
 	font-size:12px;
 	box-shadow: 0 -1px 0 #59677f inset,0 0 16px rgba(0,0,0,.15);
 }
+
+#user-title-bar-background {
+	position:fixed; 
+	left:0;top:0;right:0; 
+	height: 38px;
+	line-height:38px; 
+	background:#59677f;
+	color:#FFF;
+	cursor:default;
+	opacity: 0.9;
+	text-align:left;
+	font-size:12px;
+}
+
 
 .nav-menu {
 	height:40px;
@@ -411,10 +424,11 @@ height: 40px; text-align:center;line-height:40px;
 .user-setting:hover dt {
   background: #FFF;
   display: block;
-  width: 100px;
+  width: 110px;
   position:absolute;
   right: 0; 
   top: 38px;
+  border-left: #FF9900 solid 5px;
   margin-left: 2px;
   box-shadow:0 1px 3px rgba(0,0,0,.3);
   -moz-box-shadow:0 1px 3px rgba(0,0,0,.3);
@@ -460,28 +474,34 @@ height: 40px; text-align:center;line-height:40px;
 }
 
 .start-button:hover dt {
-  background: #FFF;
+/*  background-color: #59677f; */
+  background-color: #FFF;
   display: block;
-  width: 100px;
+  border-left: 5px #FF9900 solid;
+  width: 400px;
+  height: 250px;
   position:absolute;
-  right: 0; 
+  left: 0; 
   top: 38px;
   margin-left: 2px;
-  box-shadow:0 1px 3px rgba(0,0,0,.3);
+  box-shadow:0 1px 5px rgba(0,0,0,.3);
+  -moz-box-shadow:0 1px 5px rgba(0,0,0,.3);
+  -webkit-box-shadow:0 1px 5px rgba(0,0,0,.3);
+/* box-shadow:0 1px 3px rgba(0,0,0,.3);
   -moz-box-shadow:0 1px 3px rgba(0,0,0,.3);
   -webkit-box-shadow:0 1px 3px rgba(0,0,0,.3)
+*/
 }
 
 .start-button dt dl a, .start-button dt dl a:visited {
   color: #999;
-  font-weight:bold;
+  /*font-weight:bold;*/
   display:block;
   text-indent: 10px;
 }
 
 .start-button dt dl a:hover {
   color: #000;
-  background: #F1F1F1;
   display:block;
   text-decoration: none;  
 }

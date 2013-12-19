@@ -117,30 +117,30 @@ Waterfall.prototype = {
        return false;
   },
 
-	onscroll : function() {
-	  //滚动条未达到页尾则返回
-	  var _this = this;
+  onscroll : function() {
+    //滚动条未达到页尾则返回
+    var _this = this;
 
-	  if(!_this.needload()) return;
+    if(!_this.needload()) return;
       // console.log('load new data');
-	  _this.append(g_store.pop(5));
+    _this.append(g_store.pop(5));
       Q.removeEvent(window, 'scroll');
-      setTimeout(function(){ Q.addEvent(window, 'scroll', function() { _this.onscroll() }, false); }, 2000);	
-	},
+      setTimeout(function(){ Q.addEvent(window, 'scroll', function() { _this.onscroll() }, false); }, 2000);  
+  },
 
-	append : function(items) {
-	  var _this = this;
-	  var tpl = _this.template;
-	  var len = items.length;
-	  for (var i = 0; i < len; i++) {
+  append : function(items) {
+    var _this = this;
+    var tpl = _this.template;
+    var len = items.length;
+    for (var i = 0; i < len; i++) {
         _this.create_item(_this.id, items[i], tpl);
-	  }
+    }
 
-	  _this.id.style.height = _this.maxArr(_this.col) + "px";
-	  _this.animateObject && _this.animateObject.play();
-	},
+    _this.id.style.height = _this.maxArr(_this.col) + "px";
+    _this.animateObject && _this.animateObject.play();
+  },
 
-	create_item : function(container, item, tpl) {
+  create_item : function(container, item, tpl) {
     var _this = this;
     var pre_width = 192;
     tpl = tpl.replace(/\[\[(\w+)\]\]/ig, 
@@ -207,25 +207,25 @@ function alpha() {
 
   this.data = [];
   this.play = function() {
-	if(_this.data.length == 0) {
-	   return;
-	}
-	e = _this.data[0];
-	var op = parseFloat(e.style.opacity, 10);
-	op += 0.1;
-	if(op < 1.0) {
-	   e.style.opacity = op;
-	} else {
-	   _this.data.shift();
-	}
-	setTimeout(function() { _this.play();}, 40);
+  if(_this.data.length == 0) {
+     return;
+  }
+  e = _this.data[0];
+  var op = parseFloat(e.style.opacity, 10);
+  op += 0.1;
+  if(op < 1.0) {
+     e.style.opacity = op;
+  } else {
+     _this.data.shift();
+  }
+  setTimeout(function() { _this.play();}, 40);
   }
 
   this.push = function(e) {
     if(e) {
-		e.style.opacity = 0.0;
-		_this.data.push(e);
-	}
+    e.style.opacity = 0.0;
+    _this.data.push(e);
+  }
   }
 
   this.completed = function() {return _this.data.length == 0; };

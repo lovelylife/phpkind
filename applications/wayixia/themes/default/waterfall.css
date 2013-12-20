@@ -67,6 +67,11 @@
   background: #FFF url(selected-picture.png) right top no-repeat; 
 }
 
+/* user box style */
+
+.user-style .box {
+  width: 940px;
+}
 
 .wf-cld .inner{position: absolute;left: -9999px;top: -9999px;margin-bottom: 5px;width: 73px;overflow: hidden;border: 1px solid #f00;border-radius: 3px;}
 .wf-cld .title{margin: 0 0 5px;padding: 5px;width: 63px;color: #f00;font-size: 14px;}

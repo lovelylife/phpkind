@@ -71,7 +71,29 @@
 
 .user-style .box {
   width: 940px;
+  padding:2px 15px 0;
+  border-left: 3px solid #F1F1F1;
 }
+
+.user-style .album-list {
+  margin-left: 400px;
+  height: 172px;
+  background: #FFee00;
+  position:relative;
+}
+
+.user-style .album-list .album {
+  width: 168px;
+  height: 162px;
+  background: blue;
+}	
+
+.user-style .album-list  {text-align:left; font-size:16px; height: 65px; margin-right: 10px;}
+.user-style .album-list span {float: left;width: 260px; text-align:left; height:50px;margin: 5px 0;}
+.user-style .album-list span p { font-size: 14px; color: #999; }
+
+/* user box style end */
+
 
 .wf-cld .inner{position: absolute;left: -9999px;top: -9999px;margin-bottom: 5px;width: 73px;overflow: hidden;border: 1px solid #f00;border-radius: 3px;}
 .wf-cld .title{margin: 0 0 5px;padding: 5px;width: 63px;color: #f00;font-size: 14px;}

@@ -299,9 +299,13 @@ input[type="checkbox"] {
 .user-profile .profile-basic dl dt{float:left;width:90px;text-align:center;position:relative;}
 .user-profile .profile-basic dl dt .face-uploader{position:absolute;left:0;right:0;top:65px;width:90px;text-align:center;}
 .user-profile .profile-basic dl dd{margin-left:100px;padding:2px 0;font-size:14px;}
-.user-profile .profile-basic dl dd.name{margin-top:-6px;}
-.user-profile .profile-basic dl dd.name a{font-size:14px;font-weight:bold;background:url() right center no-repeat;padding:5px 30px 5px 0;}
+.user-profile .profile-basic dl dd.name{ text-indent: 20px;margin-top:-6px;word-wrap: break-word;}
+.user-profile .profile-basic dl dd.name a {font-size:16px;padding:5px 30px 5px 0;font-family:'helvetica neue', arial, sans-serif; color: #666;}
+.user-profile .profile-basic dl dd.name a:hover {font-size:16px;padding:5px 30px 5px 0;font-family:'helvetica neue', arial, sans-serif;color:#000;text-decoration: none;}
 .user-profile .profile-basic dl dd.privacy-set{text-align:right;font-size:12px;}
+.user-profile .profile-basic dl dd.count {text-align:left; font-size:16px; height: 65px; margin-right: 10px;}
+.user-profile .profile-basic dl dd.count span {float: left;width: 100px; text-align:center; height:50px;margin: 5px 0;border-right:1px solid #F5F2F2; }
+.user-profile .profile-basic dl dd.count span p { font-size: 14px; color: #999; }
 
 .uploadBtn{
 height:40px;width:71px; position:relative; display:inline-block; text-align:center;line-height:40px;

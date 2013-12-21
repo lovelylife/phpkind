@@ -22,7 +22,7 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
     $t = new CLASS_TEMPLATES($this->App());
     $t->load('recommend.user');
 
-    $sql = "select * from ##__users limit 0, 100;";
+    $sql = "select uid, name, description from ##__users limit 0, 100;";
     $users_list = array();
     $this->App()->db()->get_results($sql, $users_list);
 

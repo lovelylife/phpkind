@@ -72,28 +72,70 @@
 .user-style .box {
   width: 940px;
   padding:2px 15px 0;
-  border-left: 3px solid #F1F1F1;
+  border-left: 0px solid #F1F1F1;
 }
 
 .user-style .album-list {
-  margin-left: 400px;
+  margin-left: 430px;
   height: 172px;
-  background: #FFee00;
   position:relative;
 }
 
 .user-style .album-list .album {
-  width: 168px;
   height: 162px;
-  background: blue;
-}	
+}
 
-.user-style .album-list  {text-align:left; font-size:16px; height: 65px; margin-right: 10px;}
-.user-style .album-list span {float: left;width: 260px; text-align:left; height:50px;margin: 5px 0;}
-.user-style .album-list span p { font-size: 14px; color: #999; }
+.user-style .album-list  {text-align:left; font-size:16px; }
+.user-style .album-list > span.album {float: left; width: 160px; text-align:left; margin: 5px 0px 5px 10px;}
+.user-style .album-list .album .album-item {float: left;width: 48px;height: 48px;margin: 5px 5px 0px 0;background: #F8F8F8;overflow: hidden;}
+.user-style .album-list .album-item:hover {opacity: 0.7;}
+.user-style .album-list .album .album-name {text-indent: 15px;height: 20px; font-size:14px; line-height:20px;background:red;}
+.user-style .album-list .album .album-body {text-indent: 15px; height: 118px; font-size:14px; line-height:20px;}
+.user-style .album-list .album .album-bottom {text-indent: 15px; height: 20px; font-size:14px; line-height:20px;background:red;padding-right:10px;}
+.user-style .album-list .album button {margin-right: 5px;}
+
 
 /* user box style end */
 
+
+/* normal control */
+
+.button {
+	display:inline-block;
+	line-height:1;
+	border-radius:2px;
+	font-size:14px;
+	padding:0 12px;
+	height:28px;
+	line-height:28px;
+	background:#fff;
+	background:linear-gradient( #FAFAFA,#F2F2F2);
+	border:1px solid #D9D9D9;
+	box-shadow:inset 0 1px 0 white,0 1px 0 rgba(255,255,255,.3);
+	cursor:pointer;
+	text-decoration:none;
+	color:#444;
+	white-space:nowrap;
+	-moz-user-select:none;
+	-webkit-user-select:none;
+	user-select:none;
+	text-shadow:0 1px 0 rgba(255,255,255,.5);
+	text-align:center
+}
+.button:hover {
+	text-decoration:none;
+	color:#444;
+	background:linear-gradient(#FFF,#F7F7F7);
+	box-shadow:inset 0 1px 0 white,0 1px 0 rgba(255,255,255,.05);
+	border:1px solid #CCC
+}
+.button:active {
+	background:linear-gradient( #F2F2F2,#EDEDED);
+	box-shadow:inset 0 1px 1px rgba(0,0,0,.1),0 1px 0 rgba(255,255,255,.3)
+}
+
+
+/* normal control end */
 
 .wf-cld .inner{position: absolute;left: -9999px;top: -9999px;margin-bottom: 5px;width: 73px;overflow: hidden;border: 1px solid #f00;border-radius: 3px;}
 .wf-cld .title{margin: 0 0 5px;padding: 5px;width: 63px;color: #f00;font-size: 14px;}

@@ -37,9 +37,8 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
   function album() {
     $uid = $this->App()->get_user_info('uid');
     $t = new CLASS_TEMPLATES($this->App());
-    $t->load('recommend.user');
+    $t->load('recommend.album');
 
-    $t->push('lastlogin_time', $this->App()->get_user_info('lastlogin_time'));
     $t->push('username', $user_name);
 
 
@@ -48,14 +47,18 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
     createfolders($album_front_dir);
 
     // 获取画集列表
-    $sql_albums_list = $this->App()->get_albums_sql($uid);
+    $sql_albums_list = "SELECT A.id AS album_id, A.albumname AS album_name, CONCAT('{$path}','/',R.file_name) AS file_name, MAX( I.id ) AS id\n"
+    . "FROM ##__users_albums AS A\n"
+    . "left JOIN ##__users_images AS I ON A.id=I.album_id\n"
+    . "left JOIN ##__images_resource AS R ON R.id=I.res_id\n"
+    . "GROUP BY A.id";
     $albums_list = array();
     $this->App()->db()->get_results($sql_albums_list, $albums_list);
     
     if(empty($albums_list)) {
-      $t->push('images_data', '[]');
+      $t->push('albums', '[]');
     } else {
-      $t->push('images_data', json_encode($albums_list));
+      $t->push('albums', json_encode($albums_list));
     }
     $t->push('albums_num', count($albums_list)+1);
     $t->display();

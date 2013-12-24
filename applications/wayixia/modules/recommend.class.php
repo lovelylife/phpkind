@@ -64,7 +64,47 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
     $t->display();
   }
 
+  function get_update($arr) {
+    $str = "";    
+    foreach($arr as $key => $value) {
+      $str .= $key . "=VALUES(".$key."),";
+    }
+    $str = substr($str,0,-1);
+    
+    return $str;
+  }
 
+  function get_value($arr) {}
+
+  function schedule() {
+    $db = &$this->App()->db();
+    // update recommend user count data
+    $sql = "select A.uid, count(A.id) as num_albums, group_concat(A.id) as data_albums ";
+    $sql.= "from ##__users_albums A ";
+    $sql.= "group by A.uid; ";
+
+    $rs = array();
+    $db->get_results($sql, $rs);
+    if(!empty($rs)) {
+      $len = count($rs);
+      $values = "";
+      $fields_update = $this->get_update($rs[0]);
+      $update = $db->insertSQL("nosql_users_recommend", $rs[0]);
+      for($i=1; $i < $len; $i++) {
+        $user_object = $rs[$i];
+        $value = array_values($user_object);
+        $values .= ",('".implode("','", $value)."')";
+      }
+      $update .= $values." ON DUPLICATE KEY UPDATE ".$fields_update.";";
+      echo $update;
+      $db->execute($update);
+    }
+    $sql2 = "select I.album_id, I.count(I.id), group_concat(I.id) ";
+    $sql2.= "from ch_users_images I ";
+    $sql2.= "where I.album_id>0 ";
+    $sql2.= "group by I.album_id;";
+  
+  }
 }
 
 

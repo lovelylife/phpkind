@@ -8,7 +8,9 @@ function Waterfall(param){
   this.mouseover = param.mouseover|| function() {};
   this.mouseout = param.mouseout|| function() {};
   this.click = param.click|| function() {};
+  this.item_callback = param.item_callback || function(name, row) { return row[name]; }
   this.init(param.animate);
+  
 }
 
 Waterfall.prototype = {
@@ -150,6 +152,10 @@ Waterfall.prototype = {
         } else if(w2=='height') {
           return (item.height * pre_width) / (item.width*1.0); 
         }
+       
+	if(_this.item_callback) {
+	  return _this.item_callback(w2, item);
+	}
         return item[w2];
       }
     );

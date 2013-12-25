@@ -22,7 +22,7 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
     $t = new CLASS_TEMPLATES($this->App());
     $t->load('recommend.user');
 
-    $sql = "select uid, name, description from ##__users limit 0, 100;";
+    $sql = "select * from ##__nosql_users_recommend limit 0, 100;";
     $users_list = array();
     $this->App()->db()->get_results($sql, $users_list);
 
@@ -79,9 +79,10 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
   function schedule() {
     $db = &$this->App()->db();
     // update recommend user count data
-    $sql = "select A.uid, count(A.id) as num_albums, group_concat(A.id) as data_albums ";
-    $sql.= "from ##__users_albums A ";
-    $sql.= "group by A.uid; ";
+    $sql = "select U.uid, U.name, U.description, count(A.id) as num_albums, group_concat(A.id) as data_albums ";
+    $sql.= "from ##__users_albums A right join ##__users U on U.uid=A.uid ";
+    $sql.= "group by U.uid ";
+    $sql.= "order by A.id desc; ";
 
     $rs = array();
     $db->get_results($sql, $rs);
@@ -91,7 +92,9 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
       $fields_update = $this->get_update($rs[0]);
       $update = $db->insertSQL("nosql_users_recommend", $rs[0]);
       for($i=1; $i < $len; $i++) {
-        $user_object = $rs[$i];
+        $user_object = &$rs[$i];
+	#print_r($user_object);
+        $this->get_images($user_object['data_albums']);
         $value = array_values($user_object);
         $values .= ",('".implode("','", $value)."')";
       }
@@ -99,11 +102,42 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
       echo $update;
       $db->execute($update);
     }
+    /*
     $sql2 = "select I.album_id, I.count(I.id), group_concat(I.id) ";
-    $sql2.= "from ch_users_images I ";
+    $sql2.= "from ch_users_images I  ";
     $sql2.= "where I.album_id>0 ";
     $sql2.= "group by I.album_id;";
-  
+
+    $rs2 = array();
+    $db->get_results($sql2, $rs2);
+    print_r($rs2);
+     */
+  }
+
+  function get_images($albums) {
+    $db = &$this->App()->db();
+    $sql2 = "select I.album_id, count(I.id) as num_images, group_concat(I.id) as data_images ";
+    $sql2.= "from ch_users_images I  ";
+    $sql2.= "where I.album_id>0 and I.album_id IN ({$albums}) ";
+    $sql2.= "group by I.album_id ";
+    $sql2.= "order by num_images desc;";
+    $rs2 = array();
+    $db->get_results($sql2, $rs2);
+    
+    $r = array();
+    if(empty($rs2)) {
+      return "";
+    } else {
+      $len = count($rs2);
+      if($len > 3) {
+        $len = 3;
+      }
+
+      for($i=0; $i < $len; $i++) {
+        array_push($r, $rs2[$i]);
+      }
+    }
+    print_r($r);
   }
 }
 

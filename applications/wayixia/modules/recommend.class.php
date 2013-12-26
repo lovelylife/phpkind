@@ -79,65 +79,64 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
   function schedule() {
     $db = &$this->App()->db();
     // update recommend user count data
-    $sql = "select U.uid, U.name, U.description, count(A.id) as num_albums, group_concat(A.id) as data_albums ";
+    $sql = "select U.uid, U.name, U.description, count(A.id) as num_albums, U.uid as num_images, group_concat(A.id) as data_albums ";
     $sql.= "from ##__users_albums A right join ##__users U on U.uid=A.uid ";
     $sql.= "group by U.uid ";
-    $sql.= "order by A.id desc; ";
+    $sql.= "order by U.uid desc; ";
 
     $rs = array();
-    $db->get_results($sql, $rs);
+    if(!$db->get_results($sql, $rs))
+      trigger_error($db->get_error(), E_USER_ERROR);
     if(!empty($rs)) {
       $len = count($rs);
       $values = "";
       $fields_update = $this->get_update($rs[0]);
-      $update = $db->insertSQL("nosql_users_recommend", $rs[0]);
       for($i=1; $i < $len; $i++) {
         $user_object = &$rs[$i];
 	#print_r($user_object);
-        $this->get_images($user_object['data_albums']);
-        $value = array_values($user_object);
+	$num_images = 0;
+	$albums = $this->get_images($user_object['data_albums'], $num_images);
+	$user_object['data_albums'] = addslashes(json_encode($albums));
+	$user_object['num_images'] = $num_images;
+	$value = array_values($user_object);
         $values .= ",('".implode("','", $value)."')";
       }
+      $num_images = 0;
+      $albums = $this->get_images($rs[0]['data_albums'], $num_images);
+      $rs[0]['data_albums'] = addslashes(json_encode($albums));
+      $rs[0]['num_images'] = $num_images;
+
+      $update = $db->insertSQL("nosql_users_recommend", $rs[0]);
       $update .= $values." ON DUPLICATE KEY UPDATE ".$fields_update.";";
-      echo $update;
+      //echo $update;
       $db->execute($update);
     }
-    /*
-    $sql2 = "select I.album_id, I.count(I.id), group_concat(I.id) ";
-    $sql2.= "from ch_users_images I  ";
-    $sql2.= "where I.album_id>0 ";
-    $sql2.= "group by I.album_id;";
-
-    $rs2 = array();
-    $db->get_results($sql2, $rs2);
-    print_r($rs2);
-     */
   }
 
-  function get_images($albums) {
+  function get_images($albums, &$num_images) {
+    $num_images = 0;
     $db = &$this->App()->db();
-    $sql2 = "select I.album_id, count(I.id) as num_images, group_concat(I.id) as data_images ";
-    $sql2.= "from ch_users_images I  ";
-    $sql2.= "where I.album_id>0 and I.album_id IN ({$albums}) ";
-    $sql2.= "group by I.album_id ";
-    $sql2.= "order by num_images desc;";
-    $rs2 = array();
-    $db->get_results($sql2, $rs2);
+    $sql = "select I.album_id, A.albumname, count(I.id) as num_images, group_concat(I.id) as data_images ";
+    $sql.= "from ##__users_images I left join ##__users_albums A on A.id=I.album_id ";
+    $sql.= "where I.album_id>0 and I.album_id IN ({$albums}) ";
+    $sql.= "group by I.album_id ";
+    $sql.= "order by num_images desc;";
+
+    $rs = array();
+    $db->get_results($sql, $rs);
     
     $r = array();
-    if(empty($rs2)) {
-      return "";
-    } else {
-      $len = count($rs2);
-      if($len > 3) {
-        $len = 3;
-      }
-
+    if(!empty($rs)) {
+      $len = count($rs);
       for($i=0; $i < $len; $i++) {
-        array_push($r, $rs2[$i]);
+        if($i < 3) {       
+          array_push($r, $rs[$i]);
+	}
+        $num_images += intval($rs[$i]['num_images'], 10);
       }
     }
-    print_r($r);
+
+    return $r;
   }
 }
 

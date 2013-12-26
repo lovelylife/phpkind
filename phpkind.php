@@ -61,25 +61,25 @@ function err_handler( $errno , $errstr , $errfile , $errline) {
         echo "<h3>Application: </h3>".$_GET['app']."\n";
         echo "<h3>Message: </h3>".$errstr."\n";
         // echo "<h3>File: </h3>".$errfile." : ". $errline."\r\n";
-		echo print_stack_trace();
-	    echo "</pre>\r\n";
+	echo print_stack_trace();
+	echo "</pre>\r\n";
         exit(1);
     }    
 }
 
 function print_stack_trace() {
-    $array =debug_backtrace();
-	//print_r($array);
-    unset($array[0]);
-	$html = "<h3>File: </h3>";
-	$count = 0;
-    foreach($array as $row) {
-	  if($count > 0) {
-		$html .=str_ireplace(_IROOT, '', str_replace('\\', '/', $row['file'])) .":".$row['line'].", ".$row['function']."\n";
-	  }
-	  $count++;
+  $array =debug_backtrace();
+  unset($array[0]);
+  $html = "<h3>File: </h3>";
+  $count = 0;
+  foreach($array as $row) {
+    if($count > 0) {
+      $html .=str_ireplace(_IROOT, '', str_replace('\\', '/', $row['file'])) .":".$row['line'].", ".$row['function']."\n";
     }
-    return $html;
+    $count++;
+  }
+  
+  return $html;
 }
 
 function common_substr($str1, $str2) {

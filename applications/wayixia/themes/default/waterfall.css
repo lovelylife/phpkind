@@ -89,7 +89,7 @@
 .user-style .album-list > span.album {float: left; width: 160px; text-align:left; margin: 5px 0px 5px 10px;}
 .user-style .album-list .album .album-item {float: left;width: 48px;height: 48px;margin: 5px 5px 0px 0;background: #F8F8F8;overflow: hidden;}
 .user-style .album-list .album-item:hover {opacity: 0.7;}
-.user-style .album-list .album .album-name {text-indent: 15px;height: 20px; font-size:14px; line-height:20px;background:red;}
+.user-style .album-list .album .album-name { text-indent: 15px; height: 20px; font-size:14px; display:block; line-height:20px;background:red; width: 60px; overflow:hidden;}
 .user-style .album-list .album .album-body {text-indent: 15px; height: 118px; font-size:14px; line-height:20px;}
 .user-style .album-list .album .album-bottom {text-indent: 15px; height: 20px; font-size:14px; line-height:20px;background:red;padding-right:10px;}
 .user-style .album-list .album button {margin-right: 5px;}

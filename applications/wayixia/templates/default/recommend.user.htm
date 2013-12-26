@@ -229,7 +229,7 @@ function check_error(img_) {
 
 <textarea id="album_template" style="display:none;">
 <span class="album">
-  <div class="ablum-name">[[name]]</div>
+  <div class="ablum-name" style="font-size:14px; overflow:hidden; width:100px;text-overflow : ellipsis"><nobr>[[albumname]]</nobr></div>
   <div class="album-body">
     <a href="/sites/d.hiphotos.bdimg.com" target="_self">
       <div class="album-item" style="background:url(/ii/thumb/0c1b7c3e-a475-4fd7-8ff6-e7d051454128) 50% 50% no-repeat"> </div>
@@ -290,7 +290,17 @@ Q.Ready(function(){
 	"template":Q.$('wf-template').value,
 	"item_callback": function(name, item) {
 	  if(name == "albumlist") {
-	  return parse_album(Q.$('album_template').value, {});
+	    var str = "";
+	    var albums = [];
+	    try {
+	      albums = Q.json_decode(item['data_albums']);
+	    } catch(e) {
+	    
+	    }
+            for(var i=0; i < albums.length; i++) {
+	      str += parse_album(Q.$('album_template').value, albums[i]);
+	    }
+	    return str;
 	  } else {
 	    return item[name];
 	  }

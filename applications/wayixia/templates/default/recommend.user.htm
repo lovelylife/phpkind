@@ -104,7 +104,7 @@ function check_error(img_) {
       </dt>
         <dd class="name"><a href="{$app:path}/user/[[uid]]" title="挖客" style="font-size: 16px;">[[name]]</a></dd>
 	<dd class="count">
-	<span> [[num_images]] <br> <p>图片</p></span>
+	<span> <a href="{$app:path}/user/[[uid]]"> [[num_images]] <br> <p>图片</p></a></span>
 	<span> [[num_albums]] <br> <p>图集</p></span>
 	</dd>
         <!--dd class="privacy-set"><a href="#">&nbsp;&nbsp;1222222222222</a></dd-->
@@ -115,7 +115,32 @@ function check_error(img_) {
   </div>
   <div class="album-list">
     [[albumlist]]	  
-    <!--    
+  </div>
+  <!--div class="convo attribution clearfix">
+    <p class="NoImage">
+      <a href="{$app:path}/pins/[[id]]" target="_self">[[owner]]
+      </a>
+    </p>
+  </div-->
+</textarea>
+
+<textarea id="album_template" style="display:none;">
+<span class="album">
+  <div class="ablum-name" style="font-size:14px; overflow:hidden; width:100px;text-overflow : ellipsis"><nobr>[[albumname]]</nobr></div>
+  <div class="album-body">
+    [[images]]
+  </div>
+  <div class="ablum-bottom" align="right"><button class="button">关注</button></div>
+</span>
+</textarea>
+
+<textarea id="image_template" style="display:none;">
+    <a href="{$app:path}/pins/[[id]]" target="_self">
+	    <div class="album-item" style="background:url({$cfg:site.thumb_images_dir}/[[file_name]]) 50% 50% no-repeat"> </div>
+    </a>
+</textarea>
+
+<!--    
     <span class="album">
       <div class="ablum-name">图集名称1</div>
       <div class="album-body">
@@ -217,42 +242,8 @@ function check_error(img_) {
       </div>
       <div class="ablum-bottom" align="right"><button class="button">关注</button></div>
     </span>
-    -->
-  </div>
-  <!--div class="convo attribution clearfix">
-    <p class="NoImage">
-      <a href="{$app:path}/pins/[[id]]" target="_self">[[owner]]
-      </a>
-    </p>
-  </div-->
-</textarea>
+-->
 
-<textarea id="album_template" style="display:none;">
-<span class="album">
-  <div class="ablum-name" style="font-size:14px; overflow:hidden; width:100px;text-overflow : ellipsis"><nobr>[[albumname]]</nobr></div>
-  <div class="album-body">
-    <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-      <div class="album-item" style="background:url(/ii/thumb/0c1b7c3e-a475-4fd7-8ff6-e7d051454128) 50% 50% no-repeat"> </div>
-    </a>
-    <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-      <div class="album-item" style="background:url(/ii/thumb/e11bea77-06ba-48e7-8428-c7c28e5aafef) 50% 50% no-repeat"> </div>
-    </a>
-    <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-      <div class="album-item" style="background:url(/ii/thumb/39212c65-8442-45e8-966e-3605b3b9179d) 50% 50% no-repeat"> </div>
-    </a>
-    <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-      <div class="album-item" style="background:url(/ii/thumb/0a761f9f-b3f8-4434-8867-9ffb9ac4018e) 50% 50% no-repeat"> </div>
-    </a>
-    <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-      <div class="album-item" style="background:url(/ii/thumb/0a761f9f-b3f8-4434-8867-9ffb9ac4018e) 50% 50% no-repeat"> </div>
-    </a>
-    <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-      <div class="album-item" style="background:url(/ii/thumb/0a761f9f-b3f8-4434-8867-9ffb9ac4018e) 50% 50% no-repeat"> </div>
-    </a>
-  </div>
-  <div class="ablum-bottom" align="right"><button class="button">关注</button></div>
-</span>
-</textarea>
 
 <script type="text/javascript">
 
@@ -270,9 +261,34 @@ function store(arr) {
   }
 }
 
+function parse_images(tpl, item) {
+  tpl = tpl.replace(/\[\[(\w+)\]\]/ig, 
+    function(w,w2,w3,w4) {
+      return item[w2];
+    }
+  );
+  return tpl;
+}
+
 function parse_album(tpl, item) {
   tpl = tpl.replace(/\[\[(\w+)\]\]/ig, 
     function(w,w2,w3,w4) {
+      if(w2=="images") {
+        var str = "";
+        var images_arr = [];
+	try {
+          images_arr = item['data_images'];
+        } catch(e) {
+        }
+        var len = images_arr.length;
+	if(len>6) {
+	  len = 6;
+	}
+	for(var i=0; i < len; i++) {
+          str += parse_images(Q.$('image_template').value, images_arr[i]);
+        }
+        return str;
+      }
       return item[w2];
     }
   );

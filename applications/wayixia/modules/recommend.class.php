@@ -129,8 +129,10 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
     if(!empty($rs)) {
       $len = count($rs);
       for($i=0; $i < $len; $i++) {
+        $object = &$rs[$i];
+        $object['data_images'] = $this->get_resources($object['data_images']);
         if($i < 3) {       
-          array_push($r, $rs[$i]);
+          array_push($r, $object);
 	}
         $num_images += intval($rs[$i]['num_images'], 10);
       }
@@ -138,6 +140,18 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
 
     return $r;
   }
+
+  function get_resources($images) {
+    $db = &$this->App()->db();
+    $sql = "select R.server, R.file_name, R.width, R.height, I.id as id, I.from_host, I.title from ##__images_resource R, ##__users_images I where I.res_id=R.id and I.album_id>0 and I.id IN ({$images}) order by I.id DESC";
+echo $sql;
+    $rs = array();
+    $db->get_results($sql, $rs);
+    print_r($rs); 
+
+    return $rs;
+  }
+
 }
 
 

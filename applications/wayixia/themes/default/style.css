@@ -32,14 +32,19 @@ input{
 ul{
 	list-style:none;
 }
+
 a{
 	color:#666666;
 	text-decoration:none;
 }
+
+/*
 a:hover{
 	color:#F00;
 	text-decoration:underline;
 }
+	*/
+
 .center{
 	margin:0px auto;
 }
@@ -305,7 +310,14 @@ input[type="checkbox"] {
 .user-profile .profile-basic dl dd.privacy-set{text-align:right;font-size:12px;}
 .user-profile .profile-basic dl dd.count {text-align:left; font-size:16px; height: 65px; margin-right: 10px;}
 .user-profile .profile-basic dl dd.count span {float: left;width: 100px; text-align:center; height:50px;margin: 5px 0;border-right:1px solid #F5F2F2; }
-.user-profile .profile-basic dl dd.count span p { font-size: 14px; color: #999; }
+/*
+ .user-profile .profile-basic dl dd.count span p { font-size: 14px; color: #999; }
+*/
+
+a.info-link, a.info-link:visited { font-size: 16px; textdecoration:none;}
+a.info-link p, a.info-link:visited p { font-size:14; color:#999}
+a.info-link:hover, a.info-link:hover p { color: #881100; textdecoration:none;}
+
 
 .uploadBtn{
 height:40px;width:71px; position:relative; display:inline-block; text-align:center;line-height:40px;

@@ -152,13 +152,57 @@ function check_image_width(img) {
 <br><br><br><br>
 <div id="main">
   <div id="page">
-    <div><h3 style="font-size: 16px; font-weight:normal">来自 {$fields:user_name} 的分享 </h3></div>
+    <div class="main-width">
+      <h3 style="font-size: 16px; font-weight:normal;">来自 <b>{$fields:user_name}</b> 的分享 </h3>
+    </div>
+    <br>
     <div class="wf-main" id="wf-main">
-      <div class="box wf-cld" style="right: 0; top: 0; DISPLAY:none;"></DIV>
-      <div class="box wf-cld" style="right: 0; top: 0;DISPLAY:none;"></DIV>
-      <div class="box wf-cld" style="right: 0; top: 0;DISPLAY:none;"></DIV>
-      <div class="box wf-cld" style="right: 0; top:0; margin-top: 15px; height: 430px;">
-        <dl class="tbox" style="margin:0;margin-top: -5px;">
+        
+        <br><br>
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div class="clear"></div>
+  <div id="footer" class="tableheader">
+    <p>
+      Powered By <a href="http://wayixia.com">wayixia.com</a>. All Rights Reservered.
+    </p>
+  </div>
+</div>
+<br><br>
+
+<textarea id="wf-template" style="display:none;">
+<div class="actions hidden">
+    <div class="right">
+      <a href="" onclick="return false;" class="like btn btn11 wbtn">
+         <strong><em></em>赞</strong><span></span>
+	  </a>
+    </div>
+    <div class="left">
+      <a title="快速转采" href="" onclick="return false;" class="thunderpin btn btn11 wbtn">
+        <strong><em></em></strong><span></span>
+      </a>
+      <a href="#" class="repin btn btn11 wbtn">
+        <strong>转采</strong><span></span>
+      </a>
+    </div>
+  </div>
+  <a href="{$app:path}/pins/[[id]]" target="_self" class="img x">
+    <img src="{$app:path}{$cfg:site.thumb_images_dir/}/[[file_name]]" width=[[width]] height=[[height]] alt="">
+  </a>
+  <p class="description">[[title]]</p>
+  <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
+  <div class="convo attribution clearfix">
+    <p class="NoImage">
+      <a href="{$app:path}/pins/[[id]]" target="_self">[[album_name]]
+      </a>
+    </p>
+  </div>
+</div>
+</textarea>
+
+<!--
+<dl class="tbox" style="margin:0;margin-top: -5px;">
         <dt>
           <strong style="color: #333;">
             <em class="icon-calendar"></em>挖客
@@ -183,53 +227,7 @@ function check_image_width(img) {
           <dd>xxx</dd>
           <dd class="privacy-set"><a href="#" >&nbsp;&nbsp;</a></dd>
         </dl>
-      </div>
-			  
-			</div>
-        
-        <br><br>
-      </div>
-    </div>
-    <div class="clear"></div>
-  </div>
-  <div class="clear"></div>
-  <div id="footer" class="tableheader">
-    <p>
-      Powered By <a href="http://wayixia.com">wayixia.com</a>. All Rights Reservered.
-    </p>
-  </div>
-</div>
-<br><br>
-
-<span id="wf-template">
-  <div class="actions hidden">
-    <div class="right">
-      <a href="" onclick="return false;" class="like btn btn11 wbtn">
-         <strong><em></em>赞</strong><span></span>
-	  </a>
-    </div>
-    <div class="left">
-      <a title="快速转采" href="" onclick="return false;" class="thunderpin btn btn11 wbtn">
-        <strong><em></em></strong><span></span>
-      </a>
-      <a href="#" class="repin btn btn11 wbtn">
-        <strong>转采</strong><span></span>
-      </a>
-    </div>
-  </div>
-  <a href="{$app:path}/is/[[id]]" target="_self" class="img x">
-    <img src="{$app:path}{$cfg:site.thumb_images_dir/}/[[file_name]]" width=[[width]] height=[[height]] alt="">
-  </a>
-  <p class="description">[[title]]</p>
-  <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
-  <div class="convo attribution clearfix">
-    <p class="NoImage">
-      <a href="{$app:path}/pins/[[id]]" target="_self">[[owner]]
-      </a>
-    </p>
-  </div>
-<!--/div-->
-</span>
+-->
 
 <script type="text/javascript">
 
@@ -265,7 +263,7 @@ Q.Ready(function(){
 	"container":"wf-main",
 	"colWidth":238,
 	"colCount":4,
-	"template":Q.$('wf-template').innerHTML,
+	"template":Q.$('wf-template').value,
   });
 
 

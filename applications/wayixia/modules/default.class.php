@@ -6,8 +6,8 @@ if(!defined('_IPATH')) {
 
 class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
 
-	public function __construct() { parent::__construct();  }
-	public function CLASS_MODULE_DEFAULT() { $this->__construct(); }
+  public function __construct() { parent::__construct();  }
+  public function CLASS_MODULE_DEFAULT() { $this->__construct(); }
 
   function doMain($action) {
     switch($action) {
@@ -37,15 +37,14 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
       $tag = $_GET['tag'];
 
       $sql = "select ";
-      $sql.= "R.file_name, R.width, R.height, U.id as id, U.uid as owner, U.title ";
-      $sql.= " from ##__images_resource AS R, ##__users_images AS U ";
-	  $sql.= " where U.res_id=R.id and U.album_id!=0 ";
-	  // where condition
-	  if(!empty($tag))
-		$sql.=" and U.album_id in (select id from ##__users_albums where `classname`='{$tag}') ";
+      $sql.= "R.file_name, R.width, R.height, I.id as id, U.uname as owner, I.title ";
+      $sql.= " from ##__images_resource R, ##__users_images I, ##__users U ";
+      $sql.= " where U.res_id=R.id and U.album_id!=0 ";
+      // where condition
+      if(!empty($tag))
+        $sql.=" and U.album_id in (select id from ##__users_albums where `classname`='{$tag}') ";
 
-	  $sql.=" order by U.id DESC ";
-
+      $sql.=" order by U.id DESC ";
 
       $page_size = 50;
       $totalsize = $this->App()->db()->query_count($sql);

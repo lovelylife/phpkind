@@ -22,7 +22,7 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
     $t = new CLASS_TEMPLATES($this->App());
     $t->load('recommend.user');
 
-    $sql = "select * from ##__nosql_users_recommend limit 0, 100;";
+    $sql = "select * from ##__nosql_users_recommend order by num_images desc limit 0, 100;";
     $users_list = array();
     $this->App()->db()->get_results($sql, $users_list);
 
@@ -35,26 +35,25 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
   }
 
   function album() {
-    $uid = $this->App()->get_user_info('uid');
     $t = new CLASS_TEMPLATES($this->App());
     $t->load('recommend.album');
 
-    $t->push('username', $user_name);
-
-
-    // 获取画集封面
-    $album_front_dir = _IROOT.$this->Config('site.front_cover_dir').'/'.$uid;
-    createfolders($album_front_dir);
-
     // 获取画集列表
-    $sql_albums_list = "SELECT A.id AS album_id, A.albumname AS album_name, CONCAT('{$path}','/',R.file_name) AS file_name, MAX( I.id ) AS id\n"
-    . "FROM ##__users_albums AS A\n"
-    . "left JOIN ##__users_images AS I ON A.id=I.album_id\n"
-    . "left JOIN ##__images_resource AS R ON R.id=I.res_id\n"
-    . "GROUP BY A.id";
+    $sql_albums_list = "SELECT * "
+    . "FROM ##__nosql_albums_recommend "
+    . " where num_images > 8 limit 0, 50;";
     $albums_list = array();
     $this->App()->db()->get_results($sql_albums_list, $albums_list);
-    
+    #echo $sql_albums_list;
+    #print_r($albums_list[0]); 
+    #$str = stripslashes($albums_list[0]['data_images']);
+    #$o = json_decode($str, true);
+    #echo $str;
+    #print_r($o);
+    $len = count($albums_list);
+    for($i=0; $i < $len; $i++) {
+      $albums_list[$i]['data_images'] = stripslashes($albums_list[$i]['data_images']);
+    }
     if(empty($albums_list)) {
       $t->push('albums', '[]');
     } else {
@@ -75,6 +74,34 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
   }
 
   function get_value($arr) {}
+
+  function schedulealbums() {
+    $db = &$this->App()->db();
+    // update recommend user count data
+    $sql = "select A.id as album_id, A.albumname as album_name, A.description as album_description, count(I.id) as num_images, group_concat(I.id) as data_images ";
+    $sql.= "from ch_users_images I right join ch_users_albums A on A.id=I.album_id ";
+    $sql.= "group by A.id;";
+    $rs = array();
+    $db->get_results($sql, $rs);
+    
+    $fields_update = $this->get_update($rs[0]);
+    $values = "";
+    $len = count($rs);
+    for($i=1; $i < $len; $i++) {
+      $object = &$rs[$i];
+      $object['data_images'] = addslashes(json_encode(array_slice($this->get_resources($object['data_images']), 0, 9)));
+      $value = array_values($object);
+      $values .= ",('".implode("','", $value)."')";
+    }
+    $object = &$rs[0];
+    $object['data_images'] = addslashes(json_encode( array_slice($this->get_resources($object['data_images']), 0, 9) ));
+    $update = $db->insertSQL("nosql_albums_recommend", $object);
+    $update .= $values." ON DUPLICATE KEY UPDATE ".$fields_update.";";
+    echo $update;
+    if(!$db->execute($update)) {
+      trigger_error($db->get_error(), E_USER_ERROR);
+    }
+  }
 
   function schedule() {
     $db = &$this->App()->db();
@@ -143,11 +170,14 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
 
   function get_resources($images) {
     $db = &$this->App()->db();
-    $sql = "select R.server, R.file_name, R.width, R.height, I.id as id, I.from_host, I.title from ##__images_resource R, ##__users_images I where I.res_id=R.id and I.album_id>0 and I.id IN ({$images}) order by I.id DESC";
-echo $sql;
+    $sql = "select R.server, R.file_name, R.width, R.height, I.id as id, I.from_host, I.title ";
+    $sql.= "from ##__images_resource R, ##__users_images I ";
+    $sql.= "where I.res_id=R.id and I.album_id>0 and I.id IN ({$images}) ";
+    $sql.= "order by I.id DESC";
+    
+    //echo $sql;
     $rs = array();
     $db->get_results($sql, $rs);
-    print_r($rs); 
 
     return $rs;
   }

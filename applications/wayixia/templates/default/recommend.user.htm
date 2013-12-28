@@ -104,8 +104,12 @@ function check_error(img_) {
       </dt>
         <dd class="name"><a href="{$app:path}/user/[[uid]]" title="挖客" style="font-size: 16px;">[[name]]</a></dd>
 	<dd class="count">
-	<span> <a href="{$app:path}/user/[[uid]]"> [[num_images]] <br> <p>图片</p></a></span>
-	<span> [[num_albums]] <br> <p>图集</p></span>
+          <a href="{$app:path}/user/[[uid]]" class="info-link">	
+            <span>  [[num_images]]  <p>图片</p></span>
+          </a>
+          <a href="{$app:path}/useralbum/[[uid]]" class="info-link">
+            <span> [[num_albums]] <br> <p>画集</p></span>
+          </a>
 	</dd>
         <!--dd class="privacy-set"><a href="#">&nbsp;&nbsp;1222222222222</a></dd-->
       </dl>

@@ -180,7 +180,7 @@ for(var i=0; i < tree_items.length; i++) {
 	<a href="{$app:path}/is/{$fields:prev}" class="next x "></a-->
 </div>
 
-<div id="main">
+<div id="main" class="main-width">
   <div id="page">
     <div id="left-column">
       <div style="background: #FFF; height:45px;margin-top: 1px; border-bottom: #F1F1F1;line-height: 45px;font-size: 15px;">
@@ -228,7 +228,7 @@ for(var i=0; i < tree_items.length; i++) {
       <DIV class="seg-title selectitem" id="tree_album">
           <p style="color: #333; margin-top: 0px; margin-bottom: 0px;">
             <em class="icon-calendar"></em>
-            <a href="{$app:path/}/albums/{$fields:album_id}">
+            <a href="{$app:path/}/paintings/{$fields:album_id}">
               {$fields:albumname}
             </a>
           </p>
@@ -254,7 +254,7 @@ for(var i=0; i < tree_items.length; i++) {
 
       <DIV class="seg-title normalitem" style="border-top: 1px solid #EEE;" id="tree_domain" >
           <p style="color: #333; margin-top: 0px; margin-bottom: 3px;">
-            <em class="icon-calendar"></em><a href="{$app:path/}/d/{$fields:from_host}">来自{$fields:from_host}的分享</a>
+            <em class="icon-calendar"></em><a href="{$app:path/}/sites/{$fields:from_host}">来自{$fields:from_host}的分享</a>
           </p>
           <div class="arrow"></div>
       </DIV>

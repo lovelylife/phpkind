@@ -75,34 +75,38 @@
   border-left: 0px solid #F1F1F1;
 }
 
-.user-style .album-list {
-  margin-left: 430px;
-  height: 172px;
-  position:relative;
-}
-
-.user-style .album-list .album {
-  height: 162px;
-}
-
-.user-style .album-list  {text-align:left; font-size:16px; }
-.user-style .album-list > span.album {float: left; width: 160px; text-align:left; margin: 5px 0px 5px 10px;}
-.user-style .album-list .album .album-item {float: left;width: 48px;height: 48px;margin: 5px 5px 0px 0;background: #F8F8F8;overflow: hidden;}
-.user-style .album-list .album-item:hover {opacity: 0.7;}
-.user-style .album-list .album .album-name { text-indent: 15px; height: 20px; font-size:14px; display:block; line-height:20px;background:red; width: 60px; overflow:hidden;}
-.user-style .album-list .album .album-body {text-indent: 15px; height: 118px; font-size:14px; line-height:20px;}
-.user-style .album-list .album .album-bottom {text-indent: 15px; height: 20px; font-size:14px; line-height:20px;background:red;padding-right:10px;}
-.user-style .album-list .album button {margin-right: 5px;}
-
-
+.user-style .album-list {text-align:left; font-size:16px; margin-left: 430px; height: 172px; position:relative; }
 /* user box style end */
+
+/* album style */
+.album-style .box {
+  width: 190px;
+  padding:2px 15px 0;
+  border-left: 0px solid #F1F1F1;
+}
+
+
+.album-style .album-list {text-align:left; font-size:16px; height: 202px; position:relative; margin: 10px 0px 15px 2px;}
+.album-style .album-list > span.album {float: left; width: 190px; text-align:left; margin:0; }
+.album-style .album-list .album .album-item {float: left;width: 58px;height: 52px;margin: 5px 5px 0px 0;background: #F8F8F8;overflow: hidden;}
+/* album style end */
+
+/* album list style */
+.album-list > span.album {float: left; width: 160px; text-align:left; margin: 5px 0px 5px 10px;}
+.album-list .album .album-item {float: left;width: 48px;height: 48px;margin: 5px 5px 0px 0;background: #F8F8F8;overflow: hidden;}
+.album-list .album-item:hover {opacity: 0.7;}
+.album-list .album .album-name { text-indent: 15px; height: 20px; font-size:14px; display:block; line-height:20px;background:red; width: 60px; overflow:hidden;}
+.album-list .album .album-body {text-indent: 15px; height: 118px; font-size:14px; line-height:20px;}
+.album-list .album .album-bottom {text-indent: 15px; height: 20px; font-size:14px; line-height:20px;background:red;padding-right:10px;}
+.album-list .album button {margin-right: 5px;}
+
+/* user list style end */
 
 
 /* normal control */
 
 .button {
 	display:inline-block;
-	line-height:1;
 	border-radius:2px;
 	font-size:14px;
 	padding:0 12px;

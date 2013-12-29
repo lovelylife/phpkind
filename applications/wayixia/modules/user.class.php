@@ -73,9 +73,8 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     case 'avatar-upload-panel':
       $this->avatar_upload_panel();
       break;
-
     default:
-      $this->index();
+      parent::doMain($action);
     }
   }
 
@@ -204,16 +203,6 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     }
 
     $t->display();
-  }
-
-  function index() {
-      try {
-        echo "invalid page";
-        //$t = new CLASS_TEMPLATES($this->App());
-        //$t->render('index');
-      } catch(Exception $e) {
-        print_r($e);
-      }
   }
 
   /**
@@ -862,7 +851,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     // 保存用户信息
     $data = &$_POST['data'];
     $uid = intval($data['uid'], 10);
-    $name = $data['name'];
+    #$name = $data['name'];
     $gender = intval($data['gender'], 10);
     $bothday = $data['bothday'];
     $description = $data['description'];
@@ -878,7 +867,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     }
 
     if(!($gender == 0 || $gender == 1)) {
-      $this->errmsg('性别错误，难道是人妖？');
+      $this->errmsg('性别错误，难道是？');
       return;
     }
 
@@ -888,7 +877,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     }
 
     $fields = array(
-      'name' => $name,
+    #  'name' => $name,
       'gender' => $gender,
       'bothday' => $bothday,
       'description' => $description,
@@ -897,8 +886,6 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     $db = &$this->App()->db();
     $update_detail_sql = $db->updateSQL('users', $fields);
     $update_detail_sql.= " where `uid`='{$uid}';";
-    //$this->errmsg($update_detail_sql);
-    //return ;
     $db->execute($update_detail_sql);
   }
 }

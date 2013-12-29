@@ -52,7 +52,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 
   function preview() {
     // useralbums
-    $sql = "SELECT id as value, albumname as text FROM  `##__users_albums`";
+    $sql = "SELECT id as value, name as text FROM  `##__users_albums`";
     $uid = $this->App()->get_user_info('uid');
     if(!empty($uid)) {
       $sql .= " where `uid`='{$uid}'";
@@ -386,7 +386,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
   function add_album() {
     $theApp = &$this->App();
     $user_key = $theApp->get_user_info('user-key');
-    $user_name = $theApp->get_user_info('name');
+    $user_id = $theApp->get_user_info('uid');
     // 重复登录
     if(!$user_key || empty($user_key)) {
       $this->AjaxHeader(-2); // 未登录
@@ -404,13 +404,12 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 
     $db = $this->App()->db();
     $fields = array(
-				'uname' => $user_name,
-				'albumname' => $album_name,
-				'classname' => $album_class,
-				'description'=>$description,
-		);
-		$sql = $db->insertSQL('users_albums', $fields);
-    
+      'uid' => $user_id,
+      'name' => $album_name,
+      'classname' => $album_class,
+      'description'=>$description,
+    );
+    $sql = $db->insertSQL('users_albums', $fields);
     $result = $db->execute($sql);
     if(!$result) 
       $this->errmsg($db->get_error());

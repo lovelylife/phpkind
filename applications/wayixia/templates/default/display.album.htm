@@ -151,7 +151,7 @@ function check_image_width(img) {
 <br><br><br><br>
 <div id="main">
   <div id="page">
-    <div class="main-width"><h3 style="font-size: 16px; font-weight:normal">画集 >>  {$fields:albumname}</h3></div>
+    <div class="main-width"><h3 style="font-size: 16px; font-weight:normal">画集 >>  {$fields:name}</h3></div>
     <div class="wf-main" id="wf-main">
       <div class="box wf-cld" style="right: 0; top: 0; DISPLAY:none;"></DIV>
       <div class="box wf-cld" style="right: 0; top: 0;DISPLAY:none;"></DIV>
@@ -198,7 +198,7 @@ function check_image_width(img) {
         <t:data>
         <a href="{$app:path/}/paintings/[field:id]" >
             <span class="uploadBtn small" style="width:195px;color:#333;margin: 3px 0px; text-indent: 10px;text-align:left;">
-            <span> [field:albumname] </span></span>
+            <span> [field:name] </span></span>
           </a>
 	</t:data>
         </html:list>

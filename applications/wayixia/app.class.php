@@ -111,14 +111,14 @@ class CLASS_WAYIXIA_APPLICATION extends CLASS_APPLICATION {
       $path = "http://".$_SERVER['SERVER_NAME'].$this->Config("site.thumb_images_dir");
     //}
 
-    $sql_albums_list = "SELECT A.id AS album_id, A.albumname AS album_name, CONCAT('{$path}','/',R.file_name) AS file_name, MAX( I.id ) AS id\n"
+    $sql_albums_list = "SELECT A.id AS album_id, A.name as album_name, CONCAT('{$path}','/',R.file_name) AS file_name, MAX( I.id ) AS id\n"
     . "FROM ##__users_albums AS A\n"
     . "left JOIN ##__users_images AS I ON A.id=I.album_id\n"
     . "left JOIN ##__images_resource AS R ON R.id=I.res_id\n"
-    . "where A.uid='{$user_id}'\n"
+    . "where A.uid={$user_id}\n"
     . "GROUP BY A.id";
 
-	return $sql_albums_list;
+    return $sql_albums_list;
   }
 
   function get_images_dir() {

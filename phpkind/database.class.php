@@ -225,8 +225,10 @@ class CLASS_DB_MYSQL extends CLASS_DB_BASE {
 		}
 
 		$this->result = $this->execute($sql);
-		if(!$this->result) 
+		if(!$this->result) { 
+			trigger_error($this->get_error(), E_USER_ERROR);
 			return false;
+		}
 
 		while($record = $this->fetch_assoc($this->result)) {
 			array_push($result, $record);

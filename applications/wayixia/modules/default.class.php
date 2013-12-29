@@ -77,9 +77,9 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
   }
 
   function display() {
-    //$id = intval($_GET['id'], 10);
     $id = intval($_GET['id'], 10);
-    $sql = "select * from ##__images_resource AS R, ##__users_images AS U where  R.id=U.res_id and U.album_id>0 and U.id={$id} limit 0,1;";
+    
+    $sql = "select * from ##__nosql_pins where album_id>0 and id={$id} limit 0,1;";
     $db = &$this->App()->db();
     $image = $db->get_row($sql);
     if(empty($image)) {
@@ -91,7 +91,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
 
     // domain
     $from_host = $image['from_host'];
-    $from_host_images_sql = "select * from ##__images_resource AS R, ##__users_images AS I where  R.id=I.res_id and I.album_id>0 and I.from_host='{$from_host}' limit 0, 8;";
+    $from_host_images_sql = "select * from ##__nosql_pins where album_id>0 and from_host='{$from_host}' limit 0, 8;";
 
     $from_host_images = array();
     $db->get_results($from_host_images_sql, $from_host_images);
@@ -99,33 +99,30 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
 
     // get album images
     $album_id = intval($image['album_id'], 10);
-    $get_album_images_sql = "select * from ##__images_resource AS R, ##__users_images AS U where  R.id=U.res_id and U.album_id={$album_id} limit 0, 8;";
+    $get_album_images_sql = "select * from ##__nosql_pins where album_id={$album_id} limit 0, 8;";
     $album_images = array();
-    $db->get_results($get_album_images_sql, $album_images);
-    $t->push_data('album_images', $album_images);
-    //print_r($thumb_images);
+    if(!$db->get_results($get_album_images_sql, $album_images))
+      trigger_error($db->get_error(), E_USER_ERROR);
 
-    // get album info
-    $get_album_info_sql = "select UA.albumname, U.name as nickname from ##__users_albums as UA, ##__users AS U where UA.id='{$album_id}' and UA.uid=U.uid limit 0,1;";
-    $album_info = $db->get_row($get_album_info_sql);
-    if(empty($album_info)) {
-      $album_info = array(
-        'albumname' => '待分类专辑',
-      );
-    }
+    $t->push_data('album_images', $album_images);
 
     // 取前一张和后一张图片
-    $sql_preview_next = "SELECT CASE WHEN SIGN(id-'$id')>0 THEN 'next' ELSE 'prev' END AS description, CASE WHEN SIGN(id-'$id')>0 THEN MIN(id) WHEN SIGN(id-'$id')<0 THEN MAX(id) END AS id FROM ##__users_images WHERE album_id={$album_id} and id <> '$id' GROUP BY SIGN(id - '$id') ORDER BY SIGN('$id' - id );";
+    $sql_preview_next = "SELECT ";
+    $sql_preview_next.= "CASE WHEN SIGN(id-'$id')>0 THEN 'next' ELSE 'prev' END AS description, ";
+    $sql_preview_next.= "CASE WHEN SIGN(id-'$id')>0 THEN MIN(id) WHEN SIGN(id-'$id')<0 THEN MAX(id) END AS id ";
+    $sql_preview_next.= "FROM ##__nosql_pins ";
+    $sql_preview_next.= "WHERE album_id={$album_id} and id <> '$id' ";
+    $sql_preview_next.= "GROUP BY SIGN(id - '$id') ";
+    $sql_preview_next.= "ORDER BY SIGN('$id' - id );";
 
     $ids = array();
     $db->get_results($sql_preview_next, $ids);
     for($i=0; $i < count($ids); $i++) {
       $t->push($ids[$i]['description'], '<a href="'._IPATH.'/pins/'.$ids[$i]['id'].'" class="'.$ids[$i]['description'].' x "></a>');
     }
-    //print_r($ids);
-    //print_r($album_info);
+    
     $t->dump2template($album_info);
-
+    // reader page
     $t->render('display');
   }
 
@@ -135,7 +132,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $album_id = intval($_GET['aid'], 10);
     
 	  // get album info
-    $get_album_info_sql = "select A.albumname, U.name as uname, U.uid as uid from ##__users_albums as A, ##__users AS U where A.id={$album_id} and A.uid=U.uid limit 0,1;";
+    $get_album_info_sql = "select A.name, U.name as uname, U.uid as uid from ##__users_albums as A, ##__users AS U where A.id={$album_id} and A.uid=U.uid limit 0,1;";
     $album_info = $db->get_row($get_album_info_sql);
     //print_r($album_info);
     if(empty($album_info)) {
@@ -181,8 +178,10 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $t->dump2template($user_info);
 
     // images data
-    $sql = "select server, file_name, width, height, id, from_host, title from ##__nosql_pins ";
-    $sql.= "where uid={$uid} order by id DESC;";
+    $sql = "select server, file_name, width, height, id, from_host, title ";
+    $sql.= "from ##__nosql_pins ";
+    $sql.= "where uid={$uid} ";
+    $sql.= "order by id DESC;";
     $images = array();
     $db->get_results($sql, $images);
 
@@ -206,7 +205,11 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
       trigger_error("invalid host", E_USER_ERROR);
 
     // images data
-    $sql = "select R.file_name, R.width, R.height, U.id as id, U.uid as owner, U.title from ##__images_resource AS R, ##__users_images AS U where U.res_id=R.id and U.album_id>0 and U.from_host='{$from_host}' order by U.id DESC";
+    $sql = "select server, file_name, width, height, id, uid, uname as owner, title ";
+    $sql.= "from ##__nosql_pins ";
+    $sql.= "where album_id>0 and from_host='{$from_host}' ";
+    $sql.= "order by id DESC";
+
     $images = array();
     $db->get_results($sql, $images);
 
@@ -215,8 +218,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     } else {
       $t->push('images_data', json_encode($images));
     }
-
-	$t->push('from_host', $from_host);
+    $t->push('from_host', $from_host);
 
     $t->render('display.domain');
   }

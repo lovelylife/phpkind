@@ -18,7 +18,6 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
     default:
       parent::doMain($action);
     }
-    
   }
 
   function ui_edit() {
@@ -27,25 +26,31 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
 
     $db = &$this->App()->db();
     $image_id = intval($_GET['id'], 10);
-    if($image_id == 0) {
-      trigger_error('invalid image id', E_USER_ERROR);
-    }
-    $sql_get_image = "select U.id AS id, R.file_name, R.width, R.height, U.from_host, U.title, U.album_id  from ##__images_resource AS R, ##__users_images AS U where  R.id=U.res_id and U.id={$image_id} limit 0,1;";
 
-    //$sql_get_image = "select * from ##__users_images where id='{$image_id}' limit 0, 1;";
+    // check data
+    if($image_id == 0)
+      trigger_error('invalid image id', E_USER_ERROR);
+      
+    $sql_get_image = "select I.id AS id, R.file_name, R.width, R.height, I.from_host, I.title, I.album_id  ";
+    $sql_get_image.= "from ##__images_resource R, ##__users_images AS I ";
+    $sql_get_image.= "where R.id=I.res_id and I.id={$image_id} ";
+    $sql_get_image.= "limit 0,1;";
+
     $image_info = $db->get_row($sql_get_image);  
-    if(empty($image_info)) {
+    if(empty($image_info)) 
       trigger_error('image is not exists', E_USER_ERROR);
-    }
+
+    //import template var 
     $t->dump2template($image_info);
-    // useralbums
-    $sql = "SELECT id as value, albumname as text FROM  `##__users_albums`";
-    $user_name = $this->App()->get_user_info('name');
-    if(!empty($user_name)) {
-      $sql .= " where `uname`='{$user_name}'";
-    }
+    
+    // ctrl datasource useralbums
+    $sql = "SELECT id as value, name as text FROM  `##__users_albums`";
+    $uid = $this->App()->get_user_info('uid');
+    if(!empty($uid)) 
+      $sql .= " where `uid`='{$uid}'";
+    
     $albums = array();
-    $this->App()->db()->get_results($sql, $albums);
+    $db->get_results($sql, $albums);
     array_push($albums, array('value'=>0, 'text'=>'待分类'));
     $t->push_data('useralbums', $albums);
 
@@ -80,13 +85,16 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
     $title = $data['title'];
     $id = intval($data['id'], 10);
     $album_id = intval($data['album_id'], 10);
-	$src_album_id = intval($data['src_album_id'], 10);
     $uid = $this->App()->get_user_info('uid');
     $db = $this->App()->db();
-	
+    
+    if(!is_numeric($album_id) || $album_id <= 0) {
+      $album_id = -$uid;
+    }
+
     $sql = "UPDATE ##__users_images ";
-	$sql.= "set `title`='{$title}',`album_id`='{$album_id}' ";
-	$sql.= "where `id`='{$id}' and `uid`='{$uid}' and `album_id`={$src_album_id};";
+    $sql.= "set `title`='{$title}',`album_id`='{$album_id}' ";
+    $sql.= "where `id`='{$id}';";
 
     if(!$db->execute($sql)) 
       $this->errmsg($db->get_error());
@@ -95,10 +103,11 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
       return;
     }
 
-	$this->App()->notify('image_move', 
+    $this->App()->notify('image_move', 
       array(
-		'album_id' => $album_id,
-		'images' => array($id)));
+	'album_id' => $album_id,
+	'images' => array($id))
+    );
   }
 
   function delete_image() {

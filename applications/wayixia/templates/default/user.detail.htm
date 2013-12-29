@@ -122,12 +122,13 @@ Q.Ready(function() {
     <p>带 <b style="color:red;">*</b> 项为必填项 </p>
     </div>
     <div style="padding-left:20px;padding-top:10px; line-height: 40px;">
-      <p> 昵称：<br>
+      <p> 名称(<font color="#999999">不可修改</font>)：<br>
         <input 
           name="name" 
           type="text" 
           id="form_name" size="30" maxlength="30"
           value="{$fields:name}"
+          disabled
         />
         <input type="hidden" value="{$fields:uid}" id="form_uid"/>
         <span class="msg" id="msg-name"></span>

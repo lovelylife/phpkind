@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
-<title> {$fields:albumname} - 我的画集 - wayixia.com</title>
+<title> {$fields:name} - 我的画集 - wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
@@ -176,7 +176,7 @@ Q.Ready(function() {
     <div style="padding-left:20px;padding-top:10px; line-height: 40px;">
 
       <p> 名称：<br>
-          <input id="album_name" type="text" size="30" maxlength="30" value="{$fields:albumname}" style="width: 360px;"/>
+          <input id="album_name" type="text" size="30" maxlength="30" value="{$fields:name}" style="width: 360px;"/>
         <span class="msg" id="msg-username"></span>
       </p>
       <p> 所属分类：<br>

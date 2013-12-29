@@ -30,29 +30,32 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 
     $db = &$this->App()->db();
     $album_id = intval($_GET['id'], 10);
-    if(is_numeric($album_id) && $album_id !=0 ) {
-      // get albums info
-      $sql_get_album = "select * from ##__users_albums where id={$album_id} and uid={$uid} order by create_time desc limit 0, 1;";
-      $album_info = $db->get_row($sql_get_album);
+    $album_info = array();
+
+    if(is_numeric($album_id) && (!($album_id <= 0 && ($album_id!=-$uid)))) {
+  
+      $album_info = $db->get_row("select id, name as album_name from ##__users_albums where id={$album_id} and uid={$uid} order by create_time desc;");
       if(empty($album_info)) {
-        die('invalid album');
+        trigger_error('invalid album '.$album_id, E_USER_ERROR);
       }
     } else {
-      $album_info = array(
-        'albumname' => '待分类',
-        'id' => 0
-      );
+      $album_id = -$uid;
+      $album_info['album_name'] = '待分类';
+      $album_info['id']         = $album_id;
     }
     
     $t->dump2template($album_info);
+    $sql = "select R.file_name, R.width, R.height, I.id as id, I.from_host, I.title, I.agent, I.create_date, I.album_id \n"
+         . "from ch_users_images I \n"
+         . "left join ch_users_albums A on A.id=I.album_id \n"
+         . "left join ch_images_resource R on I.res_id=R.id \n"
+         . "where I.album_id={$album_id} \n"
+         . "order by I.id DESC";
 
-    // images data
-    $sql = "select R.file_name, R.width, R.height, U.id as id, U.from_host, U.title, U.agent, U.create_date ";
-    $sql.= "from ##__images_resource R, ##__users_images U ";
-    $sql.= "where U.res_id=R.id and U.album_id={$album_id} && U.uid={$uid} order by U.id DESC";
     $images = array();
-
-    $db->get_results($sql, $images);
+    if(!$db->get_results($sql, $images)) {
+      trigger_error($db->get_error(), E_USER_ERROR);
+    }
 
     if(empty($images)) {
       $t->push('images_data', '[]');
@@ -62,7 +65,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 
     $t->push('username', $user_name);
 
-    $sql = "SELECT id as value, albumname as text FROM  `##__users_albums`";
+    $sql = "SELECT id as value, name as text FROM  `##__users_albums`";
     $sql .= " where `uid`={$uid}";
     $albums = array();
     $db->get_results($sql, $albums);
@@ -85,7 +88,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
         die('invalid album');
     } else {
       $album_info = array(
-        'albumname' => '待分类',
+        'name' => '待分类',
         'id' => 0
       );
     }
@@ -149,12 +152,12 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
         $this->AjaxData('system album is not update');
       }
       
-      $sql = "UPDATE ##__users_albums set `albumname`='{$album_name}',`classname`='{$album_class}',`description`='{$description}' where `id`='{$album_id}'";
+      $sql = "UPDATE ##__users_albums set `name`='{$album_name}',`classname`='{$album_class}',`description`='{$description}' where `id`='{$album_id}'";
       $result = $db->execute($sql);
     } else {
       $fields = array(
         'uid' => $this->App()->get_user_info('uid'),
-        'albumname' => $album_name,
+        'name' => $album_name,
         'classname' => $album_class,
         'description'=>$description,
       );    
@@ -198,7 +201,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     $this->App()->db()->execute($sql);
     
     // 删除图片
-    $sql_delete_images = "delete from ##__users_images where `album_id`='{$album_id}' and `uid`={$uid};";
+    $sql_delete_images = "delete from ##__users_images where `album_id`='{$album_id}';";
     $this->App()->db()->execute($sql_delete_images);
     $this->App()->notify('album_delete', array('album_id' => $album_id));
   }
@@ -221,7 +224,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     $db = &$this->App()->db();
     $ids = implode('\',\'', $pictures);
     $uid = $this->App()->get_user_info('uid');
-    $sql = "update ##__users_images set `album_id`='{$album_id}' where `uid`={$uid} and `id` in ('{$ids}')";
+    $sql = "update ##__users_images set `album_id`='{$album_id}' where `id` in ('{$ids}')";
 
     $db->execute($sql);
 
@@ -245,7 +248,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
 
   function album_is_duplicate($album_id, $uid, $album_name) {
      $db = &$this->App()->db();
-     $sql="select id from ##__users_albums where `uid`={$uid} and `albumname`='{$album_name}'";
+     $sql="select id from ##__users_albums where `uid`={$uid} and `name`='{$album_name}'";
      if($album_id != 0)
        $sql.=" and `id` !={$album_id}";
 
@@ -259,7 +262,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
   function album_is_empty($album_id, $uid) {
     $uid = $this->App()->get_user_info('uid');
     $db = &$this->App()->db();
-    $sql = "select id from ##__users_images where `album_id`='{$album_id}' and `uid`={$uid} limit 0, 1;";
+    $sql = "select id from ##__users_images where `album_id`='{$album_id}' limit 0, 1;";
     $rs = $db->get_row($sql);
 
     return empty($rs);

@@ -8,12 +8,21 @@
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/layout.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css"/>
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css" />
 
 <style>
-#thumbRPWrap{margin-bottom:10px}#thumbRP{font-size:0;padding:10px 0 15px 0;position:relative;width:200px}.thumb-item{float:left;display:block;width:64px;height:64px;padding:0;margin:0 2px 2px 0;position:relative;z-index:1}.thumb-item .thumb-bg{position:relative;float:left;display:block;background-color:transparent;_position:absolute}.thumb-item.hover{z-index:100;background-color:#fff;zoom:1}.thumb-item.hover .thumb-bg{padding:3px;top:-3px;left:-3px;background-color:#f45e5e;border:0 solid #ccc;width:64px;box-shadow:0 1px 4px #999;-webkit-box-shadow:0 1px 3px #ccc;-moz-box-shadow:0 1px 3px #ccc}.thumb-img-wrap{display:block;overflow:hidden;position:relative;z-index:1;width:64px;height:64px}.thumb-img-wrap .mask{height:64px;width:64px;top:0;left:0;display:block;background-color:transparent;position:absolute}.thumb-img-wrap .mask img{visibility:hidden}.thumb-img-wrap img{position:absolute;visibility:hidden;z-index:-1}a.btn-refresh{padding:0;font-weight:normal;cursor:pointer;text-indent:0;position:absolute;right:0;top:0;text-decoration:none;color:#606060;line-height:22px;font-size:14px}a.btn-refresh:hover{color:#e01a1a}
-
+#thumbRPWrap{margin-bottom:10px}
+#thumbRP{font-size:0;padding:10px 0 15px 0;position:relative;width:200px}
+.thumb-item{float:left;display:block;width:64px;height:64px;padding:0;margin:0 2px 2px 0;position:relative;z-index:1}
+.thumb-item .thumb-bg{position:relative;float:left;display:block;background-color:transparent;_position:absolute}
+.thumb-item.hover{z-index:100;background-color:#fff;zoom:1}
+.thumb-item.hover .thumb-bg{padding:3px;top:-3px;left:-3px;background-color:#f45e5e;border:0 solid #ccc;width:64px;box-shadow:0 1px 4px #999;-webkit-box-shadow:0 1px 3px #ccc;-moz-box-shadow:0 1px 3px #ccc}
+.thumb-img-wrap{display:block;overflow:hidden;position:relative;z-index:1;width:64px;height:64px}
+.thumb-img-wrap .mask{height:64px;width:64px;top:0;left:0;display:block;background-color:transparent;position:absolute}
+.thumb-img-wrap .mask img{visibility:hidden}
+.thumb-img-wrap img{position:absolute;visibility:hidden;z-index:-1}
+a.btn-refresh{padding:0;font-weight:normal;cursor:pointer;text-indent:0;position:absolute;right:0;top:0;text-decoration:none;color:#606060;line-height:22px;font-size:14px}
+a.btn-refresh:hover{color:#e01a1a}
 
 .thumb-domain {width: 312px;height: 148px;padding-left: 2px;background: #FFFFFF;}
 .thumb-domain .thumb-domain-item {float: left;width: 73px;height: 73px;margin: 5px 5px 0px 0;background: #F8F8F8;overflow: hidden;}
@@ -100,7 +109,7 @@ import utils.ajax;
 <!--
 
 function check_width() {
-  if(Q.$('tweenimg').width > Q.$('tweenimg').parentNode.offsetWidth) {
+  if(Q.$('tweenimg').width > Q.$('tweenimg-background').offsetWidth) {
     Q.$('tweenimg').style.width = "100%";
   }
 }
@@ -170,7 +179,6 @@ for(var i=0; i < tree_items.length; i++) {
 
 {#template user.menubar/}
 
-
 <br><br><br><br>
 
 <div id="view_arrows">
@@ -185,12 +193,12 @@ for(var i=0; i < tree_items.length; i++) {
     <div id="left-column">
       <div style="background: #FFF; height:45px;margin-top: 1px; border-bottom: #F1F1F1;line-height: 45px;font-size: 15px;">
         <dt style="float: left; width: 88px; ">
-        <img src="{$app:path}{$cfg:site.avatar}/user48.{$fields:uname}.jpg" 
+        <img src="{$app:path}{$cfg:site.avatar}/user48.{$fields:uid}.jpg" 
         style="border:1px solid #CCC; width:48px;margin:20px;" onerror="check_error(this);">
         </dt>
         <dd style="margin-left: 88px;line-height: 32px; height: 32px;">
           <p style="padding-top:12px; ">
-          <h3 style="font-size: 18px;"><a href="{$app:path}/user/{$fields:uid}">{$fields:nickname}&nbsp;</a></h3>
+          <h3 style="font-size: 18px;"><a href="{$app:path}/user/{$fields:uid}">{$fields:uname}&nbsp;</a></h3>
           </p>
           <p style="color: #333;">
           <span>{$fields:title}</span>
@@ -199,9 +207,11 @@ for(var i=0; i < tree_items.length; i++) {
       </div>
       <div class="clear"></div>
       <div class="panel" align="center">
-        <div style="position:relative;background: url({$themes:path}/img_bg.png) repeat; line-height:0;">        
-          <img id="tweenimg" src="{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}" onload="check_width()"/>
-          <div style="position:absolute; right:3px; top:3px;">
+        <div id="tweenimg-background" style="position:relative;background: url({$themes:path}/img_bg.png) repeat; line-height:0;">   
+          <a href="{$fields:from_url}" target="_blank">	
+            <img id="tweenimg" src="{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}" onload="check_width()"/>
+          </a>
+	  <div style="position:absolute; right:3px; top:3px;">
             <a href="{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}" class="lightwindow" rel="/\\:;*?&lt;&gt;'”|®™©&amp;#[Sushi]" title="图片查看" caption="{$fields:title}" author="{$fields:nickname}">查看大图</a>
           </div>
           </div>
@@ -229,7 +239,7 @@ for(var i=0; i < tree_items.length; i++) {
           <p style="color: #333; margin-top: 0px; margin-bottom: 0px;">
             <em class="icon-calendar"></em>
             <a href="{$app:path/}/paintings/{$fields:album_id}">
-              {$fields:albumname}
+              {$fields:album_name}
             </a>
           </p>
           <div class="arrow"></div>

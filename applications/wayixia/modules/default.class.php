@@ -36,15 +36,9 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
       $db = &$this->App()->db();
       $tag = $_GET['tag'];
 
-      $sql = "select ";
-      $sql.= "R.file_name, R.width, R.height, I.id as id, U.uname as owner, I.title ";
-      $sql.= " from ##__images_resource R, ##__users_images I, ##__users U ";
-      $sql.= " where U.res_id=R.id and U.album_id!=0 ";
-      // where condition
-      if(!empty($tag))
-        $sql.=" and U.album_id in (select id from ##__users_albums where `classname`='{$tag}') ";
-
-      $sql.=" order by U.id DESC ";
+      $sql = "select file_name, width, height, id, uname as owner, title ";
+      $sql.= "from ##__nosql_pins ";
+      $sql.=" order by id DESC ";
 
       $page_size = 50;
       $totalsize = $this->App()->db()->query_count($sql);
@@ -187,7 +181,8 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $t->dump2template($user_info);
 
     // images data
-    $sql = "select R.server, R.file_name, R.width, R.height, U.id as id, U.from_host, U.title from ##__images_resource AS R, ##__users_images AS U where U.res_id=R.id and U.album_id>0 and U.uid='{$uid}' order by U.id DESC";
+    $sql = "select server, file_name, width, height, id, from_host, title from ##__nosql_pins ";
+    $sql.= "where uid={$uid} order by id DESC;";
     $images = array();
     $db->get_results($sql, $images);
 

@@ -15,7 +15,6 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
       'register','do-register', 'login', 'regular-login', 'vcode', 'forgetpwd', 'change-pwd'
     );
 
-
     if(!in_array($action, $not_need_login)) {      
       $this->App()->check_user_logon(true);
     } else {

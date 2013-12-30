@@ -78,7 +78,7 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
   function schedulealbums() {
     $db = &$this->App()->db();
     // update recommend user count data
-    $sql = "select A.id as album_id, A.albumname as album_name, A.description as album_description, count(I.id) as num_images, group_concat(I.id) as data_images ";
+    $sql = "select A.id as album_id, A.name as album_name, A.description as album_description, count(I.id) as num_images, group_concat(I.id) as data_images ";
     $sql.= "from ch_users_images I right join ch_users_albums A on A.id=I.album_id ";
     $sql.= "group by A.id;";
     $rs = array();
@@ -141,9 +141,13 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
   }
 
   function get_images($albums, &$num_images) {
+	  
     $num_images = 0;
+    if(empty($albums)) {
+      return array();
+    }
     $db = &$this->App()->db();
-    $sql = "select I.album_id, A.albumname, count(I.id) as num_images, group_concat(I.id) as data_images ";
+    $sql = "select I.album_id, A.name as album_name, count(I.id) as num_images, group_concat(I.id) as data_images ";
     $sql.= "from ##__users_images I left join ##__users_albums A on A.id=I.album_id ";
     $sql.= "where I.album_id>0 and I.album_id IN ({$albums}) ";
     $sql.= "group by I.album_id ";
@@ -169,13 +173,15 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
   }
 
   function get_resources($images) {
+    if(empty($images))
+      return array();
     $db = &$this->App()->db();
     $sql = "select R.server, R.file_name, R.width, R.height, I.id as id, I.from_host, I.title ";
     $sql.= "from ##__images_resource R, ##__users_images I ";
     $sql.= "where I.res_id=R.id and I.album_id>0 and I.id IN ({$images}) ";
     $sql.= "order by I.id DESC";
     
-    //echo $sql;
+    #echo $sql;
     $rs = array();
     $db->get_results($sql, $rs);
 

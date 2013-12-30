@@ -99,12 +99,12 @@ function check_error(img_) {
     <div class="profile-basic">
       <dl style="padding:12px 0;">
       <dt>
-        <a href="{$app:path}/user/[[uid]]" target="_self" class="img x">
+        <a href="{$cfg:urls.user}/[[uid]]" target="_self" class="img x">
           <img src="{$cfg:site.avatar}/user92.[[uid]].jpg" width=92 height=92 class="normalFace" style="border:1px solid #CCC; width:100%;" onerror="check_error(this);"></a>
       </dt>
-        <dd class="name"><a href="{$app:path}/user/[[uid]]" title="挖客" style="font-size: 16px;">[[name]]</a></dd>
+        <dd class="name"><a href="{$cfg:urls.user}/[[uid]]" title="挖客" style="font-size: 16px;">[[name]]</a></dd>
 	<dd class="count">
-          <a href="{$app:path}/user/[[uid]]" class="info-link">	
+	  <a href="{$cfg:urls.user}/[[uid]]" class="info-link">	
             <span>  [[num_images]]  <p>图片</p></span>
           </a>
           <a href="{$app:path}/useralbum/[[uid]]" class="info-link">
@@ -130,7 +130,9 @@ function check_error(img_) {
 
 <textarea id="album_template" style="display:none;">
 <span class="album">
-  <div class="ablum-name" style="font-size:14px; overflow:hidden; width:100px;text-overflow : ellipsis"><nobr>[[albumname]]</nobr></div>
+  <div class="ablum-name" style="font-size:14px; overflow:hidden; width:100px;text-overflow : ellipsis">
+    <nobr><a href="{$cfg:urls.paintings}/[[album_id]]">[[albumname]]</a></nobr>
+  </div>
   <div class="album-body">
     [[images]]
   </div>
@@ -139,9 +141,9 @@ function check_error(img_) {
 </textarea>
 
 <textarea id="image_template" style="display:none;">
-    <a href="{$app:path}/pins/[[id]]" target="_self">
-	    <div class="album-item" style="background:url({$cfg:site.thumb_images_dir}/[[file_name]]) 50% 50% no-repeat"> </div>
-    </a>
+  <a href="{$cfg:urls.image}/[[id]]" target="_self">
+    <div class="album-item" style="background:url({$cfg:site.thumb_images_dir}/[[file_name]]) 50% 50% no-repeat"> </div>
+  </a>
 </textarea>
 
 <!--    

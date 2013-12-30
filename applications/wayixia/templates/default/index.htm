@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title> 挖一下，让更多人分享~ - www.wayixia.com</title>
+<title> 挖一下，让更多人分享 |图片|美图|存储|- www.wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
@@ -9,62 +9,6 @@
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css" />
-<style>
-#wf-template {
-	display:none;
-}
-
-/*CSS page style pagination*/
-
-DIV.pager {
-	PADDING-RIGHT: 0px; 
-	PADDING-LEFT: 0px; 
-	FONT-SIZE: 15px; 
-	PADDING-BOTTOM: 10px; 
-	COLOR: #48b9ef; 
-	PADDING-TOP: 10px; 
-	FONT-FAMILY: Arial, Helvetica, sans-serif; 
-	BACKGROUND-COLOR: #fff; 
-	TEXT-ALIGN: left;
-	text-indent:5px;
-}
-
-DIV.pager A {
-	BORDER: #f0f0f0 2px solid;
-	PADDING-TOP: 8px; 
-	PADDING-RIGHT: 12px; 
-	PADDING-BOTTOM: 8px; 
-	PADDING-LEFT: 12px; 
-	MARGIN: 0px 2px; 
-	COLOR: #48b9ef; 		
-	TEXT-DECORATION: none
-}
-
-DIV.pager A:hover {
-	BORDER: #ff5a00 2px solid; COLOR: #ff5a00;
-}
-DIV.pager A:active {
-	BORDER: #ff5a00 2px solid; COLOR: #ff5a00;
-}
-DIV.pager SPAN.current {
-	PADDING-TOP: 8px; 
-	PADDING-RIGHT: 12px; 
-	PADDING-BOTTOM: 8px; 
-	PADDING-LEFT: 12px; 
-	MARGIN: 0px 2px 0px 0px;
-	BORDER: #ff5a00 2px solid; 
-	BACKGROUND-COLOR: #ff6c16;
-	
-	COLOR: #fff;  
-}
-
-DIV.pager SPAN.disabled {
-	DISPLAY: none
-}
-
-
-</style>
-
 <script src="{$app:qlib}/Q.js">
 <!--
 import utils.tween;
@@ -84,7 +28,7 @@ import utils.tween;
   <div class="btn-group time-limit">
     <a href="{$app:module}" class="btn btn-primary">最新分享</a>
     <a href="/recommend/album" class="btn btn-default">推荐画集</a>
-    <a href="{$app:domain}/recommend/user" class="btn btn-default">推荐用户</a>
+    <a href="/recommend/user" class="btn btn-default">推荐用户</a>
   </div>
 </div>
 <br>
@@ -114,18 +58,18 @@ import utils.tween;
   </div>
 </div>
 
-<span id="wf-template">
-  <a href="{$app:path/}/pins/[[id]]" target="_self" class="img x">
+<textarea id="wf-template" style="display:none;">
+  <a href="{$cfg:urls.image/}/[[id]]" target="_self" class="img x">
     <img src="{$app:path}{$cfg:site.thumb_images_dir/}/[[file_name]]" width=[[width]] height=[[height]] alt="">
   </a>
   <p class="description">[[title]]</p>
   <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
   <div class="convo attribution clearfix">
     <p class="NoImage">
-      <a href="{$app:path/}/pins/[[id]]" target="_blank">[[owner]]</a>
+      <a href="{$cfg:urls.image/}/[[id]]" target="_blank">[[owner]]</a>
     </p>
   </div>
-</span>
+</textarea>
 
 <script type="text/javascript">
 
@@ -165,7 +109,7 @@ Q.Ready(function(){
 	"container":"wf-main",
 	"colWidth":248,
 	"colCount":4,
-	"template":Q.$('wf-template').innerHTML,
+	"template":Q.$('wf-template').value,
 	"animate" : new alpha(),
   });
 

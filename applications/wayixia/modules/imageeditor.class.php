@@ -105,27 +105,31 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
 
     $this->App()->notify('image_move', 
       array(
-	'album_id' => $album_id,
-	'images' => array($id))
+  'album_id' => $album_id,
+  'images' => array($id))
     );
   }
 
   function delete_image() {
     $data = &$_POST['data'];
     $ablum_id = intval($data['album_id'], 10);
-	$pictures = $data['pictures'];
-	if(!is_array($pictures))
-		$pictures = json_decode(&$data['pictures']);
-	
+    $pictures = $data['pictures'];
+    if(!is_array($pictures))
+      $pictures = json_decode(&$data['pictures']);
+  
     if(!is_array($pictures) || empty($pictures)) {
-      $this->errmsg('invalid parameter: pictures'); //
+      $this->errmsg('invalid parameter: pictures'); 
+      return;
+    }
+    
+    if($this->App()->album_is_valid($album_id)) {
+      $this->errmsg("not authorized");
       return;
     }
 
     $db = &$this->App()->db();
     $ids = implode('\',\'', $pictures);
-    $uid = $this->App()->get_user_info('uid');
-    $sql = "delete from ##__users_images where `uid`='{$uid}' and `id` in ('{$ids}')";
+    $sql = "delete from ##__users_images where `id` in ('{$ids}')";
     $db->execute($sql);
     if($db->affected_rows() < 0) {
       $this->AjaxHeader(-2);

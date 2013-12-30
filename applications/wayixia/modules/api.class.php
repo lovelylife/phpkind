@@ -64,7 +64,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 
     $t = new CLASS_TEMPLATES($this->App());
     $t->load('plugin.chrome');
-		
+    
     $t->push_data('useralbums', $albums);
     $t->display();
   }
@@ -99,6 +99,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
   function add_image_($img_info) {
     $theApp = &$this->App();
     $user_key = $theApp->get_user_info('user-key');
+    $uid = $theApp->get_user_info('uid');
     if(!$user_key || empty($user_key)) {
       $this->AjaxHeader(-2); // not login
       $this->AjaxData('you must login!');
@@ -106,21 +107,23 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     }
     
     $img_src   = $img_info['srcUrl'];
-    $album_id  = 0; // 待分类图
+    $album_id  = -$uid; // 待分类图
     $page_url  = $img_info['pageUrl'];  
     $img_title = $img_info['title'];
 
-    if(isset($img_info['albumid']))
-      $album_id = intval($img_info['albumid'], 10); 
-
+    if(isset($img_info['albumid'])) {
+      if($theApp->album_is_valid($img_info['albumid'])) {
+        $album_id = intval($img_info['albumid'], 10); 
+      }   
+    }
     //if(!is_int($img_width) || $img_width < 1 || $img_width > 5000 ) {
-    //	$this->errmsg("image width(:$img_width) range(1-5000) is invalid.");
-    //	return;
+    //  $this->errmsg("image width(:$img_width) range(1-5000) is invalid.");
+    //  return;
     //}
 
     //if(!is_int($img_height) || $img_height < 1 || $img_height > 5000 ) {
-    //	$this->errmsg("image height(:$img_height) range(1-5000) is invalid.");
-    //	return;
+    //  $this->errmsg("image height(:$img_height) range(1-5000) is invalid.");
+    //  return;
     //}
 
     $url = parse_url($page_url);
@@ -129,18 +132,18 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     $db = &$this->App()->db();
     $res_id = 0;
     $file_name = '';
-	  $file_type = '.jpg';
+    $file_type = '.jpg';
     // according to resources library check image resource exists
     $img_res = $db->get_row("select id, file_type, file_name from ##__images_resource where `src`='{$img_src}' limit 0,1;");
 
     // images_resource
     if(empty($img_res)) {
       $file_name = $this->uuid();
-		  // get remote image
+      // get remote image
       $result_code = $this->get_remote_image
         ($img_src, $img_info['cookie'] , $img_info['referrer'], $image_data); 
 
-      if(0 != $result_code) {	  
+      if(0 != $result_code) {    
         $this->errmsg('get image error, code:'.$result_code);
         return;
       }
@@ -151,7 +154,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
         return;
       }
 
-			// save thumb      
+      // save thumb      
       $info = $this->save_thumb_($file_name);
       $img_width = $info['width'];
       $img_height = $info['height'];
@@ -197,25 +200,24 @@ class CLASS_MODULE_API extends CLASS_MODULE {
         $this->AjaxHeader(-100);
         $this->AjaxData('该图片已经挖过了，不需要重复挖.');
         return;
-      }		
+      }    
     }
 
     // insert into users_images
-	  $fields = array(
+    $fields = array(
       'res_id'    => $res_id,
       'album_id'  => $album_id,
-      'uid'       => $theApp->get_user_info('uid'),
       'title'     => $img_title,
       'from_host' => $from_host,
       'from_url'  => $page_url,
     );
 
-	  $sql = $db->insertSQL('users_images', $fields);
-	  $result = $db->execute($sql);
+    $sql = $db->insertSQL('users_images', $fields);
+    $result = $db->execute($sql);
     if(!$result) {
-	    $this->errmsg($db->get_error());
+      $this->errmsg($db->get_error());
       return;
-	  }
+    }
     
     $id = $db->get_insert_id();
     // get nid to notify client
@@ -225,7 +227,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
         'id' => $id,
         'album_id' => $album_id,        
         'file_name' => $file_name,
-		    'file_type' => $file_type,		    
+        'file_type' => $file_type,        
         'server'=> $_SERVER['SERVER_NAME'],
         'sign' => $rc4->encrypt($file_name), 
     );
@@ -248,13 +250,13 @@ class CLASS_MODULE_API extends CLASS_MODULE {
   function save_thumb_($file_name) {
     $image_file = $this->App()->get_images_dir().'/'.$file_name;
 
-		$orginal_image =  new SimpleImage;
+    $orginal_image =  new SimpleImage;
     $orginal_image->load($image_file);
     $img_width = $orginal_image->getWidth();
     $img_height = $orginal_image->getHeight();
     $img_mime = $orginal_image->getMime();
     $img_size = filesize($image_file);
-	  $orginal_image->resizeToWidth(192);
+    $orginal_image->resizeToWidth(192);
     $orginal_image->save($this->App()->get_thumbs_dir().'/'.$file_name);
 
     return array('width' => $img_width, 
@@ -276,8 +278,8 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     //$ip = "$ran3.$ran2.$ran1.$ran";
     //$headerArr = array("CLIENT-IP:$ip", "X-FORWARDED-FOR:$ip");
     //$cookieJar = tempnam(_IROOT . './cookie', 'cookie.txt');
-	  $user_agent = $_SERVER["HTTP_USER_AGENT"];
-	  // "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.8) 
+    $user_agent = $_SERVER["HTTP_USER_AGENT"];
+    // "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.8) 
     // Gecko/20100722 Firefox/3.6.8"
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
@@ -285,7 +287,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     curl_setopt($curl, CURLOPT_FAILONERROR, TRUE);
     //curl_setopt($curl, CURLOPT_HTTPHEADER , $headerArr);  //构造IP
 
-	  curl_setopt($curl, CURLOPT_USERAGENT, $user_agent);
+    curl_setopt($curl, CURLOPT_USERAGENT, $user_agent);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_TIMEOUT, 60);   //设定最大访问耗时
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, TRUE);
@@ -350,7 +352,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       $this->AjaxData('请先登录！');
       return;
     }
-	
+  
     $data = &$_POST['data'];
 
     if(!isset($data['id'])) {
@@ -416,6 +418,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 
     $this->AjaxData($db->get_insert_id());
   }
+
 }
 
 ?>

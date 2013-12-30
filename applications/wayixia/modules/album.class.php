@@ -33,7 +33,6 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     $album_info = array();
 
     if(is_numeric($album_id) && (!($album_id <= 0 && ($album_id!=-$uid)))) {
-  
       $album_info = $db->get_row("select id, name as album_name from ##__users_albums where id={$album_id} and uid={$uid} order by create_time desc;");
       if(empty($album_info)) {
         trigger_error('invalid album '.$album_id, E_USER_ERROR);
@@ -121,6 +120,9 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
       break;
     case 'move':
       $this->move();
+      break;
+    case 'follow':
+      $this->album_follow();
       break;
     }
   }
@@ -231,6 +233,23 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     $this->App()->notify('image_move', array(
         'album_id' => $album_id,
         'images' => $pictures));
+  }
+
+  function album_follow() {
+    // id
+    $data = &$_POST['data'];
+    $album_id = intval($data['album_id'], 10);
+  
+    //$this->AjaxData($data);
+    $uid = $this->App()->get_user_info('uid');
+    $fields = array('album_id' => $album_id, 'uid' => $uid);
+    $db = &$this->App()->db();
+    $sql = $db->InsertSQL('follow_albums', $fields)." ON DUPLICATE KEY UPDATE album_id=VALUES(album_id), uid=VALUES(uid);";
+    if(!$db->execute($sql)) {
+      $this->errmsg($db->get_error());
+      return;
+    }
+
   }
 
   function album_is_exists($album_id) {

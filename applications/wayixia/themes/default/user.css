@@ -451,6 +451,54 @@ height: 40px; text-align:center;line-height:40px;
 
 /* user setting drop menu end */
 
+/*CSS page style pagination*/
+
+DIV.pager {
+	PADDING-RIGHT: 0px; 
+	PADDING-LEFT: 0px; 
+	FONT-SIZE: 15px; 
+	PADDING-BOTTOM: 10px; 
+	COLOR: #48b9ef; 
+	PADDING-TOP: 10px; 
+	FONT-FAMILY: Arial, Helvetica, sans-serif; 
+	BACKGROUND-COLOR: #fff; 
+	TEXT-ALIGN: left;
+	text-indent:5px;
+}
+
+DIV.pager A {
+	BORDER: #f0f0f0 2px solid;
+	PADDING-TOP: 8px; 
+	PADDING-RIGHT: 12px; 
+	PADDING-BOTTOM: 8px; 
+	PADDING-LEFT: 12px; 
+	MARGIN: 0px 2px; 
+	COLOR: #48b9ef; 		
+	TEXT-DECORATION: none
+}
+
+DIV.pager A:hover {
+	BORDER: #ff5a00 2px solid; COLOR: #ff5a00;
+}
+DIV.pager A:active {
+	BORDER: #ff5a00 2px solid; COLOR: #ff5a00;
+}
+DIV.pager SPAN.current {
+	PADDING-TOP: 8px; 
+	PADDING-RIGHT: 12px; 
+	PADDING-BOTTOM: 8px; 
+	PADDING-LEFT: 12px; 
+	MARGIN: 0px 2px 0px 0px;
+	BORDER: #ff5a00 2px solid; 
+	BACKGROUND-COLOR: #ff6c16;
+	
+	COLOR: #fff;  
+}
+
+DIV.pager SPAN.disabled {
+	DISPLAY: none
+}
+
 /* start button drop menu */
 .start-button {
   position: relative;;

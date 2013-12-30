@@ -121,6 +121,12 @@ class CLASS_WAYIXIA_APPLICATION extends CLASS_APPLICATION {
     return $sql_albums_list;
   }
 
+  function album_is_valid($album_id) {
+    $album_id = intval($album_id, 10);    
+    $row = $this->db()->get_row("select id from ##__users_albums where id='{$album_id}' and uid='{$uid}' limit 0,1;");
+    return (!empty($row));
+  }
+
   function get_images_dir() {
     $d = $this->Config('site.images_dir');
     if(!is_dir($d)) {

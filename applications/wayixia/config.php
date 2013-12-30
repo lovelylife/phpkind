@@ -30,6 +30,13 @@ return array (
     'avatar' => '/avatar',
     'front_cover_dir'=> '/ii/frontcover',
   ),
+  'urls' => 
+  array(
+    'paintings' => 'http://wayixia.com/paintings',
+    'image' => 'http://wayixia.com/pins',
+    'user' => 'http://wayixia.com/user',
+    'sites' => 'http://wayixia.com/sites',
+  ),	  
   'openapi' => 
   array(
     'sinaweibo' => 

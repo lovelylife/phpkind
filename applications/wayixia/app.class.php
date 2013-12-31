@@ -122,8 +122,10 @@ class CLASS_WAYIXIA_APPLICATION extends CLASS_APPLICATION {
   }
 
   function album_is_valid($album_id) {
-    $album_id = intval($album_id, 10);    
-    $row = $this->db()->get_row("select id from ##__users_albums where id='{$album_id}' and uid='{$uid}' limit 0,1;");
+    $album_id = intval($album_id, 10);
+    $uid = $this->get_user_info('uid');
+    $sql = "select id from ##__users_albums where id={$album_id} and uid={$uid} limit 0,1;";
+    $row = $this->db()->get_row($sql);
     return (!empty($row));
   }
 

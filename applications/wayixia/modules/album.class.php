@@ -239,8 +239,11 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     // id
     $data = &$_POST['data'];
     $album_id = intval($data['album_id'], 10);
-  
-    //$this->AjaxData($data);
+    if($this->App()->album_is_valid($album_id)) {
+      $this->errmsg("不能关注自己的画集!");
+      return;
+    } 
+    
     $uid = $this->App()->get_user_info('uid');
     $fields = array('album_id' => $album_id, 'uid' => $uid);
     $db = &$this->App()->db();

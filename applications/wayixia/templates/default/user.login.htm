@@ -4,25 +4,20 @@
 <title> 登录 - 挖一下</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/layout.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
 <style>
 <!--
-/*
-.btn {
-	background: #FFF;
-	border: 1px solid rgba(0, 0, 0, 0.1);
-	margin-left: 5px;
-	width: 80px;
-	font-size: 14px;
-	height: 30px;
-	line-height:30px;
-	padding: 0 30px;
+html {
+  overflow:hidden;
+  background: #FFF;
 }
-*/
+
 #button-ok {
+  height: 30px;    
   width: 210px;
 }
 
@@ -89,7 +84,7 @@ function ajax_login() {
           } else if(Q.GET('t') == 2) {
             location.href = decodeURIComponent(Q.GET('refer'));
           } else {
-            parent.location.reload();
+            top.location.reload();
           }
         } else {
           var err = login_error[resp.header];
@@ -179,13 +174,13 @@ Q.Ready(function(){
 </script>
 </head>
 
-<body style="background: #e1ecff;">
+<body style="background: #FFF;">
 
 
 <div id="image-box" align="center">
   <div>
     <div id="login-area" class="regmain">
-      <div class="right" style="border:0px;background:none;padding-top:0;border-left: 1px solid #CCC; height: 150px;">
+      <div class="right" style="border:0px;background:none;padding-top:0;border-left: 1px solid #CCC; height: 165px;">
         <h3><span>合作网站登录 挖一下</span></h3>
         <p style="line-height:40px;padding-top:10px;"> 
           <a href="{$fields:sina_weibo_url}">
@@ -206,13 +201,13 @@ Q.Ready(function(){
            (<a href="{$app:module}&action=forgetpwd" target="_blank" id="login-forgetpwd">忘记密码</a> 
            | <a href="{$app:module}&action=register" target="_blank" id="login-register">注册</a>)<br/>
         </p>
+        <div id="action-bar" align="left" style="margin-top: 10px;">
+          <button id="button-ok" class="button"> 登 录 </button>
+          <span id="error" style="margin-left:15px; margin-top:3px;display:inline;color:red;"></span>
+          <!--input type="button" id="button-cancel" class="uploadBtn small" value=" 取 消 " hidefocus /-->&nbsp;&nbsp;
+        </div>
       </div>
       <div style="clear:both;"></div>
-      <div id="action-bar" align="left" style="padding-left: 15px;">
-        <input type="button" id="button-ok" class="uploadBtn small" value=" 登 录 " hidefocus/>
-        <span id="error" style="margin-left:15px; margin-top:3px;display:inline;color:red;"></span>
-        <!--input type="button" id="button-cancel" class="uploadBtn small" value=" 取 消 " hidefocus /-->&nbsp;&nbsp;
-      </div>
     </div>
   </div>
 </div>

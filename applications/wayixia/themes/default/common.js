@@ -14,13 +14,13 @@ function gotologin(url) {
     document.body.appendChild(login_iframe);
     login_iframe.src = url;
     login_iframe.setAttribute('style', 'position:fixed !important;display:block;border:0px !important;')
-    login_iframe.style.width = 500 + 'px';
-    login_iframe.style.height = 240 + 'px';
+    login_iframe.style.width = 600 + 'px';
+    login_iframe.style.height = 220 + 'px';
     login_iframe.style.WebkitBoxShadow = "5px 5px 20px rgba(0,0,0,0.5)";
 
-    login_iframe.style.top = -240 + 'px';
+    login_iframe.style.top = -220 + 'px';
     login_iframe.style.display = '';
-    var left = (document.body.clientWidth - 500 ) / 2;
+    var left = (document.body.clientWidth - 600 ) / 2;
     login_iframe.style.left = left+'px';
   // var top =  (document.body.clientHeight - wndNode.nHeight ) / 2;
   }

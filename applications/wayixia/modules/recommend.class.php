@@ -44,16 +44,6 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
     . " where num_images > 8 limit 0, 50;";
     $albums_list = array();
     $this->App()->db()->get_results($sql_albums_list, $albums_list);
-    #echo $sql_albums_list;
-    #print_r($albums_list[0]); 
-    #$str = stripslashes($albums_list[0]['data_images']);
-    #$o = json_decode($str, true);
-    #echo $str;
-    #print_r($o);
-    $len = count($albums_list);
-    for($i=0; $i < $len; $i++) {
-      $albums_list[$i]['data_images'] = stripslashes($albums_list[$i]['data_images']);
-    }
     if(empty($albums_list)) {
       $t->push('albums', '[]');
     } else {

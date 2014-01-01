@@ -89,9 +89,12 @@ class CLASS_MODULE_SCHEDULE extends CLASS_MODULE {
   function albums() {
     $db = &$this->App()->db();
     // update recommend user count data
-    $sql = "select A.id as album_id, A.name as album_name, A.description as album_description, ";
-    $sql.= "count(I.id) as num_images, group_concat(I.id) as data_images ";
-    $sql.= "from ch_users_images I right join ch_users_albums A on A.id=I.album_id ";
+    $sql = "select A.id as album_id, A.name as album_name, A.description as album_description, A.uid, ";
+    $sql.= "count(I.id) as num_images, group_concat(I.id) as data_images, ";
+    $sql.= "U.name as uname ";
+    $sql.= "from ch_users_images I ";
+    $sql.= "right join ch_users_albums A on A.id=I.album_id ";
+    $sql.= "left join ##__users U on U.uid=A.uid ";
     $sql.= "group by A.id;";
     $rs = array();
     if(!$db->get_results($sql, $rs)) 

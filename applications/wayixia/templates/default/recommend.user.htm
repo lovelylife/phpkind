@@ -1,7 +1,7 @@
-<!DOCTYPE>
-<html>
-<head>
-<title> 推荐用户 - wayixia.com</title>
+<!DOCTYPE>
+<html>
+<head>
+<title> 推荐用户 - wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
@@ -10,48 +10,26 @@
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css" />
 
-<style>
-
-#wf-template {
-	display:none;
-}
-
-.pic {
-position: absolute;
-width: 50px;
-height: 50px;
-overflow: hidden;
-margin:0;
-padding:0;
-}
-
-.xx {
-  margin:0;
-  width: 88px;
-  height: 50px;
-  display: block;
-  padding: 0 0 0 60px;
-  word-wrap: break-word;
-  font-size:15px;
-}
-
-</style>
-
 <script src="{$app:qlib}/Q.js">
 <!--
 import utils.stl;
 import utils.json2;
 import utils.ajax;
-
+import utils.tween;
 -->
 </script>
 
+<script src="{$themes:path/}/common.js"></script>
 <script src="{$themes:path/}/waterfall.js"></script>
 <script>
 <!--
 
 function check_error(img_) {
   img_.src = '{$themes:path}/icon48.png';
+}
+
+function do_follow_album(album_id) {
+  follow_album('{$app:app}&mod=album&action=follow&inajax=true', album_id);
 }
 
 -->
@@ -85,11 +63,11 @@ function check_error(img_) {
     <div class="clear"></div>
   </div>
   <div class="clear"></div>
-  {#template footer}
+  {#template user.footer}
 </div>
 <br><br>
 
-<textarea id="wf-template">
+<textarea id="wf-template" style="display:none;">
   <div class="user-profile" style="width:429px;border-right: 1px solid #F2F5F5;float: left;">
     <div class="profile-basic">
       <dl style="padding:12px 0;">
@@ -125,13 +103,16 @@ function check_error(img_) {
 
 <textarea id="album_template" style="display:none;">
 <span class="album">
-  <div class="ablum-name" style="font-size:14px; overflow:hidden; width:100px;text-overflow : ellipsis">
+  <div class="ablum-name" style="font-size:14px; overflow:hidden; width:100px;text-overflow : ellipsis;float:left">
     <nobr><a href="{$cfg:urls.paintings}/[[album_id]]">[[album_name]]</a></nobr>
+  </div>
+  <div class="ablum-name-right" style="overflow:hidden; width:55px; text-overflow : ellipsis; margin-left: 90px;text-align: right;">
+    <nobr>([[num_images]])</nobr>
   </div>
   <div class="album-body">
     [[images]]
   </div>
-  <div class="ablum-bottom" align="right"><button class="button">关注</button></div>
+  <div class="ablum-bottom" align="right"><button class="button" onclick="do_follow_album([[album_id]])">关注</button></div>
 </span>
 </textarea>
 
@@ -140,111 +121,6 @@ function check_error(img_) {
     <div class="album-item" style="background:url({$cfg:site.thumb_images_dir}/[[file_name]]) 50% 50% no-repeat"> </div>
   </a>
 </textarea>
-
-<!--    
-    <span class="album">
-      <div class="ablum-name">图集名称1</div>
-      <div class="album-body">
-        <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-           <div class="album-item" style="background:url(/ii/thumb/0c1b7c3e-a475-4fd7-8ff6-e7d051454128) 50% 50% no-repeat"> </div>
-        </a>
-            
-        <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-              <div class="album-item" style="background:url(/ii/thumb/e11bea77-06ba-48e7-8428-c7c28e5aafef) 50% 50% no-repeat">
-              </div>
-        </a>
-            
-        <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-          <div class="album-item" style="background:url(/ii/thumb/39212c65-8442-45e8-966e-3605b3b9179d) 50% 50% no-repeat">
-             </div>
-        </a>
-        <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-              <div class="album-item" style="background:url(/ii/thumb/0a761f9f-b3f8-4434-8867-9ffb9ac4018e) 50% 50% no-repeat">
-              </div>
-        </a>
-       <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-              <div class="album-item" style="background:url(/ii/thumb/0a761f9f-b3f8-4434-8867-9ffb9ac4018e) 50% 50% no-repeat">
-              </div>
-        </a>
-        <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-              <div class="album-item" style="background:url(/ii/thumb/0a761f9f-b3f8-4434-8867-9ffb9ac4018e) 50% 50% no-repeat">
-              </div>
-        </a>
-      </div>
-      <div class="ablum-bottom" align="right"><button class="button">关注</button></div>
-    </span>
-    <span class="album">
-      
-    <div class="ablum_name">图集名称1</div>
-      <div class="album-body">
-        <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-           <div class="album-item" style="background:url(/ii/thumb/0c1b7c3e-a475-4fd7-8ff6-e7d051454128) 50% 50% no-repeat"> </div>
-        </a>
-            
-        <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-              <div class="album-item" style="background:url(/ii/thumb/e11bea77-06ba-48e7-8428-c7c28e5aafef) 50% 50% no-repeat">
-              </div>
-        </a>
-            
-        <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-          <div class="album-item" style="background:url(/ii/thumb/39212c65-8442-45e8-966e-3605b3b9179d) 50% 50% no-repeat">
-             </div>
-        </a>
-        <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-              <div class="album-item" style="background:url(/ii/thumb/0a761f9f-b3f8-4434-8867-9ffb9ac4018e) 50% 50% no-repeat">
-              </div>
-        </a>
-       <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-              <div class="album-item" style="background:url(/ii/thumb/0a761f9f-b3f8-4434-8867-9ffb9ac4018e) 50% 50% no-repeat">
-              </div>
-        </a>
-       <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-              <div class="album-item" style="background:url(/ii/thumb/0a761f9f-b3f8-4434-8867-9ffb9ac4018e) 50% 50% no-repeat">
-              </div>
-        </a>
-      </div>
-      <div class="ablum-bottom" align="right"><button class="button">关注</button></div>
-    </span>
-   <span class="album">
-      <div class="ablum-name">图集名称1</div>
-      <div class="album-body">
-        <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-           <div class="album-item-primary" style="background:url(/ii/thumb/0c1b7c3e-a475-4fd7-8ff6-e7d051454128) 50% 50% no-repeat"> </div>
-        </a>
-            
-        <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-              <div class="album-item" style="background:url(/ii/thumb/e11bea77-06ba-48e7-8428-c7c28e5aafef) 50% 50% no-repeat">
-              </div>
-        </a>
-            
-        <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-          <div class="album-item" style="background:url(/ii/thumb/39212c65-8442-45e8-966e-3605b3b9179d) 50% 50% no-repeat">
-             </div>
-        </a>
-            
-              <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-              <div class="album-item" style="background:url(/ii/thumb/8229c01f-1396-4518-ab70-a70c3fc18e60) 50% 50% no-repeat">
-              </div>
-              </a>
-               <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-              <div class="album-item" style="background:url(/ii/thumb/729127ca-0891-4707-a9bb-4ac728f3de6d) 50% 50% no-repeat">
-              </div>
-              </a>
-           
-              <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-              <div class="album-item" style="background:url(/ii/thumb/729127ca-0891-4707-a9bb-4ac728f3de6d) 50% 50% no-repeat">
-              </div>
-              </a>
-            
-        <a href="/sites/d.hiphotos.bdimg.com" target="_self">
-              <div class="album-item" style="background:url(/ii/thumb/0a761f9f-b3f8-4434-8867-9ffb9ac4018e) 50% 50% no-repeat">
-              </div>
-        </a>
-      </div>
-      <div class="ablum-bottom" align="right"><button class="button">关注</button></div>
-    </span>
--->
-
 
 <script type="text/javascript">
 

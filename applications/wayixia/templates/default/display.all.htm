@@ -81,33 +81,6 @@ a.share_count:hover{
 
 </style>
 
-<style>
-
-#wf-template {
-	display:none;
-}
-
-.pic {
-position: absolute;
-width: 50px;
-height: 50px;
-overflow: hidden;
-margin:0;
-padding:0;
-}
-
-.xx {
-  margin:0;
-  width: 88px;
-  height: 50px;
-  display: block;
-  padding: 0 0 0 60px;
-  word-wrap: break-word;
-  font-size:15px;
-}
-
-</style>
-
 <script src="{$app:qlib}/Q.js">
 <!--
 import utils.stl;
@@ -144,7 +117,7 @@ function check_image_width(img) {
 -->
 </script>
 
-<body style="background:#f7f5f5;">
+<body>
 
 {#template user.menubar/}
 
@@ -153,7 +126,7 @@ function check_image_width(img) {
 <div id="main">
   <div id="page">
     <div class="main-width">
-      <h3 style="font-size: 16px; font-weight:normal;">来自 <b>{$fields:user_name}</b> 的分享 </h3>
+      <h3 style="font-size: 16px; font-weight:normal;">{$fields:user_name} 分享的图片 </h3>
     </div>
     <br>
     <div class="wf-main" id="wf-main">
@@ -163,11 +136,7 @@ function check_image_width(img) {
     <div class="clear"></div>
   </div>
   <div class="clear"></div>
-  <div id="footer" class="tableheader">
-    <p>
-      Powered By <a href="http://wayixia.com">wayixia.com</a>. All Rights Reservered.
-    </p>
-  </div>
+  {#template user.footer}
 </div>
 <br><br>
 
@@ -194,40 +163,11 @@ function check_image_width(img) {
   <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
   <div class="convo attribution clearfix">
     <p class="NoImage">
-      <a href="{$app:path}/pins/[[id]]" target="_self">[[album_name]]
-      </a>
+      <a href="{$cfg:urls.pins}/[[id]]" target="_self">[[from_host]]</a>
     </p>
   </div>
 </div>
 </textarea>
-
-<!--
-<dl class="tbox" style="margin:0;margin-top: -5px;">
-        <dt>
-          <strong style="color: #333;">
-            <em class="icon-calendar"></em>挖客
-          </strong>
-        </dt>
-        <dd>
-          <ul class="module">
-            <li> 
-              <a href="#" target=""></a>
-            </li>
-          </ul>
-        </dd>
-      </dl>
-      <div class="user-profile">
-       <div class="profile-basic">
-         <dl style="padding:5px 0;">
-	   <dt>
-	     <img src="{$cfg:site.avatar}/user92.{$fields:uname}.jpg" class="normalFace" style="border:1px solid #CCC; width:100%;" onerror="check_error(this);">
-	   </dt>
-          <dd class="name"><a href="#" title="修改个人信息" >{$fields:user_name/}</a></dd>
-          <dd class="company">xxx</dd>
-          <dd>xxx</dd>
-          <dd class="privacy-set"><a href="#" >&nbsp;&nbsp;</a></dd>
-        </dl>
--->
 
 <script type="text/javascript">
 

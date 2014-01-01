@@ -6,10 +6,8 @@
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/layout.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css"/>
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css" />
 <style>
 #thumbRPWrap{margin-bottom:10px}#thumbRP{font-size:0;padding:10px 0 15px 0;position:relative;width:200px}.thumb-item{float:left;display:block;width:64px;height:64px;padding:0;margin:0 2px 2px 0;position:relative;z-index:1}.thumb-item .thumb-bg{position:relative;float:left;display:block;background-color:transparent;_position:absolute}.thumb-item.hover{z-index:100;background-color:#fff;zoom:1}.thumb-item.hover .thumb-bg{padding:3px;top:-3px;left:-3px;background-color:#f45e5e;border:0 solid #ccc;width:64px;box-shadow:0 1px 4px #999;-webkit-box-shadow:0 1px 3px #ccc;-moz-box-shadow:0 1px 3px #ccc}.thumb-img-wrap{display:block;overflow:hidden;position:relative;z-index:1;width:64px;height:64px}.thumb-img-wrap .mask{height:64px;width:64px;top:0;left:0;display:block;background-color:transparent;position:absolute}.thumb-img-wrap .mask img{visibility:hidden}.thumb-img-wrap img{position:absolute;visibility:hidden;z-index:-1}a.btn-refresh{padding:0;font-weight:normal;cursor:pointer;text-indent:0;position:absolute;right:0;top:0;text-decoration:none;color:#606060;line-height:22px;font-size:14px}a.btn-refresh:hover{color:#e01a1a}
@@ -84,7 +82,7 @@ a.share_count:hover{
 <style>
 
 #wf-template {
-	display:none;
+  display:none;
 }
 
 .pic {
@@ -144,12 +142,13 @@ function check_image_width(img) {
 -->
 </script>
 
-<body style="background:#f7f5f5;">
+<body>
 
 {#template user.menubar/}
 
-
-<br><br><br><br>
+<br>
+<br><br>
+<br><br>
 <div id="main">
   <div id="page" class="wf-main">
     <div class="wf-main">
@@ -163,15 +162,11 @@ function check_image_width(img) {
     <div class="clear"></div>
   </div>
   <div class="clear"></div>
-  <div id="footer" class="tableheader">
-    <p>
-      Powered By <a href="http://wayixia.com">wayixia.com</a>. All Rights Reservered.
-    </p>
-  </div>
+  {#template user.footer}
 </div>
 <br><br>
 
-<span id="wf-template">
+<textarea id="wf-template" style="display:none;">
   <div class="actions hidden">
     <div class="right">
       <a href="" onclick="return false;" class="like btn btn11 wbtn">
@@ -198,7 +193,7 @@ function check_image_width(img) {
       </a>
     </p>
   </div>
-</span>
+</textarea>
 
 <script type="text/javascript">
 
@@ -224,7 +219,7 @@ Q.Ready(function(){
 	"container":"wf-main",
 	"colWidth":238,
 	"colCount":4,
-	"template":Q.$('wf-template').innerHTML,
+	"template":Q.$('wf-template').value,
   });
 
   g_waterfall.append(g_store.pop(10));

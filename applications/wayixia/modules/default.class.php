@@ -170,7 +170,34 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
   }
 
   function display_album_list() {
-  
+    $db = &$this->App()->db();
+    $uid = intval($_GET['uid'], 10);	  
+    $t = new CLASS_TEMPLATES($this->App());
+    $t->load('display.albumlist');
+
+    $user_info = $db->get_row("select uid, name as uname from ##__users where uid={$uid} limit 0,1;");
+    if(empty($user_info)) {
+      $user_name = "无此用户";
+    } else {
+      $user_name = $user_info['uname'];
+    }
+
+    $t->push('uid', $user_info['uid']);
+    // 获取画集列表
+    $sql_albums_list = "SELECT * "
+    . "FROM ##__nosql_albums_recommend "
+    . " where num_images > 8 and uid={$uid} limit 0, 50;";
+    $albums_list = array();
+    $this->App()->db()->get_results($sql_albums_list, $albums_list);
+    
+    if(empty($albums_list)) {
+      $t->push('albums', '[]');
+    } else {
+      $t->push('albums', json_encode($albums_list));
+    }
+    $t->push('uname', $user_name);
+    // render page
+    $t->display();
   }
 
   function display_all() {

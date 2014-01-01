@@ -14,6 +14,9 @@ class CLASS_MODULE_API extends CLASS_MODULE {
   
   function doAjax($action) {
     switch($action) {
+    case 'wayixia':
+      $this->wayixia();
+      break;
     case 'wa':
       $this->add_image();
       break;
@@ -47,6 +50,49 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       break;
     default:
       parent::doMain($action);
+    }
+  }
+
+  function wayixia() {
+    $theApp = &$this->App();
+    $user_key = $theApp->get_user_info('user-key');
+    $uid = $theApp->get_user_info('uid');
+    if(!$user_key || empty($user_key)) {
+      $this->AjaxHeader(-2); // not login
+      $this->AjaxData('you must login!');
+      return;
+    }
+  
+    $pins_id = intval($_GET['id'], 10);
+    
+    $db = $this->App()->db();
+    $sql = "select * from ##__users_images where id={$pins_id} limit 0,1;";
+    $row = $db->get_row($sql);
+    if(empty($row)) {
+      $this->errmsg('图片已经被删除或者不存在!');
+      return;
+    }
+
+    $sql_check_from_id = "select id from ##__users_images where from_id={$pins_id} limit 0,1;";
+    $check_row = $db->get_row($sql_check_from_id);
+    if(!empty($check_row)) {
+      $this->errmsg('这张图片您已经挖过了哦!');
+      return;
+    }
+
+    //$this->errmsg(json_encode($row));
+    //return;
+    // remote auto key
+    unset($row['id']);
+    unset($row['create_date']);
+    
+    $row['from_id'] = $pins_id;
+    $row['album_id'] = -$uid;
+    
+    $sql2 = $db->InsertSQL('users_images', $row);
+    if(!$db->execute($sql2)) {
+      $this->errmsg($db->get_error());
+      return;
     }
   }
 

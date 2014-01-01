@@ -30,33 +30,33 @@ a.btn-refresh:hover{color:#e01a1a}
 
 
 #view_arrows a.prev {
-	position: fixed;
-	left: 0;
-	top: 50%;
-	width: 60px;
-	height: 600px;
-	background: url({$themes:path}/prev_next.png) 0 0 no-repeat;
-	margin-top: -300px;
-	cursor: pointer;
+  position: fixed;
+  left: 0;
+  top: 50%;
+  width: 60px;
+  height: 600px;
+  background: url({$themes:path}/prev_next.png) 0 0 no-repeat;
+  margin-top: -300px;
+  cursor: pointer;
 }
 
 #view_arrows a.prev:hover {
-	background-position: -80px 0 ;
+  background-position: -80px 0 ;
 }
 
 #view_arrows .next {
-	position: fixed;
-	right: 0;
-	top: 50%;
-	width: 60px;
-	height: 600px;
-	background: url({$themes:path}/prev_next.png) -240px 0 no-repeat;
-	margin-top: -300px;
-	cursor: pointer;
+  position: fixed;
+  right: 0;
+  top: 50%;
+  width: 60px;
+  height: 600px;
+  background: url({$themes:path}/prev_next.png) -240px 0 no-repeat;
+  margin-top: -300px;
+  cursor: pointer;
 }
 
 #view_arrows a.next:hover {
-	background-position: -320px 0 ;
+  background-position: -320px 0 ;
 }
 
 .seg-title {
@@ -97,16 +97,36 @@ a.btn-refresh:hover{color:#e01a1a}
 import utils.stl;
 import utils.json2;
 import utils.ajax;
-
+import utils.tween;
 -->
 </script>
 <script src="{$themes:path/}/share.js" ></script>
+<script src="{$themes:path/}/common.js" ></script>
 <script type="text/javascript" src="{$themes:path}/lightwindow/prototype.js"></script>
 <script type="text/javascript" src="{$themes:path}/lightwindow/scriptaculous.js?load=effects"></script>
 <script type="text/javascript" src="{$themes:path}/lightwindow/lightwindow.js"></script>
 <link rel="stylesheet" href="{$themes:path}/lightwindow/css/lightwindow.css" type="text/css" media="screen" />
 <script>
 <!--
+function wayixia(id) {
+  Q.Ajax({
+    command: '{$app:app}&mod=api&inajax=true&action=wayixia&id='+id,
+    oncomplete: function(xmlhttp) {
+      var resp = Q.json_decode(xmlhttp.responseText);
+      if(resp.header == 0) {
+        alert('恭喜您，成功地挖到了一张美图哦!');  
+      } else if(resp.header == -2) {
+        gotologin('http://wayixia.com/index.php?app=wayixia&mod=user&action=login');
+      } else {
+        alert('error code: ' + resp.header + '\nmessage: ' + resp.data);
+      }
+    },
+    onerror: function(xmlhttp) {
+    
+      alert(xmlhttp.responseText); 
+    }
+  });
+}
 
 function check_width() {
   if(Q.$('tweenimg').width > Q.$('tweenimg-background').offsetWidth) {
@@ -133,11 +153,11 @@ var tree_selected = null;
 Q.Ready(function() {
 tree_selected = Q.$('tree_album');
 for(var i=0; i < tree_items.length; i++) {
-	var e = Q.$(tree_items[i]);
-	if(e) {
-		e.onclick = function(evt) {
-			for(var i=0; i < tree_items.length; i++) {
-				if(Q.$(tree_items[i]) == this) {
+  var e = Q.$(tree_items[i]);
+  if(e) {
+    e.onclick = function(evt) {
+      for(var i=0; i < tree_items.length; i++) {
+        if(Q.$(tree_items[i]) == this) {
           if(tree_selected == this) {
             tree_selected = null;
             Q.$(tree_items[i]+'_content').style.display='none';
@@ -147,19 +167,19 @@ for(var i=0; i < tree_items.length; i++) {
             this.style.backgroundColor='#FFF';
             tree_selected = this;
             this.className='seg-title selectitem'
-          }					
-				} else {
-					Q.$(tree_items[i]+'_content').style.display='none';
+          }          
+        } else {
+          Q.$(tree_items[i]+'_content').style.display='none';
           Q.$(tree_items[i]).className='seg-title normalitem'
-				}
-			}
-		}
+        }
+      }
+    }
 
-		e.onmouseover=function(evt){		  
+    e.onmouseover=function(evt){      
       if(tree_selected != this) {
         this.style.backgroundColor='#F8F8F8';
       }
-		}
+    }
 
     e.onmouseout=function(evt) {
       if(tree_selected != this) {
@@ -167,7 +187,7 @@ for(var i=0; i < tree_items.length; i++) {
       }
 
     }
-	}
+  }
 }
 
 });
@@ -179,13 +199,12 @@ for(var i=0; i < tree_items.length; i++) {
 
 {#template user.menubar/}
 
+<br>
 <br><br><br><br>
 
 <div id="view_arrows">
-	{$fields:next}
-	{$fields:prev}
-	<!--a href="{$app:path}/is/{$fields:next}" class="prev x "></a>
-	<a href="{$app:path}/is/{$fields:prev}" class="next x "></a-->
+  {$fields:next}
+  {$fields:prev}
 </div>
 
 <div id="main" class="main-width">
@@ -200,7 +219,7 @@ for(var i=0; i < tree_items.length; i++) {
           <p style="padding-top:12px; ">
           <h3 style="font-size: 18px;"><a href="{$app:path}/user/{$fields:uid}">{$fields:uname}&nbsp;</a></h3>
           </p>
-          <p style="color: #333;">
+          <p style="color: #333;margin-right: 10px;">
           <span>{$fields:title}</span>
           </p>
         </dd>
@@ -208,11 +227,15 @@ for(var i=0; i < tree_items.length; i++) {
       <div class="clear"></div>
       <div class="panel" align="center">
         <div id="tweenimg-background" style="position:relative;background: url({$themes:path}/img_bg.png) repeat; line-height:0;">   
-          <a href="{$fields:from_url}" target="_blank">	
+          <a href="{$fields:from_url}" target="_blank">  
             <img id="tweenimg" src="{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}" onload="check_width()"/>
           </a>
-	  <div style="position:absolute; right:3px; top:3px;">
-            <a href="{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}" class="lightwindow" rel="/\\:;*?&lt;&gt;'”|®™©&amp;#[Sushi]" title="图片查看" caption="{$fields:title}" author="{$fields:nickname}">查看大图</a>
+    <div style="position:absolute; right:8px; top:8px;opacity: 0.8;">
+            <div class="btn-group time-limit">
+              <a href="{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}" class="lightwindow btn btn-default" rel="/\\:;*?&lt;&gt;'”|®™©&amp;#[Sushi]" title="图片查看" caption="{$fields:title}" author="{$fields:nickname}">看大图</a>
+	      <a href="#" class="btn btn-default" onclick="wayixia({$fields:id})">挖一下</a>
+            </div>
+        
           </div>
           </div>
         <div class="clear"></div>
@@ -228,8 +251,9 @@ for(var i=0; i < tree_items.length; i++) {
           <a class="bulk first_item" href="javascript:void(0);" onclick="share2sina();"><span class="pa icon32 icon32_sina"></span></a> 
           <!--a class="bulk"><span class="pa icon32 icon32_qq"></span></a> 
           <a class="share_count"><span title="已累计分享5次">5</span></a-->
-		  <div id="qqwb_share__" data-appkey="801365852" data-icon="0" data-counter="0" data-content="{$fields:title}" data-pic="http://wayixia.com{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}"></div>
-		  <script src="http://mat1.gtimg.com/app/openjs/openjs.js#autoboot=no&debug=no"></script>
+          <div id="qqwb_share__" data-appkey="801365852" data-icon="0" data-counter="0" data-content="{$fields:title}" 
+            data-pic="http://wayixia.com{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}"></div>
+          <script src="http://mat1.gtimg.com/app/openjs/openjs.js#autoboot=no&debug=no"></script>
           <div style="clear:both; height: 10px;"></div>
         </dd>
       </dl>
@@ -289,11 +313,7 @@ for(var i=0; i < tree_items.length; i++) {
     <div class="clear"></div>
   </div>
   <div class="clear"></div>
-  <div id="footer" class="tableheader">
-    <p>
-      Powered By <a href="http://wayixia.com">wayixia.com</a>. All Rights Reservered.
-    </p>
-  </div>
+  {#template user.footer}
 </div>
 <br><br>
 

@@ -36,6 +36,7 @@ return array (
     'image' => 'http://wayixia.com/pins',
     'user' => 'http://wayixia.com/user',
     'sites' => 'http://wayixia.com/sites',
+    'paintingslist' => 'http://wayixia.com/paintingslist',
   ),	  
   'openapi' => 
   array(

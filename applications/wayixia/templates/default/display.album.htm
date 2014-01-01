@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-<title> {$fields:albumname} - {$fields:uname/} - wayixia.com</title>
+<title> {$fields:name} - {$fields:uname/} - wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
@@ -166,7 +166,7 @@ function check_image_width(img) {
         <dd>
           <ul class="module">
             <li> 
-              <a href="#" target=""></a>
+	    <a href="#" target=""></a>
             </li>
           </ul>
         </dd>
@@ -175,9 +175,11 @@ function check_image_width(img) {
         <div class="profile-basic">
         <dl style="padding:5px 0;">
           <dt>
-          <img src="{$app:path}{$cfg:site.avatar}/user92.{$fields:uname}.jpg" class="normalFace" style="border:1px solid #CCC; width:100%;" onerror="check_error(this);">
+          <img src="{$app:path}{$cfg:site.avatar}/user92.{$fields:uid}.jpg" style="border:1px solid #CCC;" onerror="check_error(this);">
           </dt>
-          <dd class="name"><a href="#" title="修改个人信息" >{$fields:nickname/}</a></dd>
+	  <dd class="name" style="margin-left: 90px;text-indent:15px;overflow:hidden;text-overflow:ellipsis;">
+	    <a href="/user/{$fields:uid}" title="{$fields:uname}" ><nobr>{$fields:uname/}</nobr></a>
+	  </dd>
           <dd class="company">  </dd>
           <dd></dd>
           <dd class="privacy-set">

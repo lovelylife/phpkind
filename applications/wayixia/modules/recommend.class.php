@@ -22,7 +22,7 @@ class CLASS_MODULE_RECOMMEND extends CLASS_MODULE {
     $t = new CLASS_TEMPLATES($this->App());
     $t->load('recommend.user');
 
-    $sql = "select * from ##__nosql_users_recommend order by num_images desc limit 0, 100;";
+    $sql = "select * from ##__nosql_users_recommend where num_albums >= 3 order by num_images desc limit 0, 100;";
     $users_list = array();
     $this->App()->db()->get_results($sql, $users_list);
 

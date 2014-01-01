@@ -11,30 +11,6 @@
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
 <style>
-
-#wf-template {
-	display:none;
-}
-
-.pic {
-	position: absolute;
-	width: 50px;
-	height: 50px;
-	overflow: hidden;
-	margin:0;
-	padding:0;
-}
-
-.xx {
-  margin:0;
-  width: 88px;
-  height: 50px;
-  display: block;
-  padding: 0 0 0 60px;
-  word-wrap: break-word;
-  font-size:15px;
-}
-
 #create-new-album {
   width: 100px;
 }
@@ -56,9 +32,6 @@ import ui.wndx-1-0-2;
 <body style="background:#f7f5f5;">
 <script type="text/javascript">
 <!--
-
-Q.debug(true);
-Q.setdebug('debug');
 
 function check_error(img) {
   if(img.iserror) {
@@ -201,12 +174,10 @@ Q.Ready(function(){
   </div>
   </div> 
   </div> 
-  
-  <div id="foot"> <p>© WAYIXIA.COM <em class="s-bottom-copyright">&nbsp;&nbsp;&nbsp;&nbsp;</em></p> </div> </div> 
-  <a class="mod-go-top-btn" href="#" onclick="return false" style="display: none; position: fixed; bottom: 5px; right: 66.5px;"></a> 
+  {#template user.footer /} 
 </div>
 
-<textarea id="wf-template">
+<textarea id="wf-template" style="display:none;">
   <a href="{$app:app}&mod=album&id=[[album_id]]" target="_self" class="img x" style="display:block;position:relative;overflow:hidden; height:120px;">
     <img
 		src="[[file_name]]" 
@@ -226,6 +197,5 @@ Q.Ready(function(){
   </div>
 </textarea>
 
-<span id="debug"></span>
 </body>
 </html>

@@ -23,6 +23,9 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     case 'display-all':
       $this->display_all();
       break;
+    case 'display-album-list':
+      $this->display_album_list();
+      break;
     case 'download':
       $this->download();
       break;
@@ -131,7 +134,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $db = &$this->App()->db();
     $album_id = intval($_GET['aid'], 10);
     
-	  // get album info
+    // get album info
     $get_album_info_sql = "select A.name, U.name as uname, U.uid as uid from ##__users_albums as A, ##__users AS U where A.id={$album_id} and A.uid=U.uid limit 0,1;";
     $album_info = $db->get_row($get_album_info_sql);
     //print_r($album_info);
@@ -141,15 +144,14 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
 
     $uid = intval($album_info['uid'], 10);
     $t->dump2template($album_info);
+    // album list
+    $get_albums_list = "select * from ##__users_albums where `uid`={$uid};";
+    $albums = array();
+    $db->get_results($get_albums_list, $albums);
 
-	  // album list
-	  $get_albums_list = "select * from ##__users_albums where `uid`={$uid};";
-	  $albums = array();
-	  $db->get_results($get_albums_list, $albums);
-
-	  //print_r($albums);
-	  $t->push_data('albums_data', $albums);
-	  $t->push('info_height', 320+(count($albums)+3)*35);
+    //print_r($albums);
+    $t->push_data('albums_data', $albums);
+    $t->push('info_height', 320+(count($albums)+3)*35);
 
     // images data
     $sql = "select R.file_name, R.width, R.height, I.id as id, I.from_host, I.title from ##__images_resource R, ##__users_images I where I.res_id=R.id and I.album_id>0 and I.album_id='{$album_id}' order by I.id DESC";
@@ -165,6 +167,10 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     }
 
     $t->render('display.album');
+  }
+
+  function display_album_list() {
+  
   }
 
   function display_all() {

@@ -13,4 +13,8 @@ require(_KROOT."/core.php");
 
 // echo phpkind_info();
 
+#$end = microtime(true);
+#$time = $end-$_start;
+#echo number_format($time, 10, '.', '').' seconds';
+
 ?>

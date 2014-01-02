@@ -39,8 +39,8 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
       $db = &$this->App()->db();
       $tag = $_GET['tag'];
 
-      $sql = "select file_name, width, height, id, uname as owner, title ";
-      $sql.= "from ##__nosql_pins ";
+      $sql = "select distinct(file_name), file_name, width, height, id, uname as owner, title ";
+      $sql.= "from ##__nosql_pins group by file_name ";
       $sql.=" order by id DESC ";
 
       $page_size = 50;
@@ -119,9 +119,10 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $sql_preview_next.= "ORDER BY SIGN('$id' - id );";
 
     $ids = array();
+    $pins_url = $this->Config('urls.image');
     $db->get_results($sql_preview_next, $ids);
     for($i=0; $i < count($ids); $i++) {
-      $t->push($ids[$i]['description'], '<a href="'._IPATH.'/pins/'.$ids[$i]['id'].'" class="'.$ids[$i]['description'].' x "></a>');
+      $t->push($ids[$i]['description'], '<a href="'.$pins_url.'/'.$ids[$i]['id'].'" class="'.$ids[$i]['description'].' x "></a>');
     }
     
     $t->dump2template($album_info);

@@ -127,7 +127,7 @@ class CLASS_MODULE_SCHEDULE extends CLASS_MODULE {
   function images() {
     $db = &$this->App()->db();
     $sql = "select A.id as album_id, A.name as album_name, A.uid, ";
-    $sql.= "I.id, I.from_host, I.from_url, I.title, ";
+    $sql.= "I.id, I.from_host, I.from_url, I.title, I.from_id, ";
     $sql.= "R.src, R.width, R.height, R.server, R.file_name, R.file_type, R.file_size, R.creator_uid, ";
     $sql.= "U.name as uname  ";
     $sql.= "from ##__images_resource R, ##__users U, ##__users_images I, ##__users_albums A ";

@@ -52,7 +52,7 @@ if(ini_get('register_globals')) {
 		if(isset($GLOBALS[$key])) unset($GLOBALS[$key]);
 	}
 }
-    
+
 // 清除不需要的全局变量，保存系统使用的变量
 $variables_whitelist = array (
 

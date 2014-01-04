@@ -17,6 +17,9 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     case 'wayixia':
       $this->wayixia();
       break;
+    case 'wa-image':
+      $this->wa_image();
+      break;
     case 'wa':
       $this->add_image();
       break;
@@ -94,6 +97,22 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       $this->errmsg($db->get_error());
       return;
     }
+  }
+
+  function wa_image() {
+    // this api is use for localhost request
+    // check ip
+    $server_ip = $_SERVER['SERVER_ADDR'];
+    $remote_ip = getip();
+    if($server_ip != $remote_ip) {
+      $this->errmsg("invalid access");
+      return;
+    }
+    //$this->AjaxData($_POST['data']);
+    $this->AjaxData($_COOKIE);
+    //$this->errmsg("{$remote_ip} test action {$server_ip}");  
+    // after get image
+
   }
 
   function preview() {

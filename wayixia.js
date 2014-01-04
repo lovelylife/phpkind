@@ -42,7 +42,7 @@
   //! class creator
   this.KLASS = function() {
     return function() {
-      this._initialize.apply(this, arguments);	
+      this._initialize.apply(this, arguments);  
     };
   };
 
@@ -108,7 +108,7 @@
       t+=element.offsetTop;
       l+=element.offsetLeft;
     }
-    return { width : w, height : h,	left : l,	top : t	};
+    return { width : w, height : h,  left : l,  top : t  };
   };
 
   // get scroll info
@@ -146,7 +146,7 @@
 
     libs = libs || [];
     //! 解析script import
-    var sImports = libscript.innerHTML;		
+    var sImports = libscript.innerHTML;    
     var re = /\n/ig;
     var arr = libs.concat(sImports.split(re) || []);
     //alert(arr);
@@ -182,7 +182,7 @@
               || this.readyState == "loaded" 
               || this.readyState == "complete") 
           ) {
-            this.done = true;						
+            this.done = true;            
             loadscript(header, ar);
 
             // Handle memory leak in IE
@@ -204,171 +204,171 @@
       }
     }
   };
-	
-	// 解析地址页面的查询字段
-	function doParseUrlQuery() {
-		var querystring = location.search.toString();
-		querystring = querystring.substring(1, querystring.length);
-		var queryMap = querystring.split('&');
-		for(var i=0; i < queryMap.length; i++) {
-			var t = queryMap[i].split('=');
-			if(t.length != 2) { continue; }
-			_querystring[t[0]] = t[1];
-		}
-	};
-	//! document.createElement
-	this.createElement = document.createElement;
-	//! QLib Dir
-	this.libDir = function() { return _libdir; };
-	//! get querystring
-	this.GET = function(key) { return _querystring[key]; };
-	this.querystring = function(arrExcepts) {
-		if(arrExcepts) {
-			var e = _querystring;
-			for(var i=0; i<arrExcepts.length; i++) {
-				delete e[arrExcepts[i]];
-			}
+  
+  // 解析地址页面的查询字段
+  function doParseUrlQuery() {
+    var querystring = location.search.toString();
+    querystring = querystring.substring(1, querystring.length);
+    var queryMap = querystring.split('&');
+    for(var i=0; i < queryMap.length; i++) {
+      var t = queryMap[i].split('=');
+      if(t.length != 2) { continue; }
+      _querystring[t[0]] = t[1];
+    }
+  };
+  //! document.createElement
+  this.createElement = document.createElement;
+  //! QLib Dir
+  this.libDir = function() { return _libdir; };
+  //! get querystring
+  this.GET = function(key) { return _querystring[key]; };
+  this.querystring = function(arrExcepts) {
+    if(arrExcepts) {
+      var e = _querystring;
+      for(var i=0; i<arrExcepts.length; i++) {
+        delete e[arrExcepts[i]];
+      }
 
-			var str = '';
-			for(var name in e) {
-				str += '&'+name+'='+e[name];
-			}
-			
-			return str.substring(1, str.length);		
-		}		
-	};
+      var str = '';
+      for(var name in e) {
+        str += '&'+name+'='+e[name];
+      }
+      
+      return str.substring(1, str.length);    
+    }    
+  };
 
-	this.registerDelayDOMReady = function(f) {
-		if(!_LoadCompleted) {
-			_delayDOMReady.push(f);
-		}
-	};
+  this.registerDelayDOMReady = function(f) {
+    if(!_LoadCompleted) {
+      _delayDOMReady.push(f);
+    }
+  };
 
-	this.DelayLoad = function() {
-		if(_LoadCompleted) {
-			while(_delayDOMReady.length > 0) { _delayDOMReady.shift()(); }
-		}
-	};
-	//! OnLoad
+  this.DelayLoad = function() {
+    if(_LoadCompleted) {
+      while(_delayDOMReady.length > 0) { _delayDOMReady.shift()(); }
+    }
+  };
+  //! OnLoad
     this.DOMReady = function(evt) {
-		if(!_LoadCompleted) {
-			Q.registerDelayDOMReady(Q.delayDOMReady);
-		} else {
-			Q.delayDOMReady();
-		}        
+    if(!_LoadCompleted) {
+      Q.registerDelayDOMReady(Q.delayDOMReady);
+    } else {
+      Q.delayDOMReady();
+    }        
     };
-	// 当所有脚本都加载后开始执行Ready回调
-	this.delayDOMReady = function() {
-		while(_OnPageLoad.length > 0) { _OnPageLoad.shift()(); }
-	};
+  // 当所有脚本都加载后开始执行Ready回调
+  this.delayDOMReady = function() {
+    while(_OnPageLoad.length > 0) { _OnPageLoad.shift()(); }
+  };
 
-	//! push event when document loaded
+  //! push event when document loaded
     this.Ready = function(f) { _OnPageLoad.push(f); };
 
-	// current Q.js所在路径
-	Q.__DIR__ = function() {
-		//var js=document.scripts;
-		//js=js[js.length-1].src.substring(0,js[js.length-1].src.lastIndexOf("/")+1);
-		//return js;
-		return _libdir;
-	};
+  // current Q.js所在路径
+  Q.__DIR__ = function() {
+    //var js=document.scripts;
+    //js=js[js.length-1].src.substring(0,js[js.length-1].src.lastIndexOf("/")+1);
+    //return js;
+    return _libdir;
+  };
 
-	// print debug info to 'stdoutput' element
-	Q.printf = function(message) {
-		if(Q._DEBUG.enable) {
-			Q._DEBUG.stdoutput.innerHTML += '<br/>'+message;
-			Q._DEBUG.stdoutput.scrollTop = Q._DEBUG.stdoutput.scrollHeight;
-		}
-	};
+  // print debug info to 'stdoutput' element
+  Q.printf = function(message) {
+    if(Q._DEBUG.enable) {
+      Q._DEBUG.stdoutput.innerHTML += '<br/>'+message;
+      Q._DEBUG.stdoutput.scrollTop = Q._DEBUG.stdoutput.scrollHeight;
+    }
+  };
 
-	// enable/disable debug
-	Q.debug = function(enable) {
-		Q._DEBUG.enable = enable;
-	};
+  // enable/disable debug
+  Q.debug = function(enable) {
+    Q._DEBUG.enable = enable;
+  };
 
-	Q.setdebug = function(output) {
-		if(Q._DEBUG.stdoutput) {
-			if(Q._DEBUG.stdoutput.nodeName == Q.ELEMENT_NODE) {
-				
-			}
-		}
-		Q._DEBUG.stdoutput = output;
-	}
+  Q.setdebug = function(output) {
+    if(Q._DEBUG.stdoutput) {
+      if(Q._DEBUG.stdoutput.nodeName == Q.ELEMENT_NODE) {
+        
+      }
+    }
+    Q._DEBUG.stdoutput = output;
+  }
 
-	function Initialize() {
-		//! get Browser
-		_Browser.agt = navigator.userAgent.toLowerCase();
-		_Browser.isW3C = document.getElementById ? true:false;
-		_Browser.isIE = ((_Browser.agt.indexOf("msie") != -1) && (_Browser.agt.indexOf("opera") == -1) && (_Browser.agt.indexOf("omniweb") == -1));
-		_Browser.isOpera = _Browser.agt.indexOf("opera") != -1;
-		_Browser.isNS6 = _Browser.isW3C && (navigator.appName=="Netscape");
-		//为Firefox下的DOM对象增加innerText属性
-		if(_Browser.isNS6) { //firefox innerText define
-			HTMLElement.prototype.__defineGetter__( "innerText",
-				function(){	return this.textContent;	}
-			);
-			HTMLElement.prototype.__defineSetter__( "innerText",
-				function(sText){ this.textContent=sText; }
-			);
+  function Initialize() {
+    //! get Browser
+    _Browser.agt = navigator.userAgent.toLowerCase();
+    _Browser.isW3C = document.getElementById ? true:false;
+    _Browser.isIE = ((_Browser.agt.indexOf("msie") != -1) && (_Browser.agt.indexOf("opera") == -1) && (_Browser.agt.indexOf("omniweb") == -1));
+    _Browser.isOpera = _Browser.agt.indexOf("opera") != -1;
+    _Browser.isNS6 = _Browser.isW3C && (navigator.appName=="Netscape");
+    //为Firefox下的DOM对象增加innerText属性
+    if(_Browser.isNS6) { //firefox innerText define
+      HTMLElement.prototype.__defineGetter__( "innerText",
+        function(){  return this.textContent;  }
+      );
+      HTMLElement.prototype.__defineSetter__( "innerText",
+        function(sText){ this.textContent=sText; }
+      );
 
-			HTMLElement.prototype.__defineGetter__("currentStyle", 
-				function () {
-					//getComputedStyle 目标对象，属性。
-					//return this.ownerDocument.defaultView.getComputedStyle(this, ":first-line");
-					return this.ownerDocument.defaultView.getComputedStyle(this, null);
-				}
-			);
-			// 兼容ff，ie的鼠标按键值
-			Q.LBUTTON	= 0;
-			Q.MBUTTON	= 1;
-		}
-		doParseUrlQuery();
-		Q.Ready(initf);
-		Q.registerDelayDOMReady(Q.delayDOMReady);
-		loadJsLib();
-	}	
-	// initialize
-	Initialize();
+      HTMLElement.prototype.__defineGetter__("currentStyle", 
+        function () {
+          //getComputedStyle 目标对象，属性。
+          //return this.ownerDocument.defaultView.getComputedStyle(this, ":first-line");
+          return this.ownerDocument.defaultView.getComputedStyle(this, null);
+        }
+      );
+      // 兼容ff，ie的鼠标按键值
+      Q.LBUTTON  = 0;
+      Q.MBUTTON  = 1;
+    }
+    doParseUrlQuery();
+    Q.Ready(initf);
+    Q.registerDelayDOMReady(Q.delayDOMReady);
+    loadJsLib();
+  }  
+  // initialize
+  Initialize();
 })(['import utils.json2;', 'import utils.ajax;', 'import thirdparty.easyXDM-2-4-17-1.easyXDM-min;'], 
 
 (
 function(){
-	var _this = this;
-	var _xdm = null;
+  var _this = this;
+  var _xdm = null;
   var _login_user = false;
-	var wayixia_iframes = [];
-	var wayixia_top_height = 38;
-	var rpc_iframe = null;
-	var wayixia_overlay = null;
-	var wayixia_container = null;
+  var wayixia_iframes = [];
+  var wayixia_top_height = 38;
+  var rpc_iframe = null;
+  var wayixia_overlay = null;
+  var wayixia_container = null;
 
-	var wayixia_title_bar = null;
-	var wayixia_pic_canvas = null;
-	var wayixia_pic_list = null;
-	var wayixia_images_loading = 0;
-	//  style="height: auto; width: auto; left: 0px;"
-	// 	<img class="share_sina simple_tool" src="../img/sina.png" title="分享到新浪微博" style="display: none;"> \
-	// 	<img class="open_link simple_tool" src="../img/link.png" title="新窗口打开图片" style="display: none;"> \
-	/*
-	var  wayixia_pic_template = '<div class="wayixia_box"> \
-		<span class="wayixia_info"> \
-			<span class="wh">[[width]]x[[height]]<span> </span>\
-		</span></span> \
-		<div class="wayixia_image"> \
-			<a href="javascript:;"> \
-			<img style="margin-top: [[margintop]]px;width:[[sizewidth]]px;height:[[sizeheight]]px;" src="[[imgsrc]]" alt="Wa This" class="image"> \
-			<strong class="qwa" title="" style="display: none;"></strong> \
-			<strong class="wa" title="" style="display: none;"></strong> \
-			</a> \
-		</div> \
+  var wayixia_title_bar = null;
+  var wayixia_pic_canvas = null;
+  var wayixia_pic_list = null;
+  var wayixia_images_loading = 0;
+  //  style="height: auto; width: auto; left: 0px;"
+  //   <img class="share_sina simple_tool" src="../img/sina.png" title="分享到新浪微博" style="display: none;"> \
+  //   <img class="open_link simple_tool" src="../img/link.png" title="新窗口打开图片" style="display: none;"> \
+  /*
+  var  wayixia_pic_template = '<div class="wayixia_box"> \
+    <span class="wayixia_info"> \
+      <span class="wh">[[width]]x[[height]]<span> </span>\
+    </span></span> \
+    <div class="wayixia_image"> \
+      <a href="javascript:;"> \
+      <img style="margin-top: [[margintop]]px;width:[[sizewidth]]px;height:[[sizeheight]]px;" src="[[imgsrc]]" alt="Wa This" class="image"> \
+      <strong class="qwa" title="" style="display: none;"></strong> \
+      <strong class="wa" title="" style="display: none;"></strong> \
+      </a> \
+    </div> \
   </div>';
 
   */
 
   //function add(item) {
-  //	return wayixia_pic_template.replace(/\[\[(\w+)\]\]/ig, 
-  //		function(w,w2,w3,w4) { return item[w2];	}
-  //	);
+  //  return wayixia_pic_template.replace(/\[\[(\w+)\]\]/ig, 
+  //    function(w,w2,w3,w4) { return item[w2];  }
+  //  );
   //}
 
   if(!document['__wayixia']) {
@@ -458,13 +458,13 @@ function(){
     return _login_user;
   }
 
-  _this.open_window = function(uri, json) {	
+  _this.open_window = function(uri, json) {  
     var rc = {
       align: "center",
-      left	: 300,
-      top		: 200,
-      width	: 700,
-      height	: 500,
+      left  : 300,
+      top    : 200,
+      width  : 700,
+      height  : 500,
       scrollbars : "yes",
       resizable : "yes",
       statebar : "no"
@@ -604,8 +604,10 @@ function(){
       _this.set_image_state(wing_box, 'ing');
       _xdm&&_xdm.request&&_xdm.request(
         {
-          command:"http://wayixia.com/index.php?app=wayixia&mod=api&action=wa&inajax=true",
+          command:"http://wayixia.com:8080/getimage",
+          //command:"http://wayixia.com/index.php?app=wayixia&mod=api&action=wa&inajax=true",
           data: {img: json_data},
+	  withCredentials: true,
           noCache:true,
           method:"post"
         },
@@ -624,11 +626,10 @@ function(){
               return;
             } else if(result == -100){
               _this.set_image_state(wing_box, 'warn');
-              //alert('哎呀，挖一下，失败了!('+resp.data+')')
-            } else if(result == -101) {
-			  _this.set_image_state(wing_box, 'error');
-			  alert('哎呀，挖一下，失败了!('+resp.data+')')
-			}
+            } else {
+              _this.set_image_state(wing_box, 'error');
+              alert('哎呀，挖一下，失败了!('+resp.data+')')
+            }
           } else {
             _this.set_image_state(wing_box, 'error');
             //alert('哎呀，挖一下，失败了!('+resp.data+')')
@@ -644,7 +645,7 @@ function(){
     strong_2.onclick = function() { 
       if(!check_login_dialog()) 
         return;
-	  _this.deactive();
+    _this.deactive();
       _this.open_image_window(inner_img.src);
     }
   }
@@ -680,7 +681,7 @@ function(){
     return function() {
       wayixia_images_loading--;
       var img = this;
-      if(	img.width > 100 && (img.height > 100)) {
+      if(  img.width > 100 && (img.height > 100)) {
         var img_width = img.width;
         var img_height = img.height;
         var max_width = 200;
@@ -710,27 +711,27 @@ function(){
     };
   };
 
-	function enum_pictures() {
-		var len = document.images.length;
-		var output = '';
-		var accept_images = {};
-		for(var i=0; i < len ; i++) {
-			if(document.images[i].src=='' 
-				|| accept_images[document.images[i].src]) 
-			{
-			  continue;
-			}
-			wayixia_images_loading++;
-			var img = new Image();
-			img.onerror=function() { 
-			  wayixia_images_loading--;
-			  return true;
-			}
+  function enum_pictures() {
+    var len = document.images.length;
+    var output = '';
+    var accept_images = {};
+    for(var i=0; i < len ; i++) {
+      if(document.images[i].src=='' 
+        || accept_images[document.images[i].src]) 
+      {
+        continue;
+      }
+      wayixia_images_loading++;
+      var img = new Image();
+      img.onerror=function() { 
+        wayixia_images_loading--;
+        return true;
+      }
 
-			img.onload=getImageInfoHandler();
-			img.src=document.images[i].src;
-		}
-	}
+      img.onload=getImageInfoHandler();
+      img.src=document.images[i].src;
+    }
+  }
 
   _this.displayValidImages = function() {
     // alert('displayValidImages called test');
@@ -756,7 +757,7 @@ function(){
       wayixia_title_bar.onmouseover=function() { this.style.background='#FF9900';}
       wayixia_title_bar.onmouseout=function() { this.style.background='#2d2d2d';}
       wayixia_title_bar.onmousedown=function() { this.style.background='#FF6600';}
-      wayixia_title_bar.onclick=function(){ _this.deactive();	}
+      wayixia_title_bar.onclick=function(){ _this.deactive();  }
       wayixia_title_bar.innerHTML = '[X] 点击色条可以退出哦!<div class="cache_image_1"></div>'
     }
 

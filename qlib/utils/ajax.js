@@ -70,8 +70,9 @@ function _newAjaxTrans() {
 }
 
 
-Q.Ajax = function(request) {
-	request = new STRUCT_REQUEST(request);
+Q.Ajax = function(req) {
+
+	request = new STRUCT_REQUEST(req);
 	if( request.command == null ) {	
 		alert('command is error: '+ request.comamnd); 
 		return;	
@@ -82,6 +83,9 @@ Q.Ajax = function(request) {
 	
 	xmlhttp.open("POST", request.command, true);
 	xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	if(req.withCredentials) {
+	  xmlhttp.withCredentials = !! req.withCredentials;
+	}
 	//xmlhttp.setRequestHeader( "Content-Type", "text/html;charset=UTF-8" );
 	xmlhttp.onreadystatechange = function() {
 		//try {

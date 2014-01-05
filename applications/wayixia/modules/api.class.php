@@ -83,8 +83,6 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       return;
     }
 
-    //$this->errmsg(json_encode($row));
-    //return;
     // remote auto key
     unset($row['id']);
     unset($row['create_date']);
@@ -108,11 +106,10 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       $this->errmsg("invalid access");
       return;
     }
-    //$this->AjaxData($_POST['data']);
-    $this->AjaxData($_COOKIE);
-    //$this->errmsg("{$remote_ip} test action {$server_ip}");  
-    // after get image
-
+    $task = &$_POST['data'];
+    $img  = &$task['img'];
+    $result = $this->add_image_($img);    
+    $this->AjaxData($result);
   }
 
   function preview() {
@@ -134,34 +131,13 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     $t->display();
   }
 
+  // cross control
   function xdm() {
     $t = new CLASS_TEMPLATES($this->App());
     $t->render('plugin.xdm');
   }
 
-  function quick_get() {
-    // 快速挖图
-    
-  }
-
   function add_image() {
-    $client_data = &$_POST['data'];
-    $img_info = &$client_data['img'];
-    $this->add_image_($img_info);
-  }
-
-  function public_image() {
-    $client_data = &$_POST['data'];
-    $task = &$client_data['task'];
-    if(empty($task)) {
-      $this->errmsg('invalid task');
-      return;
-    }
-    $img_info = $task['img'];
-    $this->add_image_($img_info);
-  }
-
-  function add_image_($img_info) {
     $theApp = &$this->App();
     $user_key = $theApp->get_user_info('user-key');
     $uid = $theApp->get_user_info('uid');
@@ -171,6 +147,40 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       return;
     }
     
+    $client_data = &$_POST['data'];
+    $img_info = &$client_data['img'];
+    $res = $this->add_image_($uid, $img_info);
+    $result = $res['result'];
+    if($result != 0) {
+      $this->errmsg($res['msg']);
+      return;
+    }
+  }
+
+  function public_image() {
+    $theApp = &$this->App();
+    $user_key = $theApp->get_user_info('user-key');
+    $uid = $theApp->get_user_info('uid');
+    if(!$user_key || empty($user_key)) {
+      $this->AjaxHeader(-2); // not login
+      $this->AjaxData('you must login!');
+      return;
+    }
+    $client_data = &$_POST['data'];
+    $task = &$client_data['task'];
+    if(empty($task)) {
+      $this->errmsg('invalid task');
+      return;
+    }
+    $img_info = $task['img'];
+    $res = $this->add_image_($uid, $img_info);
+    $result = $res['result'];
+    if($result != 0) {
+      $this->errmsg($res['msg']);
+      return;
+    } }
+
+  function add_image_($uid, $img_info) {
     $img_src   = $img_info['srcUrl'];
     $album_id  = -$uid; // 待分类图
     $page_url  = $img_info['pageUrl'];  
@@ -181,6 +191,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
         $album_id = intval($img_info['albumid'], 10); 
       }   
     }
+
     //if(!is_int($img_width) || $img_width < 1 || $img_width > 5000 ) {
     //  $this->errmsg("image width(:$img_width) range(1-5000) is invalid.");
     //  return;
@@ -204,6 +215,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     // images_resource
     if(empty($img_res)) {
       $file_name = $this->uuid();
+      /*
       // get remote image
       $result_code = $this->get_remote_image
         ($img_src, $img_info['cookie'] , $img_info['referrer'], $image_data); 
@@ -224,6 +236,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       $img_width = $info['width'];
       $img_height = $info['height'];
       $file_type = $info['type'];
+      */
 
       /*
       if($info['size'] > (10 * 1024 * 1024) {
@@ -242,7 +255,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
           'file_size' => $info['size'],
           'width' => $img_width,
           'height' => $img_height,
-          'creator_uid' => $theApp->get_user_info('uid')
+          'creator_uid' => $uid
       );
 
       $sql = $db->insertSQL('images_resource', $fields);
@@ -283,7 +296,10 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       $this->errmsg($db->get_error());
       return;
     }
-    
+
+    /* 
+     * disable notify to client
+     
     $id = $db->get_insert_id();
     // get nid to notify client
     $rc4 = new Crypt_RC4();
@@ -298,6 +314,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     );
 
     $this->App()->notify('image_new', $params);
+    */
   }
 
   function save_image_($file_name, $image_data) {

@@ -614,22 +614,23 @@ function(){
 
         function(response){
           //wing_box.style.display = 'none';
-          var resp = Q.json_decode(response.response);
-          if(resp) {
-            var result = resp.header;
-            if(result == 0) {
-              _this.set_image_state(wing_box, 'ok');
-              //alert('恭喜您，成功挖到了您想要的图片!');
-            } else if(result == -2) {
-              _login_user = false;
-              check_login_dialog();
-              return;
-            } else if(result == -100){
-              _this.set_image_state(wing_box, 'warn');
-            } else {
-              _this.set_image_state(wing_box, 'error');
-              alert('哎呀，挖一下，失败了!('+resp.data+')')
-            }
+          var resp = {}; 
+          try {
+            resp = Q.json_decode(response.response);
+	  } catch(e) {
+	    resp.header = -1;
+	    resp.data = e.description;
+	  }
+          var result = resp.header;
+          if(result == 0) {
+            _this.set_image_state(wing_box, 'ok');
+            //alert('恭喜您，成功挖到了您想要的图片!');
+          } else if(result == -2) {
+            _login_user = false;
+            check_login_dialog();
+            return;
+          } else if(result == -100){
+            _this.set_image_state(wing_box, 'warn');
           } else {
             _this.set_image_state(wing_box, 'error');
             //alert('哎呀，挖一下，失败了!('+resp.data+')')

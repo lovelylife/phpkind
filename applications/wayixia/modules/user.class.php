@@ -388,6 +388,9 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     foreach($userinfo as $key => $value ) {
       $theApp->set_user_info($key, $value);
     }
+
+    // insert oauth 
+    //$oauth = ""
   }
 
   function do_login_nc() {

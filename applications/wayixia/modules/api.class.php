@@ -56,6 +56,31 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     }
   }
 
+
+  function preview() {
+    // useralbums
+    $sql = "SELECT id as value, name as text FROM  `##__users_albums`";
+    $uid = $this->App()->get_user_info('uid');
+    if(!empty($uid)) {
+      $sql .= " where `uid`='{$uid}'";
+    }
+    $albums = array();
+    if(!$this->App()->db()->get_results($sql, $albums)) {
+      //trigger_error('nodata', E_USER_ERROR);
+    }
+
+    $t = new CLASS_TEMPLATES($this->App());
+    $t->load('plugin.chrome');
+    
+    $t->push_data('useralbums', $albums);
+    $t->display();
+  }
+
+  // cross control
+  function xdm() {
+    $t = new CLASS_TEMPLATES($this->App());
+    $t->render('plugin.xdm');
+  }
   function wayixia() {
     $theApp = &$this->App();
     $user_key = $theApp->get_user_info('user-key');
@@ -100,6 +125,14 @@ class CLASS_MODULE_API extends CLASS_MODULE {
   function wa_image() {
     // this api is use for localhost request
     // check ip
+    $theApp = &$this->App();
+    $user_key = $theApp->get_user_info('user-key');
+    $uid = $theApp->get_user_info('uid');
+    if(!$user_key || empty($user_key)) {
+      $this->AjaxHeader(-2); // not login
+      $this->AjaxData('you must login!');
+      return;
+    }
     $server_ip = $_SERVER['SERVER_ADDR'];
     $remote_ip = getip();
     if($server_ip != $remote_ip) {
@@ -108,33 +141,34 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     }
     $task = &$_POST['data'];
     $img  = &$task['img'];
-    $result = $this->add_image_($img);    
-    $this->AjaxData($result);
+    $res = $this->add_image_($uid, $img);
+    $result = $res['result'];    
+    if($result != 0) {
+      $this->AjaxHeader($result);     
+      $this->AjaxData($res['msg']);
+      return;
+    }
+
+    $this->AjaxData($res['filename']);
   }
-
-  function preview() {
-    // useralbums
-    $sql = "SELECT id as value, name as text FROM  `##__users_albums`";
-    $uid = $this->App()->get_user_info('uid');
-    if(!empty($uid)) {
-      $sql .= " where `uid`='{$uid}'";
+  
+  function wa_image_failed() {
+    $theApp = &$this->App();
+    $user_key = $theApp->get_user_info('user-key');
+    $uid = $theApp->get_user_info('uid');
+    if(!$user_key || empty($user_key)) {
+      $this->AjaxHeader(-2); // not login
+      $this->AjaxData('you must login!');
+      return;
     }
-    $albums = array();
-    if(!$this->App()->db()->get_results($sql, $albums)) {
-      //trigger_error('nodata', E_USER_ERROR);
+    $server_ip = $_SERVER['SERVER_ADDR'];
+    $remote_ip = getip();
+    if($server_ip != $remote_ip) {
+      $this->errmsg("invalid access");
+      return;
     }
-
-    $t = new CLASS_TEMPLATES($this->App());
-    $t->load('plugin.chrome');
     
-    $t->push_data('useralbums', $albums);
-    $t->display();
-  }
-
-  // cross control
-  function xdm() {
-    $t = new CLASS_TEMPLATES($this->App());
-    $t->render('plugin.xdm');
+    // delete mysql data
   }
 
   function add_image() {
@@ -152,7 +186,8 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     $res = $this->add_image_($uid, $img_info);
     $result = $res['result'];
     if($result != 0) {
-      $this->errmsg($res['msg']);
+      $this->AjaxHeader($result);     
+      $this->AjaxData($res['msg']);
       return;
     }
   }
@@ -176,18 +211,23 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     $res = $this->add_image_($uid, $img_info);
     $result = $res['result'];
     if($result != 0) {
-      $this->errmsg($res['msg']);
+      $this->AjaxHeader($result);     
+      $this->AjaxData($res['msg']);
       return;
-    } }
+    }
+  }
 
   function add_image_($uid, $img_info) {
+    // return value
+    $return_value = array('result' => 0, 'msg' => '');
+
     $img_src   = $img_info['srcUrl'];
     $album_id  = -$uid; // 待分类图
     $page_url  = $img_info['pageUrl'];  
     $img_title = $img_info['title'];
 
     if(isset($img_info['albumid'])) {
-      if($theApp->album_is_valid($img_info['albumid'])) {
+      if($this->App()->album_is_valid($img_info['albumid'])) {
         $album_id = intval($img_info['albumid'], 10); 
       }   
     }
@@ -209,6 +249,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     $res_id = 0;
     $file_name = '';
     $file_type = '.jpg';
+    
     // according to resources library check image resource exists
     $img_res = $db->get_row("select id, file_type, file_name from ##__images_resource where `src`='{$img_src}' limit 0,1;");
 
@@ -263,8 +304,9 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       $res_id = $db->get_insert_id();
 
       if(!$result) {
-        $this->errmsg($db->get_error());
-        return;
+        $return_value['result'] = -1;
+        $return_value['msg'] = $db->get_error();
+        return $return_value;
       }
     } else {
       $file_name = $img_res['file_name'];
@@ -275,10 +317,10 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 
       $result = $db->get_row($sql_check_duplicate);
       if(!empty($result)) {
-        $this->AjaxHeader(-100);
-        $this->AjaxData('该图片已经挖过了，不需要重复挖.');
-        return;
-      }    
+        $return_value['result'] = -100;
+        $return_value['msg'] = '该图片已经挖过了，不需要重复挖.';
+        return $return_value;
+      }   
     }
 
     // insert into users_images
@@ -292,11 +334,13 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 
     $sql = $db->insertSQL('users_images', $fields);
     $result = $db->execute($sql);
-    if(!$result) {
-      $this->errmsg($db->get_error());
-      return;
+    if(!$db->execute($sql)) {
+      $return_value['result'] = -1;
+      $return_value['msg'] = $db->get_error();
+      return $return_value;
     }
 
+    $return_value['filename'] = $file_name;
     /* 
      * disable notify to client
      
@@ -315,6 +359,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 
     $this->App()->notify('image_new', $params);
     */
+    return $return_value;
   }
 
   function save_image_($file_name, $image_data) {

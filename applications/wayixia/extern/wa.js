@@ -28,19 +28,22 @@ function parse_cookies (req) {
 
 
 function echo(res, data) {
+  console.log("echo: \n" + data);
+
   var headers = orignal_headers;
   headers['Content-Length'] = data.length;
   res.writeHead(200, headers);
-  res.write(data);
+  res.write(data, 'utf8');
   res.end();
 }
 
 function echo_json(res, header, data, extra) {
   var object = {};
-  object.header = header || null;
+  object.header = header|| 0;
   object.data   = data || null;
-  object.extra  = extra || null
-  var str = JSON.stringify(object);
+  object.extra  = extra || null;
+  // buffer ÏÝÚå
+  var str = new Buffer(JSON.stringify(object));
   echo(res, str);
 }
 
@@ -69,8 +72,8 @@ function http_process(req, response, data_from_agent) {
     // handler response
     function(error, res, body) {
        if(!error && res.statusCode==200) {
-         console.log("route request to wayixia web server");
-         try {
+         console.log("route request to wayixia web server, body:"+body);
+         //try {
 	   var json_response = JSON.parse(decodeURIComponent(body));
            // start wa image and save to disk
 	   var get_image_options = {
@@ -81,75 +84,29 @@ function http_process(req, response, data_from_agent) {
       	       "User-Agent" : req.headers['user-agent'],  
              } 
            };
-           console.log(json_response);
-	   echo(response, body);
-	   return;
-           var r = request(get_image_options, function(err, res, body) {
-             if(!err && res.statusCode == 200) {
-             } else {
-               echo(response, "statuscode: "+ res.statusCode);
-             } 
-	   }).pipe(fs.createWriteStream("D:\\t"+(num++)+".jpg"));
-         } catch(e) {
-           console.log(err);
-           echo_json(response, -1, err.message, null);
-         }
+           
+	   var header = json_response.header;
+	   if(header == 0) {
+	     var r = request(get_image_options, function(err, res, body) {
+               if(!err && res.statusCode == 200) {
+		 echo_json(response, 0, null, null);
+               } else {
+                 echo_json(response, -1, "statuscode: "+ res.statusCode, null);
+               } 
+	     }).pipe(fs.createWriteStream("D:\\ttt-"+json_response.data+".jpg")); 
+	   } else {
+	     echo_json(response, json_response.header, json_response.data, null);
+	   } 
+         //} catch(e) {
+         //  console.log(e);
+         //  echo_json(response, -1, e.message, null);
+         //}
        } else {
          console.log(err);
          echo_json(response, -1, err.message, null);
        }
     }
   );
-
-  /*
-    } else {
-      echo(response, "statuscode: "+ res.statusCode);
-    }
-  // get image options  
-  var get_image_options = {
-    url : object.data.img.srcUrl, //"http://wayixia.com/index.php?app=wayixia&mod=api&action=wa-image&inajax=true",
-    headers : {
-        "Cookie" : object.data.img.cookie,
-       	"Referer" : object.data.img.referer,
-       	"User-Agent" : req.headers['user-agent'], //"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36" 
-      }, 
-  };
-
-  console.log("test");
-
-  // get image and save file
-  request(get_image_options, function(err, res, body) {
-    console.log(res.statusCode);
-    if(!err && res.statusCode == 200) {
-      console.log(forward_cookie);
-      // route to web api 
-      delete object.data.img.cookie; 
-      var url = "http://wayixia.com/index.php?app=wayixia&mod=api&action=wa-image&inajax=true";
-      var senddata = 'postdata='+encodeURIComponent(encodeURIComponent(JSON.stringify(object)));
-      request(
-        { url : url,
-          method : "POST",
-	  headers: {
-	    "content-type" : "application/x-www-form-urlencoded",
-            "Cookie" : forward_cookie,
-	    "User-Agent" : "wayixia node server",
-	  },
-          body : senddata, 
-        }, function(error, res, body) {
-           if(!error && res.statusCode==200) {
-             console.log("route request to wayixia web server");
-             echo(response, body);  
-	   } else {
-	     console.log(err);
-	     echo(response, "{\"header\": 0}");
-	   }
-        }
-      );
-    } else {
-      echo(response, "statuscode: "+ res.statusCode);
-    }
-  }).pipe(fs.createWriteStream("D:\\t"+(num++)+".jpg"));
-  */
 }
 
 var Q = {
@@ -161,7 +118,6 @@ var Q = {
       break;
     default:
       echo(res, "no supported");
-      res.end();
     }
   },
 
@@ -178,7 +134,7 @@ var Q = {
       try {
         console.log('onend');
         var qs = querystring.parse(postdata); 
-        console.log(qs.postdata);
+        //console.log(qs.postdata);
         http_process(req, res, qs.postdata);
       } catch(e) {
         console.log(e);

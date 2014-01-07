@@ -1,4 +1,5 @@
 
+var config = require('./config');
 var http = require("http");
 var fs = require('fs');
 var request = require('request');
@@ -13,6 +14,14 @@ var orignal_headers = {
   "Access-Control-Allow-Methods": "PUT,POST,GET,DELETE,OPTIONS",
   "Access-Control-Allow-Credentials": true 
 };
+
+function uuid() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+    return v.toString(16);
+ });
+}
+
 
 function parse_cookies (req) {
     var list = {},
@@ -47,6 +56,54 @@ function echo_json(res, header, data, extra) {
   echo(res, str);
 }
 
+function wa_image(img, callback) {
+  console.log('wa image(url:'+img.src+')');
+  var options = {
+    url : img.src, 
+    headers : {
+      "Cookie"  : img.cookie,
+      "Referer" : img.referer,
+      "User-Agent" : img.agent, //req.headers['user-agent'],  
+    } 
+  };
+         
+  var r = request(options, function(err, res, body) {
+    if(!err && res.statusCode == 200) {
+      callback(true, res);
+    } else {
+      callback(false, res);
+    } 
+  }).pipe(fs.createWriteStream(config.server.path + "/" + img.filename +".jpg")); 
+}
+
+function check_image_exists(img, api_cookie, callback) {
+  var options = {
+    url : config.api.check_image,
+    method : "POST",
+    headers: {
+      "content-type" : "application/x-www-form-urlencoded",
+      "Cookie" : api_cookie,
+      "User-Agent" : "wayixia node server",
+    },
+    body : senddata, 
+  };
+
+  request(options,  function(error, res, body) {
+    if(!error && res.statusCode==200) {
+      console.log("check image is exists:"+body);
+      try {
+        var json_response = JSON.parse(decodeURIComponent(body));
+        var header = json_response.header;
+        callback(true, json_response.header, res);
+      } catch(e) {
+        callback(false, -1, res);
+      }
+    } else {
+       callback(false, -1, res);
+    }
+  });    
+}
+
 function http_process(req, response, data_from_agent) {
   // submit to web
   var object = JSON.parse(decodeURIComponent(data_from_agent));
@@ -54,13 +111,65 @@ function http_process(req, response, data_from_agent) {
   var image_cookie = object.data.img.cookie;
   // remove the image cookie
   delete object.data.img.cookie; 
+  console.log(object.data.img);
+  var img = {
+    src : object.data.img.srcUrl,
+    cookie: image_cookie,
+    referer: object.data.img.referer||object.data.img.pageUrl,
+    agent: req.headers['user-agent'],
+    filename: uuid(),
+  };
   
+  // start get image 
+  wa_image(img, function(ok, res) {
+    if(ok) {
+      console.log('wa_image ok!') 	    
+      var senddata = 'postdata='+encodeURIComponent(encodeURIComponent(JSON.stringify(object)));
+      // get image ok!
+      var options = {
+        url : config.api,
+        method : "POST",
+        headers: {
+          "content-type" : "application/x-www-form-urlencoded",
+          "Cookie" : forward_cookie,
+          "User-Agent" : "wayixia node server",
+        },
+        body : senddata, 
+      };
+
+      request(options,  function(error, res, body) {
+        if(!error && res.statusCode==200) {
+          console.log("route request to wayixia web server, body:"+body);
+          echo(response, body);
+	  return;
+	  //try {
+	    var json_response = JSON.parse(decodeURIComponent(body));
+            // start wa image and save to disk
+            var header = json_response.header;
+	    if(header == 0) {
+	    } else {
+	    } 
+         //} catch(e) {
+         //  console.log(e);
+         //  echo_json(response, -1, e.message, null);
+         //}
+        } else {
+          console.log(err);
+          echo_json(response, -1, err.message, null);
+        }
+      });    
+    } else {
+      // get image failed
+      console.log(res.statusCode);
+      echo_json(response, -1, null, null);
+    }
+  })
+
   console.log("http_process called " + object.data.img.srcUrl + ", user-agent: "+req.headers['user-agent']);
-  var url = "http://wayixia.com/index.php?app=wayixia&mod=api&action=wa-image&inajax=true";
   var senddata = 'postdata='+encodeURIComponent(encodeURIComponent(JSON.stringify(object)));
   request(
     {
-      url : url,
+      url : config.api,
       method : "POST",
       headers: {
         "content-type" : "application/x-www-form-urlencoded",
@@ -93,7 +202,7 @@ function http_process(req, response, data_from_agent) {
                } else {
                  echo_json(response, -1, "statuscode: "+ res.statusCode, null);
                } 
-	     }).pipe(fs.createWriteStream("D:\\ttt-"+json_response.data+".jpg")); 
+	     }).pipe(fs.createWriteStream(config.server.path + json_response.data+".jpg")); 
 	   } else {
 	     echo_json(response, json_response.header, json_response.data, null);
 	   } 
@@ -147,8 +256,6 @@ var Q = {
 
 var server = http.createServer(function(req, res) {   
   console.log('new request');
-  //console.log(req.headers.cookie);
-  //echo(res, "{\"header\":0, \"data\": null, \"extra\": null}");
   Q.dispatch(req, res);
 }).on('connection', function(socket) {
   socket.setNoDelay(true);

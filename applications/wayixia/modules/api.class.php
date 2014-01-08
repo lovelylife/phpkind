@@ -17,20 +17,27 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     case 'wayixia':
       $this->wayixia();
       break;
-    case 'wa-image':
-      $this->wa_image();
-      break;
-    case 'wa':
-      $this->add_image();
-      break;
-    case 'public-wa':
-      $this->public_image();
-      break;
     case 'get-album-list':
       $this->get_album_list();
       break;
     case 'get-album-image-list':
       $this->get_album_image_list();
+      break;
+
+    // api for nodejs to get remote image 
+    case 'check-wa-image':
+      $this->check_wa_image();
+      break;
+    case 'wa-image':
+      $this->wa_image();
+      break;      
+    // end api for nodejs to get remote image 
+
+    case 'wa':
+      $this->add_image();
+      break;
+    case 'public-wa':
+      $this->public_image();
       break;
     
     // 发布接口
@@ -42,7 +49,47 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       parent::doAjax($action);
     }
   }
-  
+
+  // 检查资源是否存在
+  function check_wa_image() {
+    $theApp = &$this->App();
+    $user_key = $theApp->get_user_info('user-key');
+    $uid = $theApp->get_user_info('uid');
+    if(!$user_key || empty($user_key)) {
+      $this->AjaxHeader(-2); // not login
+      $this->AjaxData('you must login!');
+      return;
+    }
+
+    // Ajax 数据
+    $data = $_POST['data'];
+    $image_srcUrl  = $data['srcUrl'];
+    $image_pageUrl = $data['pageUrl'];
+    
+    $url = parse_url($image_pageUrl);
+    $from_host = $url['host'];
+    
+    $res_id = 0;
+    $need_insert = false;
+    // 检查是否存在图片资源
+    $resource = $db->get_row("select id, file_type, file_name from ##__images_resource where `src`='{$image_srcUrl}' limit 0,1;");
+    if(empty($resource)) {
+      // 不存在， 可以挖取图片
+      $res_id = 0; 
+    } else {
+      $res_id = $resource['id']; 
+      // 资源已经存在，检测来源网页是否重复
+      $sql = "select id ";
+      $sql.= "from ##__users_images I, ##__users_albums A ";
+      $sql.= "where I.albumd_id = A.id and I.res_id={$res_id} and I.from_host='{$from_host}' and A.uid={$uid} ";
+      $sql.= "limit 0,1;";
+      $image = $db->get_row($check_duplicate);
+      $need_insert = empty($image);
+    }
+    
+    $this->AjaxData(array('res_id' => $res_id, 'need_insert' => $need_insert)); 
+  }
+
   function doMain($action) {
     switch($action) {
     case 'preview':

@@ -3,6 +3,7 @@ var config = require('./config');
 var http = require("http");
 var fs = require('fs');
 var request = require('request');
+var imagesize = require('imagesize');
 //var jar = request.jar();
 var url = require('url');
 var querystring = require('querystring');
@@ -56,7 +57,7 @@ function echo_json(res, header, data, extra) {
   echo(res, str);
 }
 
-function wa_image(img, callback) {
+function get_remote_image(img, callback) {
   console.log('wa image(url:'+img.src+')');
   var options = {
     url : img.src, 
@@ -66,19 +67,33 @@ function wa_image(img, callback) {
       "User-Agent" : img.agent, //req.headers['user-agent'],  
     } 
   };
-         
+  
+  var file_name = config.server.path + "/" + img.filename +".jpg";
+  var stream = fs.createWriteStream(file_name);  
   var r = request(options, function(err, res, body) {
     if(!err && res.statusCode == 200) {
-      callback(true, res);
+      var read_stream = fs.createReadStream(file_name);
+      imagesize(read_stream, function (err2, result) {
+        if (!err2) {
+          console.log(result); // {type, width, height}
+        } else {
+	  console.log(err2);
+	}
+      })
+      
+      callback.onsuccess();
     } else {
-      callback(false, res);
+      callback.onerror(err, res);
     } 
-  }).pipe(fs.createWriteStream(config.server.path + "/" + img.filename +".jpg")); 
+  }).pipe(stream); 
 }
 
-function check_image_exists(img, api_cookie, callback) {
+function wa_image(img, api_cookie, callback) {
+  var object = {header: 0, data: {}, extra: null};
+  object.img = img;
+  var senddata = 'postdata='+encodeURIComponent(encodeURIComponent(JSON.stringify(object)));
   var options = {
-    url : config.api.check_image,
+    url : config.api.wa_image,
     method : "POST",
     headers: {
       "content-type" : "application/x-www-form-urlencoded",
@@ -88,18 +103,61 @@ function check_image_exists(img, api_cookie, callback) {
     body : senddata, 
   };
 
-  request(options,  function(error, res, body) {
-    if(!error && res.statusCode==200) {
-      console.log("check image is exists:"+body);
-      try {
-        var json_response = JSON.parse(decodeURIComponent(body));
-        var header = json_response.header;
-        callback(true, json_response.header, res);
-      } catch(e) {
-        callback(false, -1, res);
+  request(options,  function(err, res, body) {
+    try
+    {
+    
+    if(!err && res.statusCode == 200) {
+      var r = JSON.parse(decodeURIComponent(body));
+      callback.onsuccess(r); 
+    } else {
+      throw false;
+    }
+
+    } catch(e) {
+      callback.onerror(err, res);
+    }
+  });    
+}
+
+
+function check_wa_image(img, api_cookie, callback) {
+  var object = {header: 0, data: img, extra: null};
+  var senddata = 'postdata='+encodeURIComponent(encodeURIComponent(JSON.stringify(object)));
+  var options = {
+    url : config.api.check_wa_image,
+    method : "POST",
+    headers: {
+      "content-type" : "application/x-www-form-urlencoded",
+      "Cookie" : api_cookie,
+      "User-Agent" : "wayixia node server",
+    },
+    body : senddata, 
+  };
+
+  request(options,  function(err, res, body) {
+    try
+    {
+
+    if(!err && res.statusCode == 200) {
+      console.log("check image result:"+body);
+      var r = JSON.parse(decodeURIComponent(body));
+      if(r.header !=0) {
+        // web server api failed
+        callback.onfailed(r);
+      } else {
+        if(r.data.res_id <= 0) {
+	  callback.onwa();
+        } else {
+	  callback.onsuccess();
+	}
       }
     } else {
-       callback(false, -1, res);
+      throw false;
+    }
+
+    } catch(e) {
+      callback.onerror(err, res);
     }
   });    
 }
@@ -107,10 +165,64 @@ function check_image_exists(img, api_cookie, callback) {
 function http_process(req, response, data_from_agent) {
   // submit to web
   var object = JSON.parse(decodeURIComponent(data_from_agent));
-  var forward_cookie = req.headers.cookie;
+  var data = object.data;
+  var wayixia_api_cookie = req.headers.cookie;
   var image_cookie = object.data.img.cookie;
-  // remove the image cookie
-  delete object.data.img.cookie; 
+
+  // check wa image
+  check_wa_image(
+    {
+      src : object.data.img.srcUrl,
+      url : object.data.img.pageUrl, 
+      title: object.data.img.title,
+      album_id: object.data.img.album_id
+    }, wayixia_api_cookie, {
+      onfailed: function(r) {}
+      , onerror : function(err, res) {}
+      , onsuccess : function() {}
+      , onwa: function() {
+        console.log("need get remote image"); 
+        var file_name = uuid();
+        // start get image 
+        get_remote_image(
+          {
+            src : object.data.img.srcUrl,
+            cookie: image_cookie,
+            referer: object.data.img.referer||object.data.img.pageUrl,
+            agent: req.headers['user-agent'],
+            filename: file_name,
+          },
+	  {
+	    onsuccess: function() {
+              console.log('get remote image ok!'); 
+	      var wa_image_options = {
+	        src: object.data.img.srcUrl,
+	        url: object.data.img.pageUrl,
+	      };  
+                  
+              wa_image(wa_image_options, wayixia_api_cookie, {
+                onsuccess: function(r) {
+                  console.log("wa image ok! with code: " + r.header);
+	          echo_json(response, r.header, r.data, r.extra);			
+	        },
+	        onerror: function(err, res) {
+                  console.log("wa image ok!" + res.statusCode);
+                  echo_json(response, -1, null, null);
+                }
+              });
+	    },
+	    onerror: function(err, res) {
+              console.log(res.statusCode);
+              echo_json(response, -1, null, null);
+            }
+          }
+	);
+      } 
+    }
+  ); // end check wa image
+
+  return;
+
   console.log(object.data.img);
   var img = {
     src : object.data.img.srcUrl,
@@ -131,7 +243,7 @@ function http_process(req, response, data_from_agent) {
         method : "POST",
         headers: {
           "content-type" : "application/x-www-form-urlencoded",
-          "Cookie" : forward_cookie,
+          "Cookie" : wayixia_api_cookie,
           "User-Agent" : "wayixia node server",
         },
         body : senddata, 

@@ -61,18 +61,24 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       return;
     }
 
+    $db = &$this->App()->db();
     // Ajax 数据
     $data = $_POST['data'];
-    $image_srcUrl  = $data['srcUrl'];
-    $image_pageUrl = $data['pageUrl'];
-    
-    $url = parse_url($image_pageUrl);
+    $image_src  = $data['src'];
+    $image_url = $data['url'];
+    $image_title   = $data['title'];
+    $album_id = intval($img['album_id'], 10);
+    if($album_id <= 0) $album_id = -$uid;
+    $url = parse_url($image_url);
     $from_host = $url['host'];
     
     $res_id = 0;
     $need_insert = false;
     // 检查是否存在图片资源
-    $resource = $db->get_row("select id, file_type, file_name from ##__images_resource where `src`='{$image_srcUrl}' limit 0,1;");
+    $sql_check_resource = "select id, file_type, file_name from ##__images_resource where `src`='{$image_src}' limit 0,1;";
+    $resource = $db->get_row("select id, file_type, file_name from ##__images_resource where `src`='{$image_src}' limit 0,1;");
+    //echo $sql_check_resource;
+    //print_r($resource);
     if(empty($resource)) {
       // 不存在， 可以挖取图片
       $res_id = 0; 
@@ -83,11 +89,119 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       $sql.= "from ##__users_images I, ##__users_albums A ";
       $sql.= "where I.albumd_id = A.id and I.res_id={$res_id} and I.from_host='{$from_host}' and A.uid={$uid} ";
       $sql.= "limit 0,1;";
-      $image = $db->get_row($check_duplicate);
+      $image = $db->get_row($sql);
       $need_insert = empty($image);
+      if($need_insert) {
+        $result = $this->insert_image($res_id, $image_title, $album_id, $image_url);
+        if($result !=0) {
+          $this->errmsg("挖一下失败![imgcode: {$result}]");
+          return;
+	}
+      } else {
+        $this->AjaxHeader(-100);
+	$this->AjaxData('已经挖过该图片了哦!');
+	return;
+      }
     }
     
     $this->AjaxData(array('res_id' => $res_id, 'need_insert' => $need_insert)); 
+  }
+
+  function wa_image() {
+    $theApp = &$this->App();
+    $user_key = $theApp->get_user_info('user-key');
+    $uid = $theApp->get_user_info('uid');
+    if(!$user_key || empty($user_key)) {
+      $this->AjaxHeader(-2); // not login
+      $this->AjaxData('you must login!');
+      return;
+    }
+
+    $data = &$_POST['data'];
+    // 图片 
+    $img = &$data['img'];    
+    $res_id = intval($data['res_id'], 10);
+    $server = &$data['server'];
+    if($res_id <= 0) {
+      // have the resource
+      $res_id = $this->insert_resource(
+         $img['src'], $server, $uid, 
+         $img['file_name'], $img['file_type'], $img['file_size'], 
+	 $img['width'], $img['height']
+      ); 
+      if($res_id < 0) {
+        $this->errmsg("挖一下失败![rescode: {$res_id}]");
+        return;
+      } 
+    }
+
+    $album_id = intval($img['album_id'], 10);
+    if($album_id <= 0) {
+      $album_id = -$uid;
+    }
+    $result = $this->insert_image($res_id, $img['title'], $album_id, $img['from_url']);
+    if($result !=0) {
+      $this->errmsg("挖一下失败![imgcode: {$result}]");
+      return;
+    }
+  }
+
+  // functions
+  function insert_image($res_id, $title, $album_id, $from_url) {
+    $db = $this->App()->db();
+    if($res_id <= 0) {
+      return -1;
+    }
+    $url = parse_url($from_url);	  
+    // insert into users_images
+    $fields = array(
+      'res_id'    => $res_id,
+      'album_id'  => $album_id,
+      'title'     => $title,
+      'from_host' => $url['host'],
+      'from_url'  => $from_url,
+    );
+
+    $sql = $db->insertSQL('users_images', $fields);
+    $result = $db->execute($sql);
+
+  
+  }
+
+  // insert into resource table
+  function insert_resource($src, $server, $uid, $file_name, $file_type, $file_size, $file_width, $file_height) {
+    $db = $this->App()->db();
+    if(empty($src) || empty($server) || empty($uid)) {
+      return -1;
+    }
+ 
+    if(empty($file_name) 
+	    || empty($file_type) 
+	    || empty($file_size) 
+	    || empty($file_width) 
+	    || empty($file_height)) 
+    {
+      return -2;
+    }
+
+    $fields = array(
+      'src'       => $src,
+      'server'    => $server,
+      'file_name' => $file_name,
+      'file_type' => $file_type,
+      'file_size' => $file_size,
+      'width'     => $file_width,
+      'height'    => $file_height,
+      'creator_uid' => $uid
+    );
+    
+      
+    $sql = $db->insertSQL('images_resource', $fields);
+    $result = $db->execute($sql);
+    if(!$result) 
+      return -1;
+
+    return $db->get_insert_id();
   }
 
   function doMain($action) {
@@ -168,7 +282,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       return;
     }
   }
-
+/*
   function wa_image() {
     // this api is use for localhost request
     // check ip
@@ -198,7 +312,8 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 
     $this->AjaxData($res['filename']);
   }
-  
+ */
+
   function wa_image_failed() {
     $theApp = &$this->App();
     $user_key = $theApp->get_user_info('user-key');

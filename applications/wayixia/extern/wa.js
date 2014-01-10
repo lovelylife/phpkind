@@ -3,7 +3,7 @@ var config = require('./config');
 var http = require("http");
 var fs = require('fs');
 var request = require('request');
-var imagesize = require('imagesize');
+var imageinfo = require('imageinfo');
 //var jar = request.jar();
 var url = require('url');
 var querystring = require('querystring');
@@ -65,23 +65,24 @@ function get_remote_image(img, callback) {
       "Cookie"  : img.cookie,
       "Referer" : img.referer,
       "User-Agent" : img.agent, //req.headers['user-agent'],  
-    } 
+    },
+    encoding: null,  // use binary data 
   };
   
   var file_name = config.server.path + "/" + img.filename +".jpg";
   var stream = fs.createWriteStream(file_name);  
   var r = request(options, function(err, res, body) {
     if(!err && res.statusCode == 200) {
-      var read_stream = fs.createReadStream(file_name);
-      imagesize(read_stream, function (err2, result) {
-        if (!err2) {
-          console.log(result); // {type, width, height}
-        } else {
-	  console.log(err2);
-	}
-      })
+      console.log("caculate image size");	    
+      var info = imageinfo(body);
+      console.log(info);
       
-      callback.onsuccess();
+      if(!info) {
+        callback.onerror(err, res);
+      } else {
+        info.file_size = body.length;
+        callback.onsuccess(info);
+      }
     } else {
       callback.onerror(err, res);
     } 
@@ -90,7 +91,7 @@ function get_remote_image(img, callback) {
 
 function wa_image(img, api_cookie, callback) {
   var object = {header: 0, data: {}, extra: null};
-  object.img = img;
+  object.data = img;
   var senddata = 'postdata='+encodeURIComponent(encodeURIComponent(JSON.stringify(object)));
   var options = {
     url : config.api.wa_image,
@@ -193,11 +194,29 @@ function http_process(req, response, data_from_agent) {
             filename: file_name,
           },
 	  {
-	    onsuccess: function() {
+	    onsuccess: function(info) {
+              /*
+              type: 'image',
+              format: 'JPG',
+              mimeType: 'image/jpeg',
+              width: 450,
+              height: 561 }
+              */
               console.log('get remote image ok!'); 
 	      var wa_image_options = {
-	        src: object.data.img.srcUrl,
-	        url: object.data.img.pageUrl,
+	        server : config.server.name,
+	        res_id : 0,
+	        img : {
+                  src: object.data.img.srcUrl,
+	          title: object.data.img.title,
+	          album_id: object.data.img.album_id,
+	          from_url: object.data.img.pageUrl,
+	          file_name: file_name,
+	          file_type: info.format,
+	          file_width: info.width,
+	          file_height: info.height,
+	          file_size: info.file_size,	
+	        }
 	      };  
                   
               wa_image(wa_image_options, wayixia_api_cookie, {

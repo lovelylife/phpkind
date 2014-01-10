@@ -127,10 +127,11 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       $res_id = $this->insert_resource(
          $img['src'], $server, $uid, 
          $img['file_name'], $img['file_type'], $img['file_size'], 
-	 $img['width'], $img['height']
+	 $img['file_width'], $img['file_height']
       ); 
       if($res_id < 0) {
         $this->errmsg("挖一下失败![rescode: {$res_id}]");
+        $this->AjaxExtra($data);
         return;
       } 
     }

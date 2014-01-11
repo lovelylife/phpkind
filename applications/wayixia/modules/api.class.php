@@ -69,29 +69,23 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     $image_title   = $data['title'];
     $album_id = intval($img['album_id'], 10);
     if($album_id <= 0) $album_id = -$uid;
-    $url = parse_url($image_url);
-    $from_host = $url['host'];
     
     $res_id = 0;
-    $need_insert = false;
     // 检查是否存在图片资源
-    $sql_check_resource = "select id, file_type, file_name from ##__images_resource where `src`='{$image_src}' limit 0,1;";
-    $resource = $db->get_row("select id, file_type, file_name from ##__images_resource where `src`='{$image_src}' limit 0,1;");
-    //echo $sql_check_resource;
-    //print_r($resource);
+    $sql_resource = "select id, file_type, file_name from ##__images_resource where `src`='{$image_src}' limit 0,1;";
+    $resource = $db->get_row($sql_resource);
     if(empty($resource)) {
       // 不存在， 可以挖取图片
       $res_id = 0; 
     } else {
       $res_id = $resource['id']; 
       // 资源已经存在，检测来源网页是否重复
-      $sql = "select id ";
+      $sql = "select I.id ";
       $sql.= "from ##__users_images I, ##__users_albums A ";
-      $sql.= "where I.albumd_id = A.id and I.res_id={$res_id} and I.from_host='{$from_host}' and A.uid={$uid} ";
+      $sql.= "where (I.album_id = A.id or I.album_id=-{$uid}) and I.res_id={$res_id} and I.from_url='{$image_url}' and A.uid={$uid} ";
       $sql.= "limit 0,1;";
       $image = $db->get_row($sql);
-      $need_insert = empty($image);
-      if($need_insert) {
+      if(empty($image)) {
         $result = $this->insert_image($res_id, $image_title, $album_id, $image_url);
         if($result !=0) {
           $this->errmsg("挖一下失败![imgcode: {$result}]");
@@ -104,7 +98,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       }
     }
     
-    $this->AjaxData(array('res_id' => $res_id, 'need_insert' => $need_insert)); 
+    $this->AjaxData(array('res_id' => $res_id)); 
   }
 
   function wa_image() {
@@ -177,10 +171,10 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     }
  
     if(empty($file_name) 
-	    || empty($file_type) 
-	    || empty($file_size) 
-	    || empty($file_width) 
-	    || empty($file_height)) 
+      // || empty($file_type) 
+      || empty($file_size) 
+      || empty($file_width) 
+      || empty($file_height)) 
     {
       return -2;
     }

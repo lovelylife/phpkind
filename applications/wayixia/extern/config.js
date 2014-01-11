@@ -10,6 +10,7 @@ config.api = {
 config.server = {};
 config.server.name = 's1.wayixia.com';
 config.server.path = '../../../ii';
+config.server.thumb_path = '../../../ii/thumb';
 
 
 module.exports = config;

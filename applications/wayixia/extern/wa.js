@@ -4,7 +4,8 @@ var http = require("http");
 var fs = require('fs');
 var request = require('request');
 var imageinfo = require('imageinfo');
-//var jar = request.jar();
+var image_magick = require('imagemagick');
+var gm = require('gm').subClass({ imageMagick: true });
 var url = require('url');
 var querystring = require('querystring');
 var num = 0;
@@ -57,6 +58,20 @@ function echo_json(res, header, data, extra) {
   echo(res, str);
 }
 
+function save_thumb(src, dest, src_width, src_height, dest_width) {
+  // resize and remove EXIF profile data
+  var width = dest_width;
+  var height = (width * src_height) / src_width;
+  image_magick.resize({
+    srcPath: src,
+    dstPath: dest,
+    width:   dest_width
+  }, function(err, stdout, stderr){
+    if (err) throw err;
+    console.log('resized kittens.jpg to fit within '+dest_width+'px');
+  });
+}
+
 function get_remote_image(img, callback) {
   console.log('wa image(url:'+img.src+')');
   var options = {
@@ -69,24 +84,26 @@ function get_remote_image(img, callback) {
     encoding: null,  // use binary data 
   };
   
-  var file_name = config.server.path + "/" + img.filename +".jpg";
+  var file_name = config.server.path + "/" + img.filename;
+  var thumb_file_name = config.server.thumb_path + "/" + img.filename;
   var stream = fs.createWriteStream(file_name);  
   var r = request(options, function(err, res, body) {
     if(!err && res.statusCode == 200) {
       console.log("caculate image size");	    
       var info = imageinfo(body);
       console.log(info);
-      
-      if(!info) {
+      if(!info) { 
         callback.onerror(err, res);
+        fs.unlink(file_name);
       } else {
         info.file_size = body.length;
         callback.onsuccess(info);
+        save_thumb(file_name, thumb_file_name, info.width, info.height, 192);
       }
     } else {
       callback.onerror(err, res);
     } 
-  }).pipe(stream); 
+  }).pipe(fs.createWriteStream(file_name)); 
 }
 
 function wa_image(img, api_cookie, callback) {
@@ -164,6 +181,8 @@ function check_wa_image(img, api_cookie, callback) {
 }
 
 function http_process(req, response, data_from_agent) {
+   
+  //console.log(decodeURIComponent(data_from_agent));
   // submit to web
   var object = JSON.parse(decodeURIComponent(data_from_agent));
   var data = object.data;
@@ -178,9 +197,9 @@ function http_process(req, response, data_from_agent) {
       title: object.data.img.title,
       album_id: object.data.img.album_id
     }, wayixia_api_cookie, {
-      onfailed: function(r) {}
-      , onerror : function(err, res) {}
-      , onsuccess : function() {}
+      onfailed: function(r) { console.log("check_wa_image onfailed" + JSON.stringify(r)); echo_json(response, r.header, r.data, r.extra);}
+      , onerror : function(err, res) { console.log("check_wa_image onerror" + err); echo_json(response, 0, "", ""); }
+      , onsuccess : function() { console.log("check_wa_image success"); echo_json(response, 0, "", ""); }
       , onwa: function() {
         console.log("need get remote image"); 
         var file_name = uuid();
@@ -212,9 +231,9 @@ function http_process(req, response, data_from_agent) {
 	          album_id: object.data.img.album_id,
 	          from_url: object.data.img.pageUrl,
 	          file_name: file_name,
-	          file_type: info.format,
-	          file_width: info.width,
-	          file_height: info.height,
+	          file_type: info.format || '',
+	          file_width: info.width || object.data.img.width,
+	          file_height: info.height || object.data.img.height,
 	          file_size: info.file_size,	
 	        }
 	      };  
@@ -239,114 +258,6 @@ function http_process(req, response, data_from_agent) {
       } 
     }
   ); // end check wa image
-
-  return;
-
-  console.log(object.data.img);
-  var img = {
-    src : object.data.img.srcUrl,
-    cookie: image_cookie,
-    referer: object.data.img.referer||object.data.img.pageUrl,
-    agent: req.headers['user-agent'],
-    filename: uuid(),
-  };
-  
-  // start get image 
-  wa_image(img, function(ok, res) {
-    if(ok) {
-      console.log('wa_image ok!') 	    
-      var senddata = 'postdata='+encodeURIComponent(encodeURIComponent(JSON.stringify(object)));
-      // get image ok!
-      var options = {
-        url : config.api,
-        method : "POST",
-        headers: {
-          "content-type" : "application/x-www-form-urlencoded",
-          "Cookie" : wayixia_api_cookie,
-          "User-Agent" : "wayixia node server",
-        },
-        body : senddata, 
-      };
-
-      request(options,  function(error, res, body) {
-        if(!error && res.statusCode==200) {
-          console.log("route request to wayixia web server, body:"+body);
-          echo(response, body);
-	  return;
-	  //try {
-	    var json_response = JSON.parse(decodeURIComponent(body));
-            // start wa image and save to disk
-            var header = json_response.header;
-	    if(header == 0) {
-	    } else {
-	    } 
-         //} catch(e) {
-         //  console.log(e);
-         //  echo_json(response, -1, e.message, null);
-         //}
-        } else {
-          console.log(err);
-          echo_json(response, -1, err.message, null);
-        }
-      });    
-    } else {
-      // get image failed
-      console.log(res.statusCode);
-      echo_json(response, -1, null, null);
-    }
-  })
-
-  console.log("http_process called " + object.data.img.srcUrl + ", user-agent: "+req.headers['user-agent']);
-  var senddata = 'postdata='+encodeURIComponent(encodeURIComponent(JSON.stringify(object)));
-  request(
-    {
-      url : config.api,
-      method : "POST",
-      headers: {
-        "content-type" : "application/x-www-form-urlencoded",
-        "Cookie" : forward_cookie,
-        "User-Agent" : "wayixia node server",
-      },
-      body : senddata, 
-    }, 
-    // handler response
-    function(error, res, body) {
-       if(!error && res.statusCode==200) {
-         console.log("route request to wayixia web server, body:"+body);
-         //try {
-	   var json_response = JSON.parse(decodeURIComponent(body));
-           // start wa image and save to disk
-	   var get_image_options = {
-             url : object.data.img.srcUrl, 
-             headers : {
-               "Cookie" : image_cookie,
-      	       "Referer" : object.data.img.referer,
-      	       "User-Agent" : req.headers['user-agent'],  
-             } 
-           };
-           
-	   var header = json_response.header;
-	   if(header == 0) {
-	     var r = request(get_image_options, function(err, res, body) {
-               if(!err && res.statusCode == 200) {
-		 echo_json(response, 0, null, null);
-               } else {
-                 echo_json(response, -1, "statuscode: "+ res.statusCode, null);
-               } 
-	     }).pipe(fs.createWriteStream(config.server.path + json_response.data+".jpg")); 
-	   } else {
-	     echo_json(response, json_response.header, json_response.data, null);
-	   } 
-         //} catch(e) {
-         //  console.log(e);
-         //  echo_json(response, -1, e.message, null);
-         //}
-       } else {
-         console.log(err);
-         echo_json(response, -1, err.message, null);
-       }
-    }
-  );
 }
 
 var Q = {
@@ -366,13 +277,13 @@ var Q = {
     var postdata = '';
     req.setEncoding('utf8');
     req.addListener('data', function(chunk) {
-      console.log('ondata');
+      console.log('get image process ondata');
       postdata += chunk.toString();
     });
 
     req.addListener('end', function() {
       try {
-        console.log('onend');
+        console.log('get image process onend');
         var qs = querystring.parse(postdata); 
         //console.log(qs.postdata);
         http_process(req, res, qs.postdata);

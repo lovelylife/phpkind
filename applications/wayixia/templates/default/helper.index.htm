@@ -21,30 +21,6 @@ import utils.tween;
 <script>
 <!--
 Q.Ready(function(){
-
-/*
-var pos = Q.absPosition(Q.$('nav'));
-Q.$('tweenimg').style.position = 'absolute';
-Q.$('tweenimg').style.top =  - Q.$('tweenimg').offsetHeight+ 'px';
-Q.$('tweenimg').style.display = '';
-
-
-(new Q.Animate({
-tween: 'Cubic',
-ease: 'easyIn',
-max: pos.top+pos.height,
-begin: -100,
-duration: 10,
-bind : function(x) {
-   console.log(x);
-   //if(x-Q.$('tweenimg').offsetHeight>0) {
-     
-   //}
-   Q.$('tweenimg').style.top = x+'px';
-}})).play();
-
-*/
-
 });
 
 -->
@@ -57,16 +33,17 @@ bind : function(x) {
 <br><br><br><br>
 
 <div id="main">
-  <div id="page">
+  <div id="page" class="wf-main" style="float:none; width:990px;">
     <div id="left-column">
       <div class="panel" style="font-size:14px; line-height:30px; color: #333;">
         <h2 style="color: #777; margin-top: 20px; font-size: 20px;">了解挖一下</h2>
+<hr>
 <br>
 <br>
 <p> 浏览网页时看到自己喜欢图片，工作需要的素材，肿么办？</p>
 <p> 如果你还在用古老的右键“另存为”, 说明你已经Out了，为什么？？？</p>
 <br>
-<p> <h4>下面就让Q给你解释一下为什么？</h4> </p>
+<p> <h4>下面就让Me给你解释一下为什么？</h4> </p>
 <br>
 <p> 其一：每次一次右键“另存为”都会弹出一个对话框，让你选择保存路径，如果一个网页里同时有N张你要保存的图片或者素材，可以设想一下，这是一件多么让人蛋疼的操作啊，o(╯□╰)o </p>
 <p> 其二：网页为了保护，禁止使用右键，此时还需要一些专业的技术才能搞定，如果是技术小白，情何以堪。 </p>
@@ -75,36 +52,34 @@ bind : function(x) {
 <p> 挖一下的诞生就是为了解决这些若干让人蛋疼的事情的，看到喜欢的东西，现在只需点击鼠标"挖一下"，保存图片这些操作轻松地完成。不仅如此，还有云功能哦，可以让你在任何电脑或者手机终端上随时随地的看到你挖到的！</p>
 
 <br>
-<p> <a class="uploadBtn small" href="http://wayixia.com/helper/install" target="_self" style="width:100px;"> 安装 >> </a> </p>
+<p> <a class="button" href="/help/install" target="_self" style="width:100px;"> 安装 >> </a> </p>
 <br>
 <br>
 <br>
 
 
 </p>
-					<div class="clear"></div>
+          <div class="clear"></div>
                 </div>
-			</div>
-			<div id="right-column">
-			  <div style="border:0; background: #F8F8F8;font-size: 14px;height: 45px; line-height: 45px;text-indent: 20px;padding-top: 5px;" id="tree_album">
-          <p style="color: #333; margin-top: 3px; margin-bottom: 5px;">
-          <em class="icon-calendar"></em>
-          <a href="{$app:path}/helper/index">
-            了解挖一下</a>
-          </p>
-        </div>
-        <div style="border:0; background:#FFF; font-size: 14px;height: 45px; line-height: 45px;text-indent: 20px;padding-top: 0px;" id="tree_album">
+      </div>
+      <div id="right-column">
+        <div style="border-left:5px solid #FF3300; background: #F8F8F8;font-size: 14px;height: 40px; line-height: 40px;text-indent: 20px;padding-top: 2px;" id="tree_album">
           <p style="color: #333; margin-top: 0px; margin-bottom: 5px;">
           <em class="icon-calendar"></em>
-          <a href="{$app:path}/helper/install#">
-            安装</a>
+          <a href="{$app:path}/help/index">了解挖一下</a>
           </p>
         </div>
-				</dl>		
-			</div>
-			<div class="clear"></div>
-		</div>
-		<div class="clear"></div>
+        <div style="border:0; background:#FFF; font-size: 14px;height: 40px; line-height: 40px;text-indent: 20px;" id="tree_album">
+          <p style="color: #333; margin-top: 0px; margin-bottom: 5px;">
+          <em class="icon-calendar"></em>
+          <a href="{$app:path}/help/install#">安装</a>
+          </p>
+        </div>
+        </dl>    
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div class="clear"></div>
     <div id="footer" class="tableheader">
       <hr class="hide">
       <p>
@@ -112,9 +87,9 @@ bind : function(x) {
       </p>
       </div>
       </div>
-		</div>
+    </div>
     </div>
     <br><br>
-	</div>	
+  </div>  
 </body>
 </html>

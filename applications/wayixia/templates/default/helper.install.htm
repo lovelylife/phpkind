@@ -13,8 +13,8 @@
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css"/>
 <style>
 h3 {
-	background: #EEE;
-	font-weight: normal;
+  background: #EEE;
+  font-weight: normal;
 }
 
 </style>
@@ -26,46 +26,23 @@ h3 {
 <!--
 Q.Ready(function(){
 
-/*
-var pos = Q.absPosition(Q.$('nav'));
-Q.$('tweenimg').style.position = 'absolute';
-Q.$('tweenimg').style.top =  - Q.$('tweenimg').offsetHeight+ 'px';
-Q.$('tweenimg').style.display = '';
-
-
-(new Q.Animate({
-tween: 'Cubic',
-ease: 'easyIn',
-max: pos.top+pos.height,
-begin: -100,
-duration: 10,
-bind : function(x) {
-   console.log(x);
-   //if(x-Q.$('tweenimg').offsetHeight>0) {
-     
-   //}
-   Q.$('tweenimg').style.top = x+'px';
-}})).play();
-
-*/
-
 });
 
 -->
 </script>
 </head>
-<body style="background:#f7f5f5;">
+<body>
 
 {#template user.menubar/}
 
 <br><br><br><br>
 
 <div id="main">
-  <div id="page">
+  <div id="page" class="wf-main" style="float:none;width:990px;">
     <div id="left-column">
       <div class="panel" style="font-size:14px; line-height:30px; color: #333;">
-		<h2 style="color: #777; margin-top: 20px;font-size:20px;">安装</h2>
-		<hr>
+    <h2 style="color: #777; margin-top: 20px;font-size:20px;">安装采集工具</h2>
+    <hr>
 <br>
 
 <p>
@@ -97,39 +74,29 @@ bind : function(x) {
 <br>
 
 </p>
-					<div class="clear"></div>
+          <div class="clear"></div>
                 </div>
-			</div>
-			<div id="right-column">
-			  <div style="border:0; background: #FFF;font-size: 14px;height: 45px; line-height: 45px;text-indent: 20px;padding-top: 5px;" id="tree_album">
-          <p style="color: #333; margin-top: 3px; margin-bottom: 5px;">
-          <em class="icon-calendar"></em>
-          <a href="{$app:path}/helper/index">
-            了解挖一下</a>
-          </p>
-        </div>
-        <div style="border:0; background:#F8F8F8; font-size: 14px;height: 45px; line-height: 45px;text-indent: 20px;padding-top: 0px;" id="tree_album">
+      </div>
+      <div id="right-column">
+        <div style="border-left:0px solid #F30; background: #FFF;font-size:14px;height:40px;line-height:40px;text-indent:20px;padding-top:2px;" id="tree_album">
           <p style="color: #333; margin-top: 0px; margin-bottom: 5px;">
           <em class="icon-calendar"></em>
-          <a href="{$app:path}/helper/install#">
-            安装</a>
+          <a href="{$app:path}/help/index">了解挖一下</a>
           </p>
         </div>
-				</dl>		
-			</div>
-			<div class="clear"></div>
-		</div>
-		<div class="clear"></div>
-    <div id="footer" class="tableheader">
-      <hr class="hide">
-      <p>
-        Powered By <a href="http://wayixia.com">wayixia.com</a>. All Rights Reservered. 
-      </p>
+        <div style="border-left:5px solid #F30; background:#F8F8F8; font-size:14px;height:40px;line-height:40px;text-indent: 20px;" id="tree_album">
+          <p style="color: #333; margin-top: 0px; margin-bottom: 5px;">
+          <em class="icon-calendar"></em>
+          <a href="{$app:path}/help/install#">安装</a>
+          </p>
+        </div>
+        </dl>    
       </div>
-      </div>
-		</div>
+      <div class="clear"></div>
     </div>
-    <br><br>
-	</div>	
+    <div class="clear"></div>
+    </div>
+   {#template user.footer}
+</div>  
 </body>
 </html>

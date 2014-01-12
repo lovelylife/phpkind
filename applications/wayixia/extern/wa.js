@@ -91,7 +91,7 @@ function get_remote_image(img, callback) {
     if(!err && res.statusCode == 200) {
       console.log("caculate image size");	    
       var info = imageinfo(body);
-      console.log(info);
+      //console.log(info);
       if(!info) { 
         callback.onerror(err, res);
         fs.unlink(file_name);
@@ -158,7 +158,7 @@ function check_wa_image(img, api_cookie, callback) {
     {
 
     if(!err && res.statusCode == 200) {
-      console.log("check image result:"+body);
+      //console.log("check image result:"+body);
       var r = JSON.parse(decodeURIComponent(body));
       if(r.header !=0) {
         // web server api failed
@@ -277,13 +277,13 @@ var Q = {
     var postdata = '';
     req.setEncoding('utf8');
     req.addListener('data', function(chunk) {
-      console.log('get image process ondata');
+      //console.log('get image process ondata');
       postdata += chunk.toString();
     });
 
     req.addListener('end', function() {
       try {
-        console.log('get image process onend');
+        //console.log('get image process onend');
         var qs = querystring.parse(postdata); 
         //console.log(qs.postdata);
         http_process(req, res, qs.postdata);

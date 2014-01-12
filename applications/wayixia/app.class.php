@@ -106,12 +106,10 @@ class CLASS_WAYIXIA_APPLICATION extends CLASS_APPLICATION {
     if(empty($user_id)) 
       trigger_error("paramter is invalid", E_USER_ERROR);
 
-    $path = '';
     //if(isdebug()) {
-      $path = "http://".$_SERVER['SERVER_NAME'].$this->Config("site.thumb_images_dir");
     //}
 
-    $sql_albums_list = "SELECT A.id AS album_id, A.name as album_name, CONCAT('{$path}','/',R.file_name) AS file_name, MAX( I.id ) AS id\n"
+    $sql_albums_list = "SELECT A.id AS album_id, A.name as album_name, CONCAT('http://', R.server,'/thumb/',R.file_name) AS file_name, MAX( I.id ) AS id\n"
     . "FROM ##__users_albums AS A\n"
     . "left JOIN ##__users_images AS I ON A.id=I.album_id\n"
     . "left JOIN ##__images_resource AS R ON R.id=I.res_id\n"

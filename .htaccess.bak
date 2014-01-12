@@ -7,8 +7,14 @@ RewriteBase /
 
 #RewriteRule (\w+) $1.php [L]
 #RewriteRule ^(\w+)/?$ index.php?app=wayixia&mod=$1 [L]
+RewriteRule ^recommend/user/?$ index.php?app=wayixia&mod=recommend&action=user [L]
+RewriteRule ^recommend/album/?$ index.php?app=wayixia&mod=recommend&action=album [L]
+RewriteRule ^recommend/schedule/?$ index.php?app=wayixia&mod=recommend&action=schedule [L]
+RewriteRule ^recommend/schedulealbums/?$ index.php?app=wayixia&mod=recommend&action=schedulealbums [L]
+RewriteRule ^schedule/([\w]+)/?$ index.php?app=wayixia&mod=schedule&action=$1 [L]
 RewriteRule ^pins/([0-9]+)/?$ index.php?app=wayixia&action=display&id=$1 [L]
 RewriteRule ^paintings/([0-9]+)/?$ index.php?app=wayixia&mod=default&action=display-album&&aid=$1 [L]
+RewriteRule ^paintingslist/([0-9]+)/?$ index.php?app=wayixia&mod=default&action=display-album-list&&uid=$1 [L]
 RewriteRule ^sites/([\w\-\.\$\?\s\t&]+)/?$ index.php?app=wayixia&mod=default&action=display-domain&d=$1 [L]
 RewriteRule ^user/([\w\-]+)/?$ index.php?app=wayixia&mod=default&action=display-all&u=$1 [L]
 RewriteRule ^help/([\w\-]+)/?$ index.php?app=wayixia&mod=helper&action=$1 [L]
@@ -16,7 +22,6 @@ RewriteRule ^index/?$ index.php?app=wayixia&mod=default [L]
 RewriteRule ^index/(\d+)/?$ index.php?app=wayixia&mod=default&p=$1 [L]
 RewriteRule ^index/([^/]+)/?$ index.php?app=wayixia&mod=default&tag=$1 [L]
 RewriteRule ^index/([^/]+)/([0-9]+)/?$ index.php?app=wayixia&mod=default&tag=$1&p=$2 [L]
-
 
 #RewriteCond %{HTTP_HOST} ^wayixia.com
 #RewriteCond %{REQUEST_URI} !^user.php$

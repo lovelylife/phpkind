@@ -5,81 +5,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/layout.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css"/>
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css" />
-<style>
-#thumbRPWrap{margin-bottom:10px}#thumbRP{font-size:0;padding:10px 0 15px 0;position:relative;width:200px}.thumb-item{float:left;display:block;width:64px;height:64px;padding:0;margin:0 2px 2px 0;position:relative;z-index:1}.thumb-item .thumb-bg{position:relative;float:left;display:block;background-color:transparent;_position:absolute}.thumb-item.hover{z-index:100;background-color:#fff;zoom:1}.thumb-item.hover .thumb-bg{padding:3px;top:-3px;left:-3px;background-color:#f45e5e;border:0 solid #ccc;width:64px;box-shadow:0 1px 4px #999;-webkit-box-shadow:0 1px 3px #ccc;-moz-box-shadow:0 1px 3px #ccc}.thumb-img-wrap{display:block;overflow:hidden;position:relative;z-index:1;width:64px;height:64px}.thumb-img-wrap .mask{height:64px;width:64px;top:0;left:0;display:block;background-color:transparent;position:absolute}.thumb-img-wrap .mask img{visibility:hidden}.thumb-img-wrap img{position:absolute;visibility:hidden;z-index:-1}a.btn-refresh{padding:0;font-weight:normal;cursor:pointer;text-indent:0;position:absolute;right:0;top:0;text-decoration:none;color:#606060;line-height:22px;font-size:14px}a.btn-refresh:hover{color:#e01a1a}
-
-.bulk{
-  float:left; 
-  display:block;
-  padding:0 3px;
-  overflow:hidden;
-}
-
-.bulk_style{
-  height:16px;
-  line-height:1.4em;
-  *line-height:1.5em;
-}
-
-.first_item {
-  padding-left: 0;
-}
-
-.pa { 
-  background:url({$themes:path}/bar_32.png) no-repeat 0px 0px; 
-  cursor:pointer;
-}
-.pa:hover { opacity:0.8; /*filter:alpha(opacity=80);*/}
-
-.icon32 { width:32px; height:32px; overflow:hidden; line-height:32px; display:block;}
-.icon32_qq { background-position: 0px -1696px; }
-.icon32_sina { background-position: 0px 0px; }
-.icon32_sohu { background-position:-232px -250px; }
-.icon32_kaixin { background-position:-196px -250px; }
-.icon32_taobao { background-position:-124px -250px; }
-.icon32_passit_more { background-position:-268px -250px; }
-
-.share_count {
-  float:left;
-	width:50px;
-	overflow:visible;
-	background-image:url({$themes:path}/count.gif); 
-    background-position:0px 0px;
-    font-weight: bold;
-    height: 32px;
-    line-height: 32px;
-    margin: 0 5px 0 3px;
-    padding: 0 3px 0 8px;
-    text-align: center;
-    display:block;
-}
-a.share_count:hover{
-	background-image:url({$themes:path}/count.gif); 
-  	background-position:0px -32px; 
-}
-
-.share_count span{
-  width:50px;
-  height:32px;
-  line-height: 32px;
-  display:block;
-  font-family:Arial,helvetica,sans-serif;
-  text-align:center;
-  font-size:16px;
-  font-weight:bold;
-  color:#333333;
-  cursor:default;
-  overflow:hidden;
-  background:none;
-}
-
-</style>
 
 <script src="{$app:qlib}/Q.js">
 <!--
@@ -157,7 +83,7 @@ function check_image_width(img) {
     </div>
   </div>
   <a href="{$app:path}/pins/[[id]]" target="_self" class="img x">
-    <img src="{$app:path}{$cfg:site.thumb_images_dir/}/[[file_name]]" width=[[width]] height=[[height]] alt="">
+    <img src="http://[[server]]/thumb/[[file_name]]" width=[[width]] height=[[height]] alt="">
   </a>
   <p class="description">[[title]]</p>
   <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>

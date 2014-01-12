@@ -156,11 +156,11 @@ for(var i=0; i < tree_items.length; i++) {
       <div class="panel" align="center">
         <div id="tweenimg-background" style="position:relative;background: url({$themes:path}/img_bg.png) repeat; line-height:0;">   
           <a href="{$fields:from_url}" target="_blank" title="点击打开来源网页">  
-            <img id="tweenimg" src="{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}" onload="check_width()"/>
+            <img id="tweenimg" src="http://{$fields:server/}/{$fields:file_name/}" onload="check_width()"/>
           </a>
           <div style="position:absolute; right:8px; top:8px;opacity: 0.8;">
             <div class="btn-group time-limit">
-              <a href="{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}" class="lightwindow btn btn-default" rel="/\\:;*?&lt;&gt;'”|®™©&amp;#[Sushi]" title="图片查看" caption="{$fields:title}" id="btn-view" author="{$fields:nickname}">看大图</a>
+              <a href="http://{$fields:server/}/{$fields:file_name/}" class="lightwindow btn btn-default" rel="/\\:;*?&lt;&gt;'”|®™©&amp;#[Sushi]" title="图片查看" caption="{$fields:title}" id="btn-view" author="{$fields:nickname}">看大图</a>
 	      <a href="#" class="btn btn-default" style="background: #FFF url({$themes:path}/btn-wa-normal.png) center center no-repeat;" id="btn-wa" onclick="wayixia({$fields:id})" title="挖一下">&nbsp;&nbsp;</a>
             </div>
         
@@ -203,7 +203,7 @@ for(var i=0; i < tree_items.length; i++) {
             <html:list id="domain_list" datasrc="data://album_images"> 
             <t:data>
               <a href="{$app:path/}/pins/[field:id]" target="_self">
-              <div class="thumb-domain-item" style="background:url({$app:path}{$cfg:site.thumb_images_dir/}/[field:file_name]) 50% 50% no-repeat">
+              <div class="thumb-domain-item" style="background:url(http://[field:server]/thumb/[field:file_name]) 50% 50% no-repeat">
               </div>
               </a>
             </t:data>
@@ -227,7 +227,7 @@ for(var i=0; i < tree_items.length; i++) {
             <html:list id="album_images" datasrc="data://domain_images"> 
             <t:data>
               <a href="{$app:path/}/sites/{$fields:from_host}" target="_self">
-              <div class="thumb-domain-item" style="background:url({$app:path}{$cfg:site.thumb_images_dir/}/[field:file_name]) 50% 50% no-repeat">
+              <div class="thumb-domain-item" style="background:url(http://[field:server]/thumb/[field:file_name]) 50% 50% no-repeat">
               </div>
               </a>
             </t:data>

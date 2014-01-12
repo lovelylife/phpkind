@@ -44,7 +44,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     }
     
     $t->dump2template($album_info);
-    $sql = "select R.file_name, R.width, R.height, I.id as id, I.from_host, I.title, I.agent, I.create_date, I.album_id \n"
+    $sql = "select R.server, R.file_name, R.width, R.height, I.id as id, I.from_host, I.title, I.agent, I.create_date, I.album_id \n"
          . "from ch_users_images I \n"
          . "left join ch_users_albums A on A.id=I.album_id \n"
          . "left join ch_images_resource R on I.res_id=R.id \n"

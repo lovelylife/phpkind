@@ -141,11 +141,11 @@ for(var i=0; i < tree_items.length; i++) {
             $is_from_to = intval($fields_from_id, 10); 
 	    if($is_from_to > 0) { 
 	  ?>
-	  <span>挖自 <a href="{$cfg:urls.user}/1">{$fields:uname}</a> 的画集 <a href="{$cfg:urls.paintings}/{$fields:album_id}">{$fields:album_name}</a> </span>
+	  <span>采集自画集 <a href="{$cfg:urls.paintings}/{$fields:album_id}">{$fields:album_name}</a> </span>
 	  <?php
 	     } else { 
 	  ?>
-	  <span>通过 <a href="{$cfg:urls.user}/1">{$fields:agent}</a> 挖到 </span>
+	  <span>通过 <a href="/help/install">{$fields:agent}</a> 采集 </span>
 	  <?php 
 	    } 
 	  ?>

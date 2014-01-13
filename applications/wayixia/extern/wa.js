@@ -283,7 +283,7 @@ var Q = {
 
     req.addListener('end', function() {
       try {
-        //console.log('get image process onend');
+        console.log('get image ' + req.headers.cookie);
         var qs = querystring.parse(postdata); 
         //console.log(qs.postdata);
         http_process(req, res, qs.postdata);

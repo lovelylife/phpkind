@@ -168,8 +168,8 @@ for(var i=0; i < tree_items.length; i++) {
           </div>
         <div class="clear"></div>
       </div>
-
-      <dl class="tbox" style="border:0;">
+      <br>
+      <!--dl class="tbox" style="border:0;">
         <dt>
           <strong style="color: #333;text-indent: 5px;">
           <em class="icon-calendar"></em>&nbsp;&nbsp;分享至:
@@ -177,14 +177,14 @@ for(var i=0; i < tree_items.length; i++) {
         </dt>
         <dd>
           <a class="bulk first_item" href="javascript:void(0);" onclick="share2sina();"><span class="pa icon32 icon32_sina"></span></a> 
-          <!--a class="bulk"><span class="pa icon32 icon32_qq"></span></a> 
-          <a class="share_count"><span title="已累计分享5次">5</span></a-->
+          <a class="bulk"><span class="pa icon32 icon32_qq"></span></a> 
+          <a class="share_count"><span title="已累计分享5次">5</span></a>
           <div id="qqwb_share__" data-appkey="801365852" data-icon="0" data-counter="0" data-content="{$fields:title}" 
             data-pic="http://wayixia.com{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}"></div>
           <script src="http://mat1.gtimg.com/app/openjs/openjs.js#autoboot=no&debug=no"></script>
           <div style="clear:both; height: 10px;"></div>
         </dd>
-      </dl>
+      </dl-->
     </div>
     <div id="right-column">
       <DIV class="seg-title selectitem" id="tree_album">
@@ -237,7 +237,29 @@ for(var i=0; i < tree_items.length; i++) {
           <div style="clear:both; height: 10px;">
         </dd>
       </dl>
-    </div>
+      
+      <!-- share buttons -->
+      <DIV class="seg-title normalitem" style="border-top: 1px solid #EEE;" id="share" >
+          <p style="color: #333; margin-top: 0px; margin-bottom: 3px;">
+            <em class="icon-calendar"></em>分享至:
+          </p>
+          <!--div class="arrow"></div-->
+      </DIV>
+      <dl class="tbox" style="border:0;margin-top:10;" id="share_content">
+        <dd>
+          <a class="bulk first_item" href="javascript:void(0);" onclick="share2sina();"><span class="pa icon32 icon32_sina"></span></a> 
+          <!--a class="bulk"><span class="pa icon32 icon32_qq"></span></a> 
+          <a class="share_count"><span title="已累计分享5次">5</span></a-->
+          <div id="qqwb_share__" data-appkey="801365852" data-icon="0" data-counter="0" data-content="{$fields:title}" 
+            data-pic="http://wayixia.com{$app:path/}{$cfg:site.images_dir/}/{$fields:file_name/}"></div>
+          <script src="http://mat1.gtimg.com/app/openjs/openjs.js#autoboot=no&debug=no"></script>
+          <div style="clear:both; height: 10px;"></div>
+	  </dd>
+     	  <dd>
+          <div style="clear:both; height: 10px;">
+        </dd>
+      </dl>
+   </div>
     <div class="clear"></div>
   </div>
   <div class="clear"></div>

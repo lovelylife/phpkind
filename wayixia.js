@@ -6,24 +6,20 @@
 ---------------------------------------------------------*/
 
 // 初始化 Javascript Loader
-(function(libs, initf) {
 
+var Q = new function() {
+  // Q function
   var pa = new RegExp("wayixia.com");
-  if(pa.test(location.host)) {
-    alert('亲，您已经在挖一下网站了!');
-    return;
-  }
-
+  if(pa.test(location.host)) { alert('亲，您已经在挖一下网站了!'); return; }
   window.undefined = window.undefined;
-
   // check the name is used
   if(window.Q) {
-    //alert('conflict name for Q');
+    alert('conflict Q');
     return;
   }
-    
-    //! Q
-    window.Q = Q = this;
+
+  //! Q
+  window.Q = Q = this;
   //! QLib base dir
   var _libdir = null;
   // dom elements cache
@@ -129,7 +125,7 @@
   };
 
     //! Javascript Loader
-  function loadJsLib(arr) { 
+  function loadJsLib(libs) { 
     var scripts = document.getElementsByTagName("script");  
     // 判断指定的文件是否已经包含，如果已包含则触发onsuccess事件并返回  
     var libscript = null;
@@ -295,7 +291,7 @@
     Q._DEBUG.stdoutput = output;
   }
 
-  function Initialize() {
+  this.Initialize = function(libs, initf) {
     //! get Browser
     _Browser.agt = navigator.userAgent.toLowerCase();
     _Browser.isW3C = document.getElementById ? true:false;
@@ -325,11 +321,11 @@
     doParseUrlQuery();
     Q.Ready(initf);
     Q.registerDelayDOMReady(Q.delayDOMReady);
-    loadJsLib();
+    loadJsLib(libs);
   }  
-  // initialize
-  Initialize();
-})(['import utils.json2;', 'import utils.ajax;', 'import thirdparty.easyXDM-2-4-17-1.easyXDM-min;'], 
+};
+
+Q.Initialize(['import utils.json2;', 'import utils.ajax;', 'import thirdparty.easyXDM-2-4-17-1.easyXDM-min;'], 
 
 (
 function(){

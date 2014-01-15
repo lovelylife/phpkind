@@ -883,13 +883,16 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     #  'name' => $name,
       'gender' => $gender,
       'bothday' => $bothday,
-      'description' => $description,
+      'description' => htmlspecialchars(addslashes($description)),
     );
 
     $db = &$this->App()->db();
     $update_detail_sql = $db->updateSQL('users', $fields);
     $update_detail_sql.= " where `uid`='{$uid}';";
-    $db->execute($update_detail_sql);
+    if(!$db->execute($update_detail_sql)) {
+      $this->errmsg($db->get_error());
+      return;
+    }
   }
 }
 

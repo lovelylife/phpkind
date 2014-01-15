@@ -32,7 +32,7 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
       trigger_error('invalid image id', E_USER_ERROR);
       
     $sql_get_image = "select I.id AS id, R.file_name, R.width, R.height, I.from_host, I.title, I.album_id  ";
-    $sql_get_image.= "from ##__images_resource R, ##__users_images AS I ";
+    $sql_get_image.= "from ##__images_resource R, ##__users_images I ";
     $sql_get_image.= "where R.id=I.res_id and I.id={$image_id} ";
     $sql_get_image.= "limit 0,1;";
 
@@ -51,7 +51,7 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
     
     $albums = array();
     $db->get_results($sql, $albums);
-    array_push($albums, array('value'=>0, 'text'=>'待分类'));
+    array_push($albums, array('value'=>-$uid, 'text'=>'待分类'));
     $t->push_data('useralbums', $albums);
 
     // render
@@ -82,7 +82,7 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
 
   function edit() {
     $data = &$_POST['data'];
-    $title = $data['title'];
+    $title = htmlspecialchars(addslashes($data['title']));
     $id = intval($data['id'], 10);
     $album_id = intval($data['album_id'], 10);
     $uid = $this->App()->get_user_info('uid');
@@ -93,8 +93,8 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
     }
 
     $sql = "UPDATE ##__users_images ";
-    $sql.= "set `title`='{$title}',`album_id`='{$album_id}' ";
-    $sql.= "where `id`='{$id}';";
+    $sql.= "set `title`='{$title}',`album_id`={$album_id} ";
+    $sql.= "where `id`={$id};";
 
     if(!$db->execute($sql)) 
       $this->errmsg($db->get_error());

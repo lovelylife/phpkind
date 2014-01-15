@@ -88,7 +88,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     if(empty($image)) {
       trigger_error('image is invalid or deleted', E_USER_ERROR);
     }
-
+    
     $t = new CLASS_TEMPLATES($this->App());
     $t->dump2template($image);
 

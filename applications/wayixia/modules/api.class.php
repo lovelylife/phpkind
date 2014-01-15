@@ -226,9 +226,9 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     $fields = array(
       'res_id'    => $res_id,
       'album_id'  => $album_id,
-      'title'     => $title,
+      'title'     => htmlspecialchars($title),
       'from_host' => $url['host'],
-      'from_url'  => $from_url,
+      'from_url'  => htmlspecialchars($from_url),
     );
 
     $sql = $db->insertSQL('users_images', $fields);

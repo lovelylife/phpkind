@@ -131,7 +131,7 @@ class CLASS_MODULE_ALBUM extends CLASS_MODULE {
     
     $data = &$_POST['data'];
     $album_name = $data['album_name'];
-    if(empty($album_name) || !eregi("^[^\/\\:\*\?,\",<>\¦]+$", $album_name)) {
+    if(empty($album_name) || !eregi("^[^\/\\:\*\?\"<>\|]+$", $album_name)) {
       $this->AjaxHeader(-2);
       $this->AjaxData('画集名称非法！'.$album_name);
       return;

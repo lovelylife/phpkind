@@ -44,14 +44,23 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
       $sql.=" order by id DESC ";
 
       $page_size = 50;
-      $totalsize = $this->App()->db()->query_count($sql);
+      $count_sql =  "select sum(size) totalsize from ";
+      $count_sql.= "(select count(distinct file_name) size from ##__nosql_pins group by file_name) d; ";
+      
+      $count_row = $this->App()->db()->get_row($count_sql);
+      if(empty($count_row)) {
+        $totalsize = 0;
+      } else {
+        $totalsize = $count_row['totalsize'];
+      }
 
+      //print_r($count_row);
       $cfg = array(
         "totalsize" => $totalsize,
         "pagesize" => $page_size,
         "pagekey" => "p",
         "html" => true,
-        "tpl" => "/index/".urlencode($tag)."/{pid}",
+        "tpl" => "/index/".urlencode($tag)."{pid}",
       );
 
       // 实例化分页类,初始化构造函数中的总条目数和每页显示条目数

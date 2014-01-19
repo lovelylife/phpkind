@@ -33,6 +33,13 @@ class CLASS_DTL_SELECT extends CLASS_DTL {
     $this->value_selected = $this->getAttribute('valueSelected');
     $this->key_selected = $this->getAttribute('keySelected');
     $this->mask_selected = $this->getAttribute('maskSelected');
+    
+    if(empty($this->mask_selected)) 
+      $this->mask_selected = "selected";
+    
+    if(empty($this->key_selected)) 
+      $this->key_selected = "value";
+    
     if($this->is_datatype_sql()) {
       if($this->is_viewtype_tree()) {
         $records = $this->query_data();
@@ -61,10 +68,10 @@ class CLASS_DTL_SELECT extends CLASS_DTL {
     } else {
       $buffer = '';
       $records = $this->query_data();
-       
       foreach($records as $item) {
         $buffer .= $this->item_process($item, $item_tpl);
       }
+      //print($buffer);
       return $buffer;
     }
   }
@@ -79,6 +86,7 @@ class CLASS_DTL_SELECT extends CLASS_DTL {
     if($item[$this->key_selected] == $this->value_selected) {
       $item['selected'] = $this->mask_selected;
     }
+    //print_r($item);
     return parent::item_process($item, $item_tpl);
   }
   

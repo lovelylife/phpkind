@@ -11,10 +11,10 @@
 define('REGEX_PARSE_ATTRS', "/\s+(\w+)=\"([^>\"]+)\"/i");
 
 class CLASS_DTL {
-	
-	// html output
+  
+  // html output
   private $pager_;
-  private $data_type_;	// 0 - sql, 1 - dict
+  private $data_type_;  // 0 - sql, 1 - dict
   private $data_value_;
   private $app_;
   private $t_;
@@ -25,7 +25,7 @@ class CLASS_DTL {
   private $tpl_data_;
 
   // constuct
-  function __construct() {	$this->t_ = null;  }
+  function __construct() {  $this->t_ = null;  }
 
 
 
@@ -58,13 +58,13 @@ class CLASS_DTL {
   function query_data_tpl($tpl) {
     $out_buffer = '';
     if($this->is_datatype_sql() && (!$this->is_viewtype_tree())) {
-	  $db = $this->getApp()->db();
-	  $sql = $this->getPageSQL($this->data_value_);
-	  if(!$db->execute_tpl($sql, $this, $tpl, $out_buffer)) 
-			$this->error($db->get_error());
+    $db = $this->getApp()->db();
+    $sql = $this->getPageSQL($this->data_value_);
+    if(!$db->execute_tpl($sql, $this, $tpl, $out_buffer)) 
+      $this->error($db->get_error());
     }
 
-		return $out_buffer;
+    return $out_buffer;
   }
 
   function query_tree_data_tpl($records, $tpl) {
@@ -88,7 +88,7 @@ class CLASS_DTL {
       ),
     );
 
-	  $algory = new CLASS_ALGORY($config, $this);
+    $algory = new CLASS_ALGORY($config, $this);
     return $algory->__toString();
   }
 
@@ -103,12 +103,12 @@ class CLASS_DTL {
     } else if($this->is_datatype_dict()) {
       $theApp->query_dictionary($this->data_value_, $records);
     } else if($this->is_datatype_data()) {
-		  $records = $this->t_->get_data($this->data_value_);
-		}
+      $records = $this->t_->get_data($this->data_value_);
+    }
 
     return $records;
   }
-	
+  
   // 解析标签内的属性，传入的tag不能包含子标签，否则解析可能不正确
   function parse_attrs($tag) {
     $attrs = array();
@@ -121,7 +121,7 @@ class CLASS_DTL {
     }
     return $attrs;
   }
-	
+  
   // contact the attributes to string
   function contact_attrs($attrs) {
     $str = "";
@@ -131,72 +131,75 @@ class CLASS_DTL {
     }
     return $str;
   }
-	
+  
   // record 处理
   function item_process($item, $tpl) {
-	// 解析变量标签[field:varname[attrs='']/]
-	return preg_replace(
-	  '/\[field:(\w+)([^\/\]]*)\s*\/?\]/ie', 
-	  '$this->parse_item($item["\\1"],"\\2")',
-	  $tpl);       
+  // 解析变量标签[field:varname[attrs='']/]
+  return preg_replace(
+    '/\[field:(\w+)([^\/\]]*)\s*\/?\]/ie', 
+    '$this->parse_item($item["\\1"],"\\2")',
+    $tpl);       
   }
 
   function tree_item_process($item, $context, &$out) {
-		echo "dtl::tree_item_process is not called.";
-		return true;
+    echo "dtl::tree_item_process is not called.";
+    return true;
   }
-	
+  
   function parse_item($value, $attrs_str) {
-		// print_r($attrs);
-		$attrs = CLASS_DTL::parse_attrs($attrs_str);
-		
-		// 处理字典
-		if(isset($attrs["dict"])) {
-			$dict = null;
-			//trigger_error("err", E_USER_ERROR);
-			if($this->getApp()->query_dictionary($attrs["dict"], $dict)) {
-				$value = $dict[$value];
-				// print_r($dict);
-			}
-		}
-		
-		// 处理函数
-		if(isset($attrs["func"])) {
-			// get func name
-			$func = str_ireplace("@this", "'".$value."'", stripcslashes( $attrs["func"]));
-			$nPos = strpos($func, '(', 0);
-			if($nPos >= 0) {
-				$funcname = trim(substr($func, 0, $nPos));
-				if(function_exists($funcname)) {
-					if(isdebug()) {
-						eval("\$value = ".$func.";");	
-					} else {
-						@eval("\$value = ".$func.";");
-					}
-				} else {
-					if(isdebug()) {
-						echo "function {$funcname} not exists<br>";
-					}
-				}
-			}
-		}
+    // print_r($attrs);
+    $attrs = CLASS_DTL::parse_attrs($attrs_str);
+
+    // 处理字典
+    if(isset($attrs["dict"])) {
+      $dict = null;
+      //trigger_error("err", E_USER_ERROR);
+      if($this->getApp()->query_dictionary($attrs["dict"], $dict)) {
+        foreach($dict as $item) {
+          if($item['value'] == $value) {
+	    $value = $item['text'];
+	  }
+        }
+      }
+    }
+    
+    // 处理函数
+    if(isset($attrs["func"])) {
+      // get func name
+      $func = str_ireplace("@this", "'".$value."'", stripcslashes( $attrs["func"]));
+      $nPos = strpos($func, '(', 0);
+      if($nPos >= 0) {
+        $funcname = trim(substr($func, 0, $nPos));
+        if(function_exists($funcname)) {
+          if(isdebug()) {
+            eval("\$value = ".$func.";");  
+          } else {
+            @eval("\$value = ".$func.";");
+          }
+        } else {
+          if(isdebug()) {
+            echo "function {$funcname} not exists<br>";
+          }
+        }
+      }
+    }
         
     if(empty($value) && !empty($attrs['default'])) {
       $value = $attrs['default'];
     }
-		
+    
     // printf("%s\n", $value);
     return $value;
   }
 
   function is_viewtype_tree() { 
-	return ($this->support_viewtype_tree() 
-	  && ($this->getAttribute('viewtype') == "tree"));
+  return ($this->support_viewtype_tree() 
+    && ($this->getAttribute('viewtype') == "tree"));
   }
 
   function is_datatype_sql() { return ($this->data_type_ == "sql"); }
   function is_datatype_dict() { return ($this->data_type_ == "dict"); }
-	function is_datatype_data() { return ($this->data_type_ == "data"); }
+  function is_datatype_data() { return ($this->data_type_ == "data"); }
 
   // can overrided by subclass
   function support_data_source() { return true; }
@@ -210,7 +213,7 @@ class CLASS_DTL {
     $return_code = array();
     if($this->getAttribute("datasrc") == '') 
       return $return_code;
-	
+  
     // get data source * high priority
     // $str = "sql://asdfasd dasdda'sdff";
     $result = preg_match_all(
@@ -221,10 +224,10 @@ class CLASS_DTL {
 
     if($result <= 0 ) 
       $this->error("invalid data source:".$this->getAttribute("datasrc"));
-		
+    
     $return_code['type'] = $type = $matches[1][0];
     $return_code['value'] = $value = $matches[2][0];
-		
+    
     if($type == 'sql' || $type=='share') {
       $db = $this->getApp()->db();
       $sql = $value;
@@ -246,66 +249,66 @@ class CLASS_DTL {
       // query the tag is support tree or not
       if($page_size > 0) {
         $totalsize = $this->getApp()->db()->query_count($sql);
-				//echo "totalsize:\n".$totalsize;
+        //echo "totalsize:\n".$totalsize;
         $cfg = array("totalsize" => $totalsize,"pagesize" => $page_size);
         if($this->getAttribute("html") == true) {
           $cfg["html"] = true;
-	        $cfg["tpl"] = $this->getAttribute("tpl");
-	        $cfg["first"] = $this->getAttribute("first");
-	        $cfg["page"] = $this->getAttribute("page");
-	      }
+          $cfg["tpl"] = $this->getAttribute("tpl");
+          $cfg["first"] = $this->getAttribute("first");
+          $cfg["page"] = $this->getAttribute("page");
+        }
 
-				// 实例化分页类,初始化构造函数中的总条目数和每页显示条目数
-	      $this->pager_ = new CLASS_PAGE($cfg);
-			} 
-		}
+        // 实例化分页类,初始化构造函数中的总条目数和每页显示条目数
+        $this->pager_ = new CLASS_PAGE($cfg);
+      } 
+    }
 
     return $this->pager_;
   }
 
   function getPageSQL($sql) 
-	{
+  {
     if($this->getPager()) {
-			$page_size = $this->getPager()->getPageSize();
-			$sql .= " limit ";
-			$sql .= ($this->getPager()->GetCurrentPage()-1)*$page_size;
-			$sql .= ",{$page_size};";			
-		} else {			
-			$size = intval($this->getAttribute('size'), 10);
-		  if($size > 0) {
-				$sql .= " limit 0, {$size};";
-			}
-		}
-		return $sql;
+      $page_size = $this->getPager()->getPageSize();
+      $sql .= " limit ";
+      $sql .= ($this->getPager()->GetCurrentPage()-1)*$page_size;
+      $sql .= ",{$page_size};";      
+    } else {      
+      $size = intval($this->getAttribute('size'), 10);
+      if($size > 0) {
+        $sql .= " limit 0, {$size};";
+      }
+    }
+    return $sql;
   }
 
   function getApp() {  return $this->t_->getApp(); }
 
-	// error 
+  // error 
   function error($message) {
-		trigger_error(
-			htmlspecialchars(
-				"error occurred:\n\n$message in tag [".$this->getNodeName()."]"
-			), 
-			E_USER_ERROR
-		);
+    trigger_error(
+      htmlspecialchars(
+        "error occurred:\n\n$message in tag [".$this->getNodeName()."]"
+      ), 
+      E_USER_ERROR
+    );
   }
 
   // out put html
   function __toString() 
-	{ 
-		$tpl = $this->t_->complie_php_vars($this->tpl_data_);
+  { 
+    $tpl = $this->t_->complie_php_vars($this->tpl_data_);
     $this->InitDataSource();    
-    $out_html_ = $this->onheader();	
-		// 解析t:标签,例如 <t:data>tpl</t:data>
+    $out_html_ = $this->onheader();  
+    // 解析t:标签,例如 <t:data>tpl</t:data>
     $out_html_ .= preg_replace_callback(
-			'/<(t):(\w+)>(.+?)<\/\1:\2>/is',
-			array($this, 'construct_tag'),
-			$tpl
-		);		
-		$out_html_ .= $this->onfooter();
+      '/<(t):(\w+)>(.+?)<\/\1:\2>/is',
+      array($this, 'construct_tag'),
+      $tpl
+    );    
+    $out_html_ .= $this->onfooter();
 
-		return $out_html_;
+    return $out_html_;
   }
 
   function setTemplate($t) {
@@ -318,15 +321,15 @@ class CLASS_DTL {
 
   // Parse
   function parse($tag_xml) {
-		if(empty($tag_xml))
-			return false; 
+    if(empty($tag_xml))
+      return false; 
 
-		$this->tag_xml_ = $tag_xml;
+    $this->tag_xml_ = $tag_xml;
     $ret = preg_match_all(
       '/<html:(\w+)([^>]*)>(.*?)<\/html:\1>/is', 
       $tag_xml, 
-			$matches
-		);
+      $matches
+    );
 
     if(!$ret) return false;
 
@@ -347,7 +350,7 @@ class CLASS_DTL {
     }
 
     $this->error('invalid tag config:\n'.$tag_config);
-		return false;
+    return false;
   }
 
   // Serialize
@@ -367,7 +370,7 @@ class CLASS_DTL {
   // 读取标签属性
   function getAttribute($attrName) {
     $s = $this->attributes_[$attrName];
-	  if(!empty($s)) {
+    if(!empty($s)) {
       return $this->t_->complie_php_vars($s);
     }
 

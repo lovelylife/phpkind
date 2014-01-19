@@ -25,10 +25,10 @@ $_PHPKIND_ENVS['_modulesDir'] = '/modules';
 $_PHPKIND_ENVS['_allowedApps'] = array(
   'wayixia',
   'cms',
-  'cdmusic',
+  'collector',
   'command',
   'samples',
-  'collector',
+  'xmlbook',
 );
 
 //! 默认应用程序

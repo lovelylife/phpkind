@@ -52,12 +52,12 @@ phpkind_info();
 data数据源：
 </h3>
 <html:table 
-	id="mydata" 
-	datasrc="data://mydata1" 
-	cellpadding="3" 
-	cellspacing="1"
-	style="background: #333; width: 500px;"
-	valueSelected="key:value"
+  id="mydata" 
+  datasrc="data://mydata" 
+  cellpadding="3" 
+  cellspacing="1"
+  style="background: #333; width: 500px;"
+  valueSelected="key:value"
 >
 <thead style="background:red; color:white;">
 <th width="100" align="left">value</th>
@@ -78,13 +78,13 @@ onmouseout="this.style.backgroundColor='';"
 table page：
 </h3>
 <html:table 
-	id="mydata2" 
-	datasrc="sql://select * from c_table_3" 
-	pagesize="10"
-	cellpadding="3" 
-	cellspacing="1"
-	style="background: #333; width: 500px;"
-	valueSelected="key:value"
+  id="mydata2" 
+  datasrc="sql://select * from c_table_3" 
+  pagesize="10"
+  cellpadding="3" 
+  cellspacing="1"
+  style="background: #333; width: 500px;"
+  valueSelected="key:value"
 >
 <thead style="background:red; color:white;">
 <th width="100" align="left">value</th>
@@ -110,14 +110,14 @@ onmouseout="this.style.backgroundColor='';"
 
 <h4>list:</h4>
 <html:list
-	id="mydatalist" 
-	datasrc="data://mydatas" 
-	cellpadding="3" 
-	cellspacing="1"
-	style="background: #333; width: 500px;"
-	keySelected="index"
-	valueSelected="3"
-	maskSelected="class='xxx'"
+  id="mydatalist" 
+  datasrc="data://mydata" 
+  cellpadding="3" 
+  cellspacing="1"
+  style="background: #333; width: 500px;"
+  keySelected="index"
+  valueSelected="3"
+  maskSelected="class='xxx'"
 >
 <t:data>
 <li [field:selected]>

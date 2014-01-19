@@ -468,24 +468,24 @@ class CLASS_TEMPLATES {
 
   // dict指令
   function dict($attrs) {
-      $type = strtolower($attrs["type"]);
-      if($type == "database") {
+    $type = strtolower($attrs["type"]);
+    if($type == "database") {
         // 加载数据库字典
-        $this->load_dicFromDatabase($attrs);
-      } else {
-        // 加载xml字典
-        $dict_file = $this->theApp->getAppRoot()
-      .$this->theApp->getDataPath()
-      ."/".$attrs['src'].".php";
-        if(file_exists($dict_file)) {
-      $arr = require_once($dict_file);
-      if(is_array($arr) && !empty($arr)) {
-      $this->dict = array_merge($this->dict, $arr);
-      }
-        } else {
-          trigger_error('file['.$dict_file.'] not founded!', E_USER_ERROR);
+      $this->load_dicFromDatabase($attrs);
+    } else {
+      // 加载xml字典
+      $dict_file = $this->theApp->getAppRoot()
+                   .$this->theApp->getDataPath()
+                   ."/".$attrs['src'].".php";
+      if(file_exists($dict_file)) {
+        $arr = require_once($dict_file);
+        if(is_array($arr) && !empty($arr)) {
+          $this->dict = array_merge($this->dict, $arr);
         }
+      } else {
+          trigger_error('file['.$dict_file.'] not founded!', E_USER_ERROR);
       }
+    }
   }
 
     // 加载数据库字典表
@@ -494,20 +494,15 @@ class CLASS_TEMPLATES {
     if(!isset($attrs["name"])) { return; }
     if(!isset($attrs["table"])) { return; }
     $id = $attrs["name"];
-    $key = $attrs["key"];
+    $text = $attrs["text"];
     $value = $attrs["value"];
-    $sql = "select ".$attrs["key"].",".$attrs["value"]." from ##__".$attrs["table"];
+    $sql = "select {$value} value, {$text} text from ##__".$attrs["table"];
     $rs = array();
     if(!$this->theApp->db()->get_results($sql, $rs)) {
       trigger_error($this->theApp->db()->get_error(), E_USER_ERROR);
     }
-    $dicitems = array();
-    //print_r($rs);
-    foreach($rs as $record) {
-      $dicitems[$record[$key]] = $record[$value];
-    }
     // 存入字典
-     $this->dict[$id] = $dicitems;
+    $this->dict[$id] = $rs;
   }
     
   // 字典查询，如果查到则把值输出到$value，并返回true
@@ -543,8 +538,8 @@ class CLASS_TEMPLATES {
     if(empty($name)) {
        trigger_error("name is empty", E_USER_ERROR);
     } 
-     
-    if(isset($this->cache_data_[$name])) { 
+    
+    if(array_key_exists($name, $this->cache_data_)) { 
       return $this->cache_data_[$name]; 
     }
     

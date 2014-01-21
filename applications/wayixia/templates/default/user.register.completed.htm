@@ -4,12 +4,7 @@
 <title> 成为挖客 - wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
-
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css">
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css">
 <style>
 #form-username, #form-password, #form-repassword, #form-email  {
   width: 300px;
@@ -41,126 +36,126 @@ function check_submit_button() {
    var disabled = false;
    for(var i=0; i<arr.length; i++) {
      if(Q.$(arr[i]).innerHTML != '') {
-	   disabled = true;
-	   break;
-	 }
+     disabled = true;
+     break;
+   }
    }
    Q.$('submit-button').disabled = disabled;
 }
 
 Q.Ready(function(){
-	Q.$("form-username").onblur = function(){
-		if(!this.value){
-			Q.$("msg-username").innerHTML = "请输入用户名";
-			check_submit_button();
-		} else {
-		  var username = this.value;
-			Q.Ajax({
-				command: "{$app:module}&action=check-username&inajax=true&username="+username,
-				oncomplete: function (xmlhttp){//成功
-				  try {
-				    var resp = eval('('+xmlhttp.responseText+')');
-					if(resp.header != 0) {
-					  Q.$("msg-username").innerHTML = resp.data;
-					} else {
-					  Q.$("msg-username").innerHTML = '';
-					}
-				  } catch (e) {
+  Q.$("form-username").onblur = function(){
+    if(!this.value){
+      Q.$("msg-username").innerHTML = "请输入用户名";
+      check_submit_button();
+    } else {
+      var username = this.value;
+      Q.Ajax({
+        command: "{$app:module}&action=check-username&inajax=true&username="+username,
+        oncomplete: function (xmlhttp){//成功
+          try {
+            var resp = eval('('+xmlhttp.responseText+')');
+          if(resp.header != 0) {
+            Q.$("msg-username").innerHTML = resp.data;
+          } else {
+            Q.$("msg-username").innerHTML = '';
+          }
+          } catch (e) {
                     Q.$("msg-username").innerHTML = xmlhttp.responseText;
-				  }
-				  check_submit_button();
-				}
-		    });
-		}
-	};
+          }
+          check_submit_button();
+        }
+        });
+    }
+  };
 
-	Q.$("form-password").onblur = function(){
-		if(!this.value){
-		  Q.$("msg-password").innerHTML = "请输入登录密码";
-		}else{
-		  Q.$("msg-password").innerHTML = "";
-		}
-		if(this.value!=Q.$("form-repassword").value && Q.$("form-repassword").value){
-			Q.$("msg-repassword").innerHTML = ("两次密码不一致");
-		}else{
-			Q.$("msg-repassword").innerHTML = "";
-		}
+  Q.$("form-password").onblur = function(){
+    if(!this.value){
+      Q.$("msg-password").innerHTML = "请输入登录密码";
+    }else{
+      Q.$("msg-password").innerHTML = "";
+    }
+    if(this.value!=Q.$("form-repassword").value && Q.$("form-repassword").value){
+      Q.$("msg-repassword").innerHTML = ("两次密码不一致");
+    }else{
+      Q.$("msg-repassword").innerHTML = "";
+    }
         check_submit_button();
-	};
+  };
 
-	Q.$("form-repassword").onblur = function(){
-		if(!this.value){
-			Q.$("msg-repassword").innerHTML = ("请确认登录密码");
-		}else if(this.value!=Q.$("form-password").value){
-			Q.$("msg-repassword").innerHTML = ("两次密码不一致");
-		}else{
-			Q.$("msg-password").innerHTML = "";
-		}
-		check_submit_button();
-	};
+  Q.$("form-repassword").onblur = function(){
+    if(!this.value){
+      Q.$("msg-repassword").innerHTML = ("请确认登录密码");
+    }else if(this.value!=Q.$("form-password").value){
+      Q.$("msg-repassword").innerHTML = ("两次密码不一致");
+    }else{
+      Q.$("msg-password").innerHTML = "";
+    }
+    check_submit_button();
+  };
 
-	Q.$("form-email").onblur = function(){
-	  if(!this.value){
-		Q.$("msg-email").innerHTML = "请输入邮件地址";
-		check_submit_button();
-	  } else {
-		var email = this.value;
-		Q.Ajax({
-		  command: "{$app:module}&action=check-email&inajax=true&email="+email,
-		  oncomplete: function (xmlhttp){//成功
-		    try {
-		      var resp = eval('('+xmlhttp.responseText+')');
-			  if(resp.header != 0) {
-			    Q.$("msg-email").innerHTML = resp.data;
-			  } else {
-			    Q.$("msg-email").innerHTML = '';
-			  }
-		    } catch (e) {
+  Q.$("form-email").onblur = function(){
+    if(!this.value){
+    Q.$("msg-email").innerHTML = "请输入邮件地址";
+    check_submit_button();
+    } else {
+    var email = this.value;
+    Q.Ajax({
+      command: "{$app:module}&action=check-email&inajax=true&email="+email,
+      oncomplete: function (xmlhttp){//成功
+        try {
+          var resp = eval('('+xmlhttp.responseText+')');
+        if(resp.header != 0) {
+          Q.$("msg-email").innerHTML = resp.data;
+        } else {
+          Q.$("msg-email").innerHTML = '';
+        }
+        } catch (e) {
               Q.$("msg-email").innerHTML = xmlhttp.responseText;
-		    }
-		    check_submit_button();
-		  }
-		});
-	  }
-	};
+        }
+        check_submit_button();
+      }
+    });
+    }
+  };
 
-	Q.$("form-vcode").onblur = function(){
-	  if(!this.value){
-			Q.$("msg-vcode").innerHTML = "请输入验证码";
-			check_submit_button();
-		} else {
-		  var vcode = this.value;
-			Q.Ajax({
-				command: "{$app:module}&action=check-vcode&inajax=true&vcode="+vcode,
-				oncomplete: function (xmlhttp){//成功
-				  try {
-				    var resp = eval('('+xmlhttp.responseText+')');
-					if(resp.header != 0) {
-					  Q.$("msg-vcode").innerHTML = resp.data;
-					} else {
-					  Q.$("msg-vcode").innerHTML = '';
-					}
-				  } catch (e) {
+  Q.$("form-vcode").onblur = function(){
+    if(!this.value){
+      Q.$("msg-vcode").innerHTML = "请输入验证码";
+      check_submit_button();
+    } else {
+      var vcode = this.value;
+      Q.Ajax({
+        command: "{$app:module}&action=check-vcode&inajax=true&vcode="+vcode,
+        oncomplete: function (xmlhttp){//成功
+          try {
+            var resp = eval('('+xmlhttp.responseText+')');
+          if(resp.header != 0) {
+            Q.$("msg-vcode").innerHTML = resp.data;
+          } else {
+            Q.$("msg-vcode").innerHTML = '';
+          }
+          } catch (e) {
                     Q.$("msg-vcode").innerHTML = xmlhttp.responseText;
-				  }
-				  check_submit_button();
-				}
-		    });
-		}
-	};
-/*	
-	Q.$("input[name='uname']").blur(function(){
-		!$(this).val() ? $(this).next(".msg").html("请输入昵称") : $(this).next(".msg").html("");
-	});
+          }
+          check_submit_button();
+        }
+        });
+    }
+  };
+/*  
+  Q.$("input[name='uname']").blur(function(){
+    !$(this).val() ? $(this).next(".msg").html("请输入昵称") : $(this).next(".msg").html("");
+  });
 
-	$("#cpnamebox").hide();
-	$("input[name='type']").click(function(){
-		$(this).val() == "1" ? $("#cpnamebox").show() : $("#cpnamebox").hide();
-	})
-	$("input[name='comname']").blur(function(){
-		!$(this).val() ? $(this).next(".msg").html("请输入企业名称") : $(this).next(".msg").html("");
-	});
-	*/
+  $("#cpnamebox").hide();
+  $("input[name='type']").click(function(){
+    $(this).val() == "1" ? $("#cpnamebox").show() : $("#cpnamebox").hide();
+  })
+  $("input[name='comname']").blur(function(){
+    !$(this).val() ? $(this).next(".msg").html("请输入企业名称") : $(this).next(".msg").html("");
+  });
+  */
 });
 -->
 </script>
@@ -177,7 +172,7 @@ Q.Ready(function(){
   <ul class="content-tab"> 
   <li class="beibao-tab">
     <a id="my-beibao" href="#" class="tab-title songti tabbtn" hidefocus="">
-	  <span class="tab-title-tag"></span>注册挖客
+    <span class="tab-title-tag"></span>注册挖客
     </a>  
   </li>
   <!--li class="settings-tab">
@@ -189,39 +184,36 @@ Q.Ready(function(){
   </ul> 
   <div class="cnthld-main clearfix">
     <div class="loadingtpl">LOADING...</div> 
-	<div class="col leftside"> 
-	  <div class="plzhld" data-fill="tab_content">
-	    <br><br>
-		<div class="regmain">
-			<!--div class="right">
-				<dl>
-					<dt>注册须知：</dt>
-					<dd>在本站注册的会员，必须遵守《互联网电子公告服务管理规定》，不得在本站发表诽谤他人，侵犯他人隐私，侵犯他人知识产权，传播病毒，政治言论，商业讯息等信息。</dd>
-					<dd>在所有在本站发布的图片资源，本站都具有最终编辑权，并且保留用于印刷或向第三方发表的权利，如果你的资料不齐全，我们将有权不作任何通知使用你在本站发布的作品。</dd>
-				</dl>	
-			</div-->
-			<div align="left" style="width: 500px; margin-left: 25px; font-size: 14px; line-height: 40px;">
-				<form name="form2" action="{$app:module}&action=do-register" method="post">
-				<input type="hidden" name="fmdo" value="user" />
-				<input type="hidden" name="dopost" value="regok" />
-				<div>
-					<p>
-						{$fields:resultmsg/}
-					</p>
-				</div>
-				</form>
-			</div>
-		</div>
-	  </div>
-	  <div class="leftside-shadow"></div> 
-	</div> 
+  <div class="col leftside"> 
+    <div class="plzhld" data-fill="tab_content">
+      <br><br>
+    <div class="regmain">
+      <!--div class="right">
+        <dl>
+          <dt>注册须知：</dt>
+          <dd>在本站注册的会员，必须遵守《互联网电子公告服务管理规定》，不得在本站发表诽谤他人，侵犯他人隐私，侵犯他人知识产权，传播病毒，政治言论，商业讯息等信息。</dd>
+          <dd>在所有在本站发布的图片资源，本站都具有最终编辑权，并且保留用于印刷或向第三方发表的权利，如果你的资料不齐全，我们将有权不作任何通知使用你在本站发布的作品。</dd>
+        </dl>  
+      </div-->
+      <div align="left" style="width: 500px; margin-left: 25px; font-size: 14px; line-height: 40px;">
+        <form name="form2" action="{$app:module}&action=do-register" method="post">
+        <input type="hidden" name="fmdo" value="user" />
+        <input type="hidden" name="dopost" value="regok" />
+        <div>
+          <p>
+            {$fields:resultmsg/}
+          </p>
+        </div>
+        </form>
+      </div>
+    </div>
+    </div>
+    <div class="leftside-shadow"></div> 
+  </div> 
   </div>
   </div> 
   </div> 
-  
-  <div id="foot"> <div class="mod-footer"> <div class="bottom-line2"> <p>© WAYIXIA.COM <em class="s-bottom-copyright">&nbsp;&nbsp;&nbsp;&nbsp;</em></p> </div></div> </div> </div> 
-
-  <a class="mod-go-top-btn" href="#" onclick="return false" style="display: none; position: fixed; bottom: 5px; right: 66.5px;"></a> 
+  {#template user.footer}  
 </div>
 
 </body>

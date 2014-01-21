@@ -6,11 +6,6 @@
 <!-- 使用QLib控件是必须包含样式表 -->
 <link rel="stylesheet" type="text/css" href="{$app:qlib/}/ui.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css">
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
 
 <style>
 #name, #email {
@@ -125,28 +120,23 @@ function alpha() {
   </li>
   </ul> 
   <div class="cnthld-main clearfix">
-    <div class="loadingtpl">LOADING...</div> 
   <div class="col leftside"> 
     <div class="plzhld" data-fill="tab_content">
-      <br><br>
+      <br>
     <div class="regmain">
-      <div class="right" style="display:none;;">
-        
-      </div>
       <div class="left" style="font-size:14px;">
-         <div id="forget-1" style="width:500px;margin-left:25px;">
+         <div id="forget-1" style="width:500px;margin-left:25px;line-height:40px;">
            <p>
-              用户名：<br><br>
+              用户名：<br>
               <input id="name" type=text value="{$fields:authkey/}" />
               <span class="msg" id="msg-username"></span>
            </p>
            <p>
-	   <br/>电子邮件：<br><br>
+	   电子邮件：<br>
             <input id="email" type=text value="{$fields:authkey/}" />
             <span class="msg" id="msg-password"></span></td>
           </p>
           <p>
-            <br/>
             <br/>
             <button id="get-pwd" class="uploadBtn small">找回密码</button>
             <br/><br/>
@@ -167,10 +157,8 @@ function alpha() {
   </div>
   </div> 
   </div> 
-  
-  <div id="foot"> <div class="mod-footer"> <div class="bottom-line2"> <p>© WAYIXIA.COM <em class="s-bottom-copyright">&nbsp;&nbsp;&nbsp;&nbsp;</em></p> </div></div> </div> </div> 
+   {#template user.footer}  
 
-  <a class="mod-go-top-btn" href="#" onclick="return false" style="display: none; position: fixed; bottom: 5px; right: 66.5px;"></a> 
 </div>
 
 </body>

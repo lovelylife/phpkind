@@ -21,45 +21,41 @@ import utils.xml;
 import utils.templates-1-0-1;
 import utils.json2;
 import utils.ajax;
-
 import ui.jtable;
-
 //-->
 </script>
 <script>
 <!--
 Q.Ready(function() {
+  Q.$("search-button").onclick=function() {
+    Q.Ajax({
+      command: '{$app:app}&mod=service&inajax=true&action=songurl&name='+Q.$('song-name').value,
+      data : {},
+      oncomplete : function(xmlhttp) {
+      Q.$("output-wnd").value = (xmlhttp.responseText);
+      }
+    });
+  }
 
-
-	Q.$("search-button").onclick=function() {
-		Q.Ajax({
-		  command: '{$app:app}&mod=service&inajax=true&action=songurl&name='+Q.$('song-name').value,
-		  data : {},
-		  oncomplete : function(xmlhttp) {
-			Q.$("output-wnd").value = (xmlhttp.responseText);
-		  }
-		});
-	}
-
-	Q.$('selector_artist').onchange = function() {
-		//http://localhost/phpkind/?app=cdmusic&mod=collector&inajax=true&action=artist
-		var id = this.options[this.selectedIndex].value;
-		Q.Ajax({
-		  command: '{$app:app}&mod=collector&inajax=true&action=artist&id='+id,
-		  data : {},
-		  oncomplete : function(xmlhttp) {
-		    try
-		    {
-				var result = eval('('+xmlhttp.responseText+')');
-				print_sql(id, result.data);
-		    }
-		    catch (e)
-		    {
-				alert(xmlhttp.responseText);
-		    }	
-		  }
-		});
-	}
+  Q.$('selector_artist').onchange = function() {
+    //http://localhost/phpkind/?app=cdmusic&mod=collector&inajax=true&action=artist
+    var id = this.options[this.selectedIndex].value;
+    Q.Ajax({
+      command: '{$app:app}&mod=collector&inajax=true&action=artist&id='+id,
+      data : {},
+      oncomplete : function(xmlhttp) {
+        try
+        {
+        var result = eval('('+xmlhttp.responseText+')');
+        print_sql(id, result.data);
+        }
+        catch (e)
+        {
+        alert(xmlhttp.responseText);
+        }  
+      }
+    });
+  }
 
 });
 
@@ -95,33 +91,33 @@ function implode (glue, pieces) {
 
 // 组合insert语句(insert into ##__$table(...) values(...);
 function insert_sql(table, fields, isPrefix) {
-	var setFields = [];
-	var setValues = [];
-	for(var name in fields) {
-		setFields.push(name);
-		setValues.push(fields[name]);
-	}
-	setFields = "`"+implode("`,`", setFields)+"`";
-	setValues = "'"+implode("','", setValues)+"'";
-		
-	var prefix = isPrefix ? "ch_" : "";
-		
-	$sql = "INSERT INTO `"+prefix+table+"` ("+setFields+") VALUES("+setValues+");";
-	return $sql;	
+  var setFields = [];
+  var setValues = [];
+  for(var name in fields) {
+    setFields.push(name);
+    setValues.push(fields[name]);
+  }
+  setFields = "`"+implode("`,`", setFields)+"`";
+  setValues = "'"+implode("','", setValues)+"'";
+    
+  var prefix = isPrefix ? "ch_" : "";
+    
+  $sql = "INSERT INTO `"+prefix+table+"` ("+setFields+") VALUES("+setValues+");";
+  return $sql;  
 }
 
 function print_sql(id, r) {
-	var output_string = '';
-	if(r instanceof Array) {
-		Q.$('artist-count').innerText=''+r.length+'位';
-		for(var i=0; i<r.length; i++) {
-			var fields = {artisttype: id, name:r[i]};
-			var sql = insert_sql('artist', fields, true);
-			output_string += sql+'\n';
-		}
+  var output_string = '';
+  if(r instanceof Array) {
+    Q.$('artist-count').innerText=''+r.length+'位';
+    for(var i=0; i<r.length; i++) {
+      var fields = {artisttype: id, name:r[i]};
+      var sql = insert_sql('artist', fields, true);
+      output_string += sql+'\n';
+    }
 
-		Q.$("output-wnd-sql").value = output_string;
-	}
+    Q.$("output-wnd-sql").value = output_string;
+  }
 }
 
 //-->
@@ -141,7 +137,7 @@ function print_sql(id, r) {
 -->
 
 <h3>艺术家列表:</h3>
-<html:table id="table_artist" datasrc="sql://select * from ##__artisttype" pagesize="4" cellspacing="3" border="1">
+<html:table id="table_artist" datasrc="sql://select * from ##__artist" pagesize="20" cellspacing="0" border="1" style="width:100%">
 <tr>
 <th width="100" align="left">Id</th>
 <th width="200" align="left"><a href="#" color="red">Name</a></th>
@@ -179,8 +175,8 @@ function print_sql(id, r) {
 <textarea id="output-wnd-sql" cols="100" rows="10"></textarea>
 
 <html:jtable id="my_jtable" 
-	datasrc="sql://select * from ##__artisttype"
-	wstyle="|WS_TITLEBAR"
+  datasrc="sql://select * from ##__artisttype"
+  wstyle="|WS_TITLEBAR"
 >
 <t:cols>
 <item fieldname="id" align="center">column 1 </item>

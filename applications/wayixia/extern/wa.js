@@ -158,7 +158,7 @@ function check_wa_image(img, api_cookie, callback) {
     {
 
     if(!err && res.statusCode == 200) {
-      //console.log("check image result:"+body);
+      console.log("check image result:"+body);
       var r = JSON.parse(decodeURIComponent(body));
       if(r.header !=0) {
         // web server api failed

@@ -28,7 +28,7 @@ $_PHPKIND_ENVS['_allowedApps'] = array(
   'collector',
   'command',
   'samples',
-  'xmlbook',
+  'cdmusic',
 );
 
 //! 默认应用程序

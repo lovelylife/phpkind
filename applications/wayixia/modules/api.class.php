@@ -102,7 +102,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
 
     $sql_c = "select I.id ";
     $sql_c .= "from ##__users_images I, ##__users_albums A ";
-    $sql_c .= "where (A.id=I.album_id or I.album_id=-{$uid}) and A.uid=$uid and (I.from_id={$pins_id} or I.id={$pins_id}) ";
+    $sql_c .= "where ((A.id=I.album_id and A.uid={$uid}) or I.album_id=-{$uid}) and (I.from_id={$pins_id} or I.id={$pins_id}) ";
     $sql_c .= "limit 0,1;";
     $check_row = $db->get_row($sql_c);
     if(!empty($check_row)) {
@@ -139,8 +139,8 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     // Ajax 数据
     $data = $_POST['data'];
     $image_src  = $data['src'];
-    $image_url = $data['url'];
-    $image_title   = $data['title'];
+    $image_url = htmlspecialchars($data['url']);
+    $image_title   = htmlspecialchars($data['title']);
     $album_id = intval($img['album_id'], 10);
     if($album_id <= 0) $album_id = -$uid;
     
@@ -156,7 +156,7 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       // 资源已经存在，检测来源网页是否重复
       $sql = "select I.id ";
       $sql.= "from ##__users_images I, ##__users_albums A ";
-      $sql.= "where (I.album_id = A.id or I.album_id=-{$uid}) and I.res_id={$res_id} and I.from_url='{$image_url}' and A.uid={$uid} ";
+      $sql.= "where ((I.album_id = A.id and A.uid={$uid}) or I.album_id=-{$uid}) and I.res_id={$res_id} and I.from_url='{$image_url}' ";
       $sql.= "limit 0,1;";
       $image = $db->get_row($sql);
       if(empty($image)) {

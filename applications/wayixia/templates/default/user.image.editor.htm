@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title> 编辑图片 - 我的背包 - wayixia.com</title>
+<title> 编辑图片 - wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
@@ -159,7 +159,7 @@ function check_width() {
       <br>
       <div style="padding-left:20px;padding-top:10px; line-height: 40px;">
         <div style="background:; width:425px; margin-right: 30px;height:400px;float: right; border: 1px solid #F1F1F1; text-align:center; line-height:400px;">
-          <img id="tweenimg" src="{$app:path}{$cfg:site.images_dir/}/{$fields:file_name}" onload="check_width()"/>
+          <img id="tweenimg" src="http://{$fields:server/}/{$fields:file_name/}" onload="check_width()"/>
         </div>
         <div style="margin-right:460px; width:600px;">
           <p> 所属分类：<br>

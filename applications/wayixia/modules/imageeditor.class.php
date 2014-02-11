@@ -31,7 +31,7 @@ class CLASS_MODULE_IMAGEEDITOR extends CLASS_MODULE {
     if($image_id == 0)
       trigger_error('invalid image id', E_USER_ERROR);
       
-    $sql_get_image = "select I.id AS id, R.file_name, R.width, R.height, I.from_host, I.title, I.album_id  ";
+    $sql_get_image = "select R.server, I.id AS id, R.file_name, R.width, R.height, I.from_host, I.title, I.album_id  ";
     $sql_get_image.= "from ##__images_resource R, ##__users_images I ";
     $sql_get_image.= "where R.id=I.res_id and I.id={$image_id} ";
     $sql_get_image.= "limit 0,1;";

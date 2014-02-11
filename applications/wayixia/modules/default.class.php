@@ -42,6 +42,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
       $sql = "select distinct(file_name), server, file_name, width, height, id, uname as owner, title ";
       $sql.= "from ##__nosql_pins group by file_name ";
       $sql.=" order by id DESC ";
+      
 
       $page_size = 50;
       $count_sql =  "select sum(size) totalsize from ";
@@ -53,7 +54,6 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
       } else {
         $totalsize = $count_row['totalsize'];
       }
-
       //print_r($count_row);
       $cfg = array(
         "totalsize" => $totalsize,

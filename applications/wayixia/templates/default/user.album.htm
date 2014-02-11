@@ -194,13 +194,13 @@ function move_pictures(pics) {
 }
 
 Q.Ready(function() {
-	Q.$('my-beibao').onclick=function() {
-	  Q.$('cnthld').className = 'beibao';
-	}
+  Q.$('my-beibao').onclick=function() {
+    Q.$('cnthld').className = 'beibao';
+  }
 
-	Q.$('my-settings').onclick=function() {
-	  Q.$('cnthld').className = 'settings';
-	}
+  Q.$('my-settings').onclick=function() {
+    Q.$('cnthld').className = 'settings';
+  }
 
   Q.$('button_bat_mode').onclick=function() {
     hide_button(this);
@@ -275,10 +275,10 @@ var g_selected_count = 0;
 
 Q.Ready(function(){
   g_waterfall = new Waterfall({
-	"container":"wf-main",
-	"colWidth":238,
-	"colCount":4,
-	"template":Q.$('wf-template').value,
+  "container":"wf-main",
+  "colWidth":238,
+  "colCount":4,
+  "template":Q.$('wf-template').value,
   "mouseover": function(e) {
       if(Q.$('wf-main').className != 'wf-main bat-mode') {
         return;
@@ -324,14 +324,14 @@ Q.Ready(function(){
 <div id="wrapper" class="skin01" style="margin-top: 40px;"> 
 <div class="bground"> 
   <!--div id="head"> 
-	{#template user.infoheader}
+  {#template user.infoheader}
   </div--> 
   <div id="content">  
   <div id="cnthld" class="beibao" style="display: block;"> 
   <ul class="content-tab"> 
   <li class="beibao-tab">
     <a id="my-beibao" href="{$app:module}&id={$get:id}" class="tab-title songti tabbtn" hidefocus="">
-	  <span class="tab-title-tag">查看</span>内容
+    <span class="tab-title-tag">查看</span>内容
     </a>  
   </li>
   <li class="settings-tab">
@@ -360,13 +360,13 @@ Q.Ready(function(){
         </div>
       </div>
       <br><br><br><br>
-	  </div> 
-	
-	  <div class="leftside-shadow"></div> 
-	</div> 
-	<!--div class="col rightside"> 
-	  <div class="plzhld p1" data-fill="friend_content"></div> 
-	</div--> 
+    </div> 
+  
+    <div class="leftside-shadow"></div> 
+  </div> 
+  <!--div class="col rightside"> 
+    <div class="plzhld p1" data-fill="friend_content"></div> 
+  </div--> 
   </div>
   </div> 
   </div> 
@@ -380,7 +380,7 @@ Q.Ready(function(){
     <div class="right">
       <a href="" onclick="return false;" class="like btn btn11 wbtn">
          <strong><em></em>赞</strong><span></span>
-	  </a>
+    </a>
     </div>
     <div class="left">
       <a title="快速转采" href="" onclick="return false;" class="thunderpin btn btn11 wbtn">
@@ -391,9 +391,9 @@ Q.Ready(function(){
       </a>
     </div>
   </div>
-	<a href="http://[[server]]/[[file_name]]" class="lightwindow img x" rel="/\\:;*?<>'”|®™©&#[Sushi]" title="图片查看" caption="[[title]]" author="yourself">
-		<img src="http://[[server]]/thumb/[[file_name]]" width=[[width]] height=[[height]] alt="">
-	</a>
+  <a href="http://[[server]]/[[file_name]]" class="lightwindow img x" rel="/\\:;*?<>'”|®™©&#[Sushi]" title="图片查看" caption="[[title]]" author="yourself">
+    <img src="http://[[server]]/thumb/[[file_name]]" width=[[width]] height=[[height]] alt="">
+  </a>
   <p class="description">&nbsp;<!--[[title]]{$app:app}&mod=imageeditor&action=edit&id=[[id]]--></p>
   <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
   <div 

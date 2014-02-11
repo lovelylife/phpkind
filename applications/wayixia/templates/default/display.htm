@@ -65,44 +65,63 @@ function check_image_width(img) {
 var tree_items = ['tree_album', 'tree_domain'];
 var tree_selected = null;
 Q.Ready(function() {
-tree_selected = Q.$('tree_album');
-for(var i=0; i < tree_items.length; i++) {
-  var e = Q.$(tree_items[i]);
-  if(e) {
-    e.onclick = function(evt) {
-      for(var i=0; i < tree_items.length; i++) {
-        if(Q.$(tree_items[i]) == this) {
-          if(tree_selected == this) {
-            tree_selected = null;
+  tree_selected = Q.$('tree_album');
+  for(var i=0; i < tree_items.length; i++) {
+    var e = Q.$(tree_items[i]);
+    if(e) {
+      e.onclick = function(evt) {
+        for(var i=0; i < tree_items.length; i++) {
+          if(Q.$(tree_items[i]) == this) {
+            if(tree_selected == this) {
+              tree_selected = null;
+              Q.$(tree_items[i]+'_content').style.display='none';
+              Q.$(tree_items[i]).className='seg-title normalitem'
+            } else {
+              Q.$(tree_items[i]+'_content').style.display = 'block';
+              this.style.backgroundColor='#FFF';
+              tree_selected = this;
+              this.className='seg-title selectitem'
+            }           
+          } else {
             Q.$(tree_items[i]+'_content').style.display='none';
             Q.$(tree_items[i]).className='seg-title normalitem'
-          } else {
-            Q.$(tree_items[i]+'_content').style.display = 'block';
-            this.style.backgroundColor='#FFF';
-            tree_selected = this;
-            this.className='seg-title selectitem'
-          }          
-        } else {
-          Q.$(tree_items[i]+'_content').style.display='none';
-          Q.$(tree_items[i]).className='seg-title normalitem'
+          }
         }
       }
-    }
 
-    e.onmouseover=function(evt){      
-      if(tree_selected != this) {
-        this.style.backgroundColor='#F8F8F8';
-      }
-    }
-
-    e.onmouseout=function(evt) {
-      if(tree_selected != this) {
-        this.style.backgroundColor='#FFF';
+      e.onmouseover=function(evt){      
+        if(tree_selected != this) {
+          this.style.backgroundColor='#F8F8F8';
+        }
       }
 
+      e.onmouseout=function(evt) {
+        if(tree_selected != this) {
+          this.style.backgroundColor='#FFF';
+        }
+
+      }
     }
   }
-}
+
+  Q.$('btn-wa').onclick = function() {
+    Q.Ajax({
+      command: '{$app:app}&mod=api&inajax=true&action=wayixia&id='+{$fields:id},
+      oncomplete: function(xmlhttp) {
+        var resp = Q.json_decode(xmlhttp.responseText);
+        if(resp.header == 0) {
+          alert('恭喜您，成功地挖到了一张美图哦!');  
+        } else if(resp.header == -2) {
+          gotologin('http://wayixia.com/index.php?app=wayixia&mod=user&action=login');
+        } else {
+          alert('error code: ' + resp.header + '\nmessage: ' + resp.data);
+        }
+      },
+      onerror: function(xmlhttp) {
+        alert(xmlhttp.responseText); 
+      }
+    }); 
+  }
 
 });
 
@@ -161,7 +180,7 @@ for(var i=0; i < tree_items.length; i++) {
           <div style="position:absolute; right:8px; top:8px;opacity: 0.8;">
             <div class="btn-group time-limit">
               <a href="http://{$fields:server/}/{$fields:file_name/}" class="lightwindow btn btn-default" rel="/\\:;*?&lt;&gt;'”|®™©&amp;#[Sushi]" title="图片查看" caption="{$fields:title}" id="btn-view" author="{$fields:nickname}">看大图</a>
-	      <a href="#" class="btn btn-default" style="background: #FFF url({$themes:path}/btn-wa-normal.png) center center no-repeat;" id="btn-wa" onclick="wayixia({$fields:id})" title="挖一下">&nbsp;&nbsp;</a>
+	      <a href="#" class="btn btn-default" style="background: #FFF url({$themes:path}/btn-wa-normal.png) center center no-repeat;" id="btn-wa" title="挖一下">&nbsp;&nbsp;</a>
             </div>
         
           </div>

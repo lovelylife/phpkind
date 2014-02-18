@@ -14,52 +14,63 @@ background: #000;
 color: #cccccc;
 }
 
+
+#mydata2 {
+  background: #333; 
+  color:#414141; 
+  font-size: 13px;
+}
+
+#mydata2 td {
+  background: #FFF;
+}
+
 /*CSS page style pagination*/
 
 DIV.pager {
-	PADDING-RIGHT: 0px; 
-	PADDING-LEFT: 0px; 
-	FONT-SIZE: 15px; 
-	PADDING-BOTTOM: 10px; 
-	COLOR: #48b9ef; 
-	PADDING-TOP: 10px; 
-	FONT-FAMILY: Arial, Helvetica, sans-serif; 
-	BACKGROUND-COLOR: #fff; 
-	TEXT-ALIGN: left;
-	text-indent:5px;
+  PADDING-RIGHT: 0px; 
+  PADDING-LEFT: 0px; 
+  FONT-SIZE: 15px; 
+  PADDING-BOTTOM: 10px; 
+  COLOR: #48b9ef; 
+  PADDING-TOP: 10px; 
+  FONT-FAMILY: Arial, Helvetica, sans-serif; 
+  BACKGROUND-COLOR: #fff; 
+  TEXT-ALIGN: left;
+  text-indent:5px;
 }
 
 DIV.pager A {
-	BORDER: #f0f0f0 2px solid;
-	PADDING-TOP: 8px; 
-	PADDING-RIGHT: 12px; 
-	PADDING-BOTTOM: 8px; 
-	PADDING-LEFT: 12px; 
-	MARGIN: 0px 2px; 
-	COLOR: #48b9ef; 		
-	TEXT-DECORATION: none
+  BORDER: #f0f0f0 2px solid;
+  PADDING-TOP: 8px; 
+  PADDING-RIGHT: 12px; 
+  PADDING-BOTTOM: 8px; 
+  PADDING-LEFT: 12px; 
+  MARGIN: 0px 2px; 
+  COLOR: #48b9ef;     
+  TEXT-DECORATION: none
 }
 
 DIV.pager A:hover {
-	BORDER: #ff5a00 2px solid; COLOR: #ff5a00;
+  BORDER: #ff5a00 2px solid; COLOR: #ff5a00;
 }
 DIV.pager A:active {
-	BORDER: #ff5a00 2px solid; COLOR: #ff5a00;
+  BORDER: #ff5a00 2px solid; COLOR: #ff5a00;
 }
 DIV.pager SPAN.current {
-	PADDING-TOP: 8px; 
-	PADDING-RIGHT: 12px; 
-	PADDING-BOTTOM: 8px; 
-	PADDING-LEFT: 12px; 
-	MARGIN: 0px 2px 0px 0px;
-	BORDER: #ff5a00 2px solid; 
-	BACKGROUND-COLOR: #ff6c16;
-	
-	COLOR: #fff;  
+  PADDING-TOP: 8px; 
+  PADDING-RIGHT: 12px; 
+  PADDING-BOTTOM: 8px; 
+  PADDING-LEFT: 12px; 
+  MARGIN: 0px 2px 0px 0px;
+  BORDER: #ff5a00 2px solid; 
+  BACKGROUND-COLOR: #ff6c16;
+  
+  COLOR: #fff;  
 }
 
 DIV.pager SPAN.disabled {
-	DISPLAY: none
+  DISPLAY: none
 }
 
 
@@ -79,147 +90,147 @@ import ui.wndx-1-0-2;
 <script>
 <!--
 
-var SELECTNONE		= 0;
-var SELECTALL 		= 1;
-var SELECTREVERSE	= 2;
+var SELECTNONE    = 0;
+var SELECTALL     = 1;
+var SELECTREVERSE  = 2;
 
 function doSelectItem(type){
-	var f=Q.$('form1');
-	var cids = [];
-	var nodelist = f["task_id[]"];
-	if(type == SELECTREVERSE) {
-		for(var i=0; i < nodelist.length; i++ ) {
-			nodelist[i].checked = !nodelist[i].checked;
-		}
-	} else {
-		var value = (type == SELECTALL) ? true : false;
-		for(var i=0; i < nodelist.length; i++ ) {
-			nodelist[i].checked = value;
-		}
-	}
+  var f=Q.$('form1');
+  var cids = [];
+  var nodelist = f["task_id[]"];
+  if(type == SELECTREVERSE) {
+    for(var i=0; i < nodelist.length; i++ ) {
+      nodelist[i].checked = !nodelist[i].checked;
+    }
+  } else {
+    var value = (type == SELECTALL) ? true : false;
+    for(var i=0; i < nodelist.length; i++ ) {
+      nodelist[i].checked = value;
+    }
+  }
 }
 
 
-function get_zol_url(p) {	
-	return 'http://desk.zol.com.cn/meinv/'+p+'.html';
+function get_zol_url(p) {  
+  return 'http://desk.zol.com.cn/meinv/'+p+'.html';
 }
 
 function zol_task_update() {
 
-	var end = 13;
-	var begin=0;
-	get_content(get_zol_url(begin++), function(jsondata) {
-		Q.$('debug').innerText += "正在更新第"+begin+"页(发现"+jsondata+"个画集)\n";
-		if(begin < end) {
-			get_content(get_zol_url(begin++), arguments.callee);
-		} else {
-			alert('更新成功');
-			location.reload();
-		}	
-	})
+  var end = 13;
+  var begin=0;
+  get_content(get_zol_url(begin++), function(jsondata) {
+    Q.$('debug').innerText += "正在更新第"+begin+"页(发现"+jsondata+"个画集)\n";
+    if(begin < end) {
+      get_content(get_zol_url(begin++), arguments.callee);
+    } else {
+      alert('更新成功');
+      //location.reload();
+    }  
+  })
 }
 
 function get_content(url, onok) {
-	Q.Ajax({
-		command: '{$app:module}&action=getlist&inajax=true',
-		data: {url: url},
-		oncomplete: function(xmlhttp) {
-			try
-			{
-				var resp =  Q.json_decode(xmlhttp.responseText);
-				// Q.$('debug').innerHTML = (xmlhttp.responseText);
-				if(resp.header==0) {
-					onok(resp.data);
-				} else {
-					throw resp.header;
-				}
-			}
-			catch (e)
-			{
-				alert(e);
-				Q.$('debug').innerHTML = (xmlhttp.responseText);
-			}			
-		},
-		onerror: function(xmlhttp) {
-			
-		}
-	});
+  Q.Ajax({
+    command: '{$app:module}&action=getlist&inajax=true',
+    data: {url: url},
+    oncomplete: function(xmlhttp) {
+      try
+      {
+        var resp =  Q.json_decode(xmlhttp.responseText);
+        // Q.$('debug').innerHTML = (xmlhttp.responseText);
+        if(resp.header==0) {
+          onok(resp.data);
+        } else {
+          throw resp.header;
+        }
+      }
+      catch (e)
+      {
+        alert(e);
+        Q.$('debug').innerHTML = (xmlhttp.responseText);
+      }      
+    },
+    onerror: function(xmlhttp) {
+      
+    }
+  });
 }
 
 function zol_image_list(urls, onget, oncompleted) { 
-	get_image_list(urls, function(u, jsondata) {
+  get_image_list(urls, function(u, jsondata) {
     onget(u, jsondata);
-		if(urls.length > 0) {
-			get_image_list(urls, arguments.callee);
-		} else {
-			oncompleted();
-		}	
-	})
+    if(urls.length > 0) {
+      get_image_list(urls, arguments.callee);
+    } else {
+      oncompleted();
+    }  
+  })
 }
 
 function get_image_list(urls, onok) {
   var url = urls.pop();
-	Q.Ajax({
-		command: '{$app:module}&action=get-zol-images-list&inajax=true',
-		data: {url: url},
-		oncomplete: function(xmlhttp) {
-			try
-			{
-				var resp =  Q.json_decode(xmlhttp.responseText);
-				if(resp.header==0) {
-					onok(url, resp.data);
-				} else {
-					throw resp.header;
-				}
-			}
-			catch (e)
-			{
-				alert(e);
-				Q.$('debug').innerHTML = (xmlhttp.responseText);
-			}			
-		},
-		onerror: function(xmlhttp) {
-			
-		}
-	});
+  Q.Ajax({
+    command: '{$app:module}&action=get-zol-images-list&inajax=true',
+    data: {url: url},
+    oncomplete: function(xmlhttp) {
+      try
+      {
+        var resp =  Q.json_decode(xmlhttp.responseText);
+        if(resp.header==0) {
+          onok(url, resp.data);
+        } else {
+          throw resp.header;
+        }
+      }
+      catch (e)
+      {
+        alert(e);
+        Q.$('debug').innerHTML = (xmlhttp.responseText);
+      }      
+    },
+    onerror: function(xmlhttp) {
+      
+    }
+  });
 }
 
 function task_get_images(tasks, onget, oncompleted) {
-	get_images(tasks, function(u, jsondata) {
+  get_images(tasks, function(u, jsondata) {
     onget(u, jsondata);
-		if(tasks.length > 0) {
-			get_images(tasks, arguments.callee);
-		} else {
-			oncompleted();
-		}	
-	})
+    if(tasks.length > 0) {
+      get_images(tasks, arguments.callee);
+    } else {
+      oncompleted();
+    }  
+  })
 }
 
 function get_images(tasks, onok) {
   var task = tasks.pop();
-	Q.Ajax({
-		command: '{$app:module}&action=get-image-url&inajax=true',
-		data: {urls: task.data, from_url: task.name},
-		oncomplete: function(xmlhttp) {
-			try
-			{
-				var resp =  Q.json_decode(xmlhttp.responseText);
-				if(resp.header==0) {
-					onok(task.name, resp.data);
-				} else {
-					throw resp.header;
-				}
-			}
-			catch (e)
-			{
-				alert(e);
-				Q.$('debug').innerHTML = (xmlhttp.responseText);
-			}			
-		},
-		onerror: function(xmlhttp) {
-			
-		}
-	});
+  Q.Ajax({
+    command: '{$app:module}&action=get-image-url&inajax=true',
+    data: {urls: task.data, from_url: task.name},
+    oncomplete: function(xmlhttp) {
+      try
+      {
+        var resp =  Q.json_decode(xmlhttp.responseText);
+        if(resp.header==0) {
+          onok(task.name, resp.data);
+        } else {
+          throw resp.header;
+        }
+      }
+      catch (e)
+      {
+        alert(e);
+        Q.$('debug').innerHTML = (xmlhttp.responseText);
+      }      
+    },
+    onerror: function(xmlhttp) {
+      
+    }
+  });
 }
 
 
@@ -227,29 +238,29 @@ function get_images(tasks, onok) {
 
 function public_album(tasks, onok) {
   var task = tasks.pop();
-	Q.Ajax({
-		command: '{$app:app}&mod=public&action=public-album&inajax=true',
-		data: {task: task},
-		oncomplete: function(xmlhttp) {
-			try
-			{
-				var resp =  Q.json_decode(xmlhttp.responseText);
-				if(resp.header==0) {
-					onok(task.name, resp);
-				} else {
-					throw resp.header;
-				}
-			}
-			catch (e)
-			{
-				alert(e);
-				Q.$('debug').innerHTML = (xmlhttp.responseText);
-			}			
-		},
-		onerror: function(xmlhttp) {
-			
-		}
-	});
+  Q.Ajax({
+    command: '{$app:app}&mod=public&action=public-album&inajax=true',
+    data: {task: task},
+    oncomplete: function(xmlhttp) {
+      try
+      {
+        var resp =  Q.json_decode(xmlhttp.responseText);
+        if(resp.header==0) {
+          onok(task.name, resp);
+        } else {
+          throw resp.header;
+        }
+      }
+      catch (e)
+      {
+        alert(e);
+        Q.$('debug').innerHTML = (xmlhttp.responseText);
+      }      
+    },
+    onerror: function(xmlhttp) {
+      
+    }
+  });
 }
 
 var g_album_tasks = [];
@@ -260,8 +271,8 @@ Q.setdebug(Q.$('debug'));
 Q.debug(true);
 
 Q.$('update-list').onclick = function() {
-	zol_task_update();
-	return false;
+  zol_task_update();
+  return false;
 }
 
 Q.$("form1").onsubmit = function() {
@@ -277,28 +288,16 @@ Q.$('button-collect').onclick=function()
   var urls = [];
   for(var i=0; i < len; i++ ) {
     if(items[i].checked)
-  	  urls.push(items_url[i].value);
+      urls.push(items_url[i].value);
   }
-/*
-  task_execute({
-    'api' : '{$app:app}&mod=public&action=public-album&inajax=true',
-    'tasks' : g_album_tasks,
-    'task_onok' : function(task, response) {
-      Q.$('debug').innerText += "从"+u+"采集到"+data.length+"条记录\n";
-    },
-    'oncompleted' : function() {
-    
-    }
-  });
-
- */
+  
   zol_image_list(urls, function(u, data) {
     g_album_tasks.push({name: u, data: data});
     Q.printf("从"+u+"采集到"+data.length+"条记录\n");
   }, 
   function() { 
-	  console.log(g_album_tasks); 
-	  Q.printf('completed!\n');
+    console.log(g_album_tasks); 
+    Q.printf('completed!\n');
     Q.printf('-------------------------------\nstart get image!\n');
     task_get_images(g_album_tasks, 
       function(u, data) {
@@ -374,15 +373,14 @@ desk.zol.com.cn 画集列表列表
 </h5>
 <form id="form1">
 <html:table 
-	id="mydata2" 
-	datasrc="sql://select * from ch_album_urls order by t desc" 
-	pagesize="15"
-	cellpadding="3" 
-	cellspacing="1"
-	style="background: #333; width: 800px; color:414141; font-size: 13px;"
-	valueSelected="key:value"
+  id="mydata2" 
+  datasrc="sql://select * from ch_album_urls order by t desc" 
+  pagesize="15"
+  cellpadding="3" 
+  cellspacing="1"
+  valueSelected="key:value"
 >
-<thead style="background:red; color:white;">
+<thead style="background:#000; color:white;">
 <th width="50" align="left"><input id="idCheckAll" type=checkbox></th>
 <th width="200" align="left">title/album</th>
 <th width="400" align="left">url</th>
@@ -393,30 +391,30 @@ onmouseover="this.style.backgroundColor='#FFFF00';"
 onmouseout="this.style.backgroundColor='';"
 >
 <td width="50" align="left">
-	<input name="from_url[]" type="hidden" value="[field:from_url]">
-	<input name="task_id[]" type="checkbox" value="[field:id]">
+  <input name="from_url[]" type="hidden" value="[field:from_url]">
+  <input name="task_id[]" type="checkbox" value="[field:id]">
 </td>
 <td>
-	<input name="title[]" type="hidden" value="[field:title]">
-	[field:title]
-	<!--br/><img src="[field:album_url]" /-->
+  <input name="title[]" type="hidden" value="[field:title]">
+  [field:title]
+  <!--br/><img src="[field:album_url]" /-->
 </td>
 <td><a href="{$app:app}&mod=public&id=[field:id]">[field:from_url]</a></td>
 </tr>
 </t:data>
 
 <tr style="background:white">
-	<td width="100">
-		<button id="button-collect">采集</button>
-		<button id="button-prepublic">预发布</button>
-	</td>
-	<td width="700" colspan=2 align="left">
-		<div class="pager">
-		<t:pager>
-		[[field:index]]
-		</t:pager>
-		</div>
-	</td>
+  <td width="100">
+    <button id="button-collect">采集</button>
+    <button id="button-prepublic">预发布</button>
+  </td>
+  <td width="700" colspan=2 align="left">
+    <div class="pager">
+    <t:pager>
+    [[field:index]]
+    </t:pager>
+    </div>
+  </td>
 </tr>
 </html:table>
 </form>

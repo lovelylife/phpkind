@@ -60,12 +60,16 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     function getlist() {
       $data = &$_POST['data'];
       $url = $data['url'];
+      // 获取采集地址的内容
       $content = gbk2utf($this->getfile($url));
+      // 提取图集的正则表达式
       $pattern = <<<STR
-/<a class="pic" href="([^\"]*?)" target="_blank" hidefocus="true"><img alt="" src="([^\"]*?)" width="208px" height="130px" title = "([^\"]*?)"\/>/
+/<a class="pic" href="([^"]*?)" target="_blank" hidefocus="true"><img width="208px" height="130px"\s+alt="[^"]*?" src="([^"]*?)" title = "([^"]*?)"\/>/
 STR;
       $a = parse_url($url);
       preg_match_all($pattern, $content, $matches);
+      
+      // 写入待采集画集列表数据,
       $db = $this->App()->db();
       $len = count($matches[0]);
       for($i=0; $i < $len; $i++ ) {
@@ -87,8 +91,8 @@ STR;
       $this->AjaxData($len);
     }
 
-	function get_zol_images_list() {
-	  $data = &$_POST['data'];
+  function get_zol_images_list() {
+    $data = &$_POST['data'];
       $url = $data['url'];
       $content = gbk2utf($this->getfile($url));
       $pattern = <<<STR
@@ -98,8 +102,8 @@ STR;
       preg_match_all($pattern, $content, $matches);
       
       $db = $this->App()->db();
-	  $len = count($matches[0]);
-	  $arr = array();
+    $len = count($matches[0]);
+    $arr = array();
       for($i=0; $i < $len; $i++ ) {
         $from_url = $a['scheme']."://".$a['host'].$matches[1][$i];
         $fields = array(
@@ -107,14 +111,14 @@ STR;
         );
         array_push($arr, $from_url);
       }
-	  $s = json_encode($arr);
-	  $this->AjaxData($arr);
-	}
+    $s = json_encode($arr);
+    $this->AjaxData($arr);
+  }
 
-	function get_image_url(){
+  function get_image_url(){
     $db = $this->App()->db();
-	  $data = &$_POST['data'];
-	  $urls = $data['urls'];
+    $data = &$_POST['data'];
+    $urls = $data['urls'];
     $from_url = $data['from_url'];
     $task_id = $this->get_task_id($from_url);
     if($task_id <= 0) {
@@ -123,24 +127,24 @@ STR;
     }
 
     $result = array();
-	  for($i=0; $i<count($urls); $i++) {
-		  $content = gbk2utf($this->getfile($urls[$i]));
-		  $pattern = <<<STR
+    for($i=0; $i<count($urls); $i++) {
+      $content = gbk2utf($this->getfile($urls[$i]));
+      $pattern = <<<STR
 /<img id="bigImg" src="([^\"]+?)" srcs="[^\"]+?" width="960" height="600" alt="">/
 STR;
-		  preg_match_all($pattern, $content, $matches);
-		  $src = $matches[1][0];
+      preg_match_all($pattern, $content, $matches);
+      $src = $matches[1][0];
 
       $pattern3 = <<<STR2
 /<dd id="tagfbl">\s*<a target="_blank" id="([^\"]+?)" href="([^\"]+?)">\\1<\/a>/
 STR2;
-		  preg_match_all($pattern3, $content, $matches2);
+      preg_match_all($pattern3, $content, $matches2);
       //print_r($matches2);
-		  $src = str_replace("960x600", $matches2[1][0], $src);
+      $src = str_replace("960x600", $matches2[1][0], $src);
       $a = parse_url($urls[$i]);
       $from = $a['scheme']."://".$a['host'].$matches2[2][0];
 
-		  $pattern2 = <<<STR
+      $pattern2 = <<<STR
 /<title>(.*)<\/title>/
 STR;
       // title
@@ -160,10 +164,10 @@ STR;
       }
 
       array_push($result, $fields);
-	  }
+    }
 
-	  $this->AjaxData($result);
-	}
+    $this->AjaxData($result);
+  }
 
   function get_task_id($url) {
     $db = $this->App()->db();
@@ -189,49 +193,49 @@ STR;
   }
 
   function getfile($url){
-		$content = file_get_contents($url);
-		if(FALSE == $content){
-			if (function_exists('curl_init')) {
-				$curl = curl_init();
-				curl_setopt($curl, CURLOPT_URL, $url);
-				curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; U; Linux i686; zh-CN; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 GTB5');
-				curl_setopt($curl, CURLOPT_HEADER, 0);
-				curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-				$tmpInfo = curl_exec($curl);
-				curl_close($curl);
-				if(FALSE !== stristr($tmpInfo,"HTTP/1.1 200 OK")){ //正确返回数据
-					return $tmpInfo;
-				}else{
-					return FALSE;
-				}
-			}else{
-				// Non-CURL based version...
-				 /*
-				  $context =
-					array('http' =>
-						  array('method' => 'GET',
-								'header' => 'Content-type: application/x-www-form-urlencoded'."\r\n".
-											'User-Agent: Mozilla/5.0 (X11; U; Linux i686; zh-CN; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 GTB5'."\r\n".
-											'Content-length: 0'),
-								'content' => ""));
-				  $contextid=stream_context_create($context);
-				  $sock=fopen($url, 'r', false, $contextid);
-				  if ($sock) {
-					$tmpInfo='';
-					while (!feof($sock))
-					  $tmpInfo.=fgets($sock, 4096);
+    $content = file_get_contents($url);
+    if(FALSE == $content){
+      if (function_exists('curl_init')) {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; U; Linux i686; zh-CN; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 GTB5');
+        curl_setopt($curl, CURLOPT_HEADER, 0);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $tmpInfo = curl_exec($curl);
+        curl_close($curl);
+        if(FALSE !== stristr($tmpInfo,"HTTP/1.1 200 OK")){ //正确返回数据
+          return $tmpInfo;
+        }else{
+          return FALSE;
+        }
+      }else{
+        // Non-CURL based version...
+         /*
+          $context =
+          array('http' =>
+              array('method' => 'GET',
+                'header' => 'Content-type: application/x-www-form-urlencoded'."\r\n".
+                      'User-Agent: Mozilla/5.0 (X11; U; Linux i686; zh-CN; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 GTB5'."\r\n".
+                      'Content-length: 0'),
+                'content' => ""));
+          $contextid=stream_context_create($context);
+          $sock=fopen($url, 'r', false, $contextid);
+          if ($sock) {
+          $tmpInfo='';
+          while (!feof($sock))
+            $tmpInfo.=fgets($sock, 4096);
 
-					fclose($sock);
-					return $tmpInfo;
-				  }else{
-					return FALSE;
-				  }*/
-				  return false;
-			}
-		}else{
-			return $content;
-		}
-	}
+          fclose($sock);
+          return $tmpInfo;
+          }else{
+          return FALSE;
+          }*/
+          return false;
+      }
+    }else{
+      return $content;
+    }
+  }
 }
 
 ?>

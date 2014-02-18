@@ -47,28 +47,31 @@ class CLASS_MODULE_PUBLIC extends CLASS_MODULE {
 
     function index() {
       try {
-				$db = $this->App()->db();
-				// get public data
-				$id = $_GET['id'];
-				$sql = "select I.imgSrc, I.pageUrl, I.title, A.public_id as album_id from ##__prepublic_images AS I left join ##__album_urls AS A on A.id=I.task_id ";
-				$page_size = 15;
-				$totalsize = $db ->query_count($sql);
+        $db = $this->App()->db();
+        // get public data
+        $id = $_GET['id'];
+	$sql = "select I.imgSrc, I.pageUrl, I.title, A.public_id as album_id ";
+	$sql.= "from ##__prepublic_images AS I ";
+	$sql.= "left join ##__album_urls AS A ";
+	$sql.= "on A.id=I.task_id ";
+        $page_size = 15;
+        $totalsize = $db ->query_count($sql);
         
-				$cfg = array(
-					"totalsize" => $totalsize,
-					"pagesize" => $page_size,
-					"pagekey" => "p",
-				);
+        $cfg = array(
+          "totalsize" => $totalsize,
+          "pagesize" => $page_size,
+          "pagekey" => "p",
+        );
 
         // 实例化分页类,初始化构造函数中的总条目数和每页显示条目数
-				$pager = new CLASS_PAGE($cfg);
-				$sql .= $pager->getSQLPage();
+        $pager = new CLASS_PAGE($cfg);
+        $sql .= $pager->getSQLPage();
         $rs = array();
-				$db->get_results($sql, $rs);
+        $db->get_results($sql, $rs);
 
-				$t = new CLASS_TEMPLATES($this->App());
-				$t->push_data('publicdata', $rs);
-				$t->push('pager', $pager->__toString());
+        $t = new CLASS_TEMPLATES($this->App());
+        $t->push_data('publicdata', $rs);
+        $t->push('pager', $pager->__toString());
 
         $t->render('public');
       } catch(Exception $e) {

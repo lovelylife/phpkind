@@ -12,11 +12,13 @@
         </a>
       </li>
 <?php 
+    $url = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] ;
+    $url = urlencode($url) ;
     $name = $theApp->get_user_info('name');
     if(empty($name)) {
 ?>  
       <li class="nav_item" style="float:right;"><a href="{$app:app}&mod=user&action=register">注册</a></li>
-      <li class="nav_item" style="float:right;"><a href="{$app:app}&mod=user&action=regular-login" >登录</a></li>
+      <li class="nav_item" style="float:right;"><a href="{$app:app}&mod=user&action=regular-login&refer=<?php echo $url; ?>" >登录</a></li>
 <?php
     } else {
 ?>

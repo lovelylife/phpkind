@@ -59,12 +59,12 @@ class CLASS_MODULE {
     
   // 多态接口，用于处理普通表单的提交的请求
   function doMain($action) {
-    trigger_error('ui mode: action"'.$action.'" is not supported .', E_USER_ERROR);
+    trigger_error('ui mode: action "'.$action.'" is not supported .', E_USER_ERROR);
   }
 
   // 默认提示
   function doAjax($action) {
-    $this->errmsg('ajax mode: action"'.$action.'" is not supported. ');
+    $this->errmsg('ajax mode: action "'.$action.'" is not supported. ');
   }
  
   // Ajax Header Set

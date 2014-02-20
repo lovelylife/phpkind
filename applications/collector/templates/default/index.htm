@@ -6,6 +6,8 @@
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib}/ui.css" />
 <style>
+
+
 #screen {
 width:100%;
 height: 600px;
@@ -16,14 +18,66 @@ color: #cccccc;
 
 
 #mydata2 {
-  background: #333; 
+  border:1px solid #999;    
+  width: 100%; 
+  background: #FFF; 
   color:#414141; 
   font-size: 13px;
 }
 
-#mydata2 td {
-  background: #FFF;
+#mydata2 a {
+  color: #666;
+  text-decoration: none;
 }
+
+#mydata2 a:hover {
+  color: #000;
+}
+
+/* Grid css style	//border-collapse:collapse; */
+
+.clsGrid {
+	width: 98%;
+	border-top: 1px solid #FFF;
+	border-left: 0px solid #CCC;
+	collapse:separate;    
+	*border-spacing:expression(this.cellSpacing="0px");
+	border-spacing: 0px;
+}
+
+.clsGrid td {
+	padding: 4px;
+/*	background: white; */
+	border: 1px solid #EEE;
+	border-top: 0px solid #CCC;
+	border-left: 0px solid #CCC;
+	border-right: 0px solid #CCC;
+	font-size: 13px;
+}
+
+.clsGrid td.highlight {
+	padding: 4px;
+	background: #E9F2FB;
+
+}
+
+.clsGrid th {
+	padding: 4px;
+	background: #EEE url(th.gif) repeat-x bottom left;
+	color: #777;/*#07519A;EAF3FD*/
+	border-RIGHT: #DDD 1px solid;  
+	BORDER-TOP: #fff 0px solid; 
+	BORDER-LEFT: #FFF 1px solid;
+	BORDER-BOTTOM: #CCC 1px solid;
+	OVERFLOW: hidden; 
+	text-align: left;
+	WHITE-SPACE: nowrap;
+	font-weight: normal;
+	vertical-align: middle;
+	height: 20px;
+}
+
+
 
 /*CSS page style pagination*/
 
@@ -278,7 +332,7 @@ Q.$('update-list').onclick = function() {
 Q.$("form1").onsubmit = function() {
   return false;
 }
-
+/*
 Q.$('button-collect').onclick=function() 
 {
   var f = Q.$("form1");
@@ -349,7 +403,7 @@ Q.$('button-prepublic').onclick = function(){
     }
   });
 }
-
+*/
 var chkAll = Q.$('idCheckAll');
   if(chkAll) {
         chkAll.onchange = function() {
@@ -376,18 +430,19 @@ desk.zol.com.cn 画集列表列表
   id="mydata2" 
   datasrc="sql://select * from ch_album_urls order by t desc" 
   pagesize="15"
-  cellpadding="3" 
-  cellspacing="1"
+  cellpadding="0" 
+  cellspacing="0"
   valueSelected="key:value"
+  class="clsGrid"
 >
 <thead style="background:#000; color:white;">
-<th width="50" align="left"><input id="idCheckAll" type=checkbox></th>
-<th width="200" align="left">title/album</th>
+<th width="10" align="left"><input id="idCheckAll" type=checkbox></th>
+<th width="400" align="left">title/album</th>
 <th width="400" align="left">url</th>
 </thead>
 <t:data>
 <tr 
-onmouseover="this.style.backgroundColor='#FFFF00';"
+onmouseover="this.style.backgroundColor='#F8F8F8';"
 onmouseout="this.style.backgroundColor='';"
 >
 <td width="50" align="left">
@@ -404,11 +459,11 @@ onmouseout="this.style.backgroundColor='';"
 </t:data>
 
 <tr style="background:white">
-  <td width="100">
+  <!--td width="100">
     <button id="button-collect">采集</button>
     <button id="button-prepublic">预发布</button>
-  </td>
-  <td width="700" colspan=2 align="left">
+  </td-->
+  <td colspan="3" align="left">
     <div class="pager">
     <t:pager>
     [[field:index]]

@@ -18,7 +18,7 @@ color: #cccccc;
 
 
 #mydata2 {
-  border:1px solid #999;    
+  border:1px solid #CCC;    
   width: 100%; 
   background: #FFF; 
   color:#414141; 
@@ -138,6 +138,7 @@ import utils.json2;
 import utils.ajax;
 import utils.xml;
 import ui.wndx-1-0-2;
+import ui.jtable;
 -->
 </script>
 <script src="{$themes:path}/common.js"></script>
@@ -415,6 +416,16 @@ var chkAll = Q.$('idCheckAll');
         }
 }
 });
+
+
+function render_title(row) {
+  return  row['title'] + "("+row['public_id']+")";
+}
+
+function render_action(row) {
+  return '<a href="#id'+row['id']+'">更新</a>';
+}
+
 //-->
 </script>
 
@@ -426,7 +437,30 @@ desk.zol.com.cn 画集列表列表
 <a id="发布" href="{$app:app}&mod=public">发布</a>
 </h5>
 <form id="form1">
-<html:table 
+	
+<html:jtable 
+  id="mydata2" 
+  title="画集列表列表"
+  datasrc="sql://select * from ch_album_urls order by t desc" 
+  rowHeight="70px"
+  pagesize="15"
+  cellpadding="0" 
+  cellspacing="0"
+  wstyle="WS_TOOLBAR|WS_PAGING|WS_CHECKBOX|WS_AUTOHEIGHT|WS_TITLEBAR|WS_TITLE"
+  class="clsGrid"
+>
+<t:cols> 
+<item width="100" align="left" fieldname="public_id">画集ID</item>
+<item width="400" align="left" fieldname="title" renderer="render_title">画集名称</item>
+<item width="400" align="left" fieldname="from_url">url</item>
+<item width="100" align="center" fieldname="id" renderer="render_action">操作</item>
+</t:cols>
+<t:data>
+</t:data>
+</html:jtable>
+
+
+<!--html::jtable 
   id="mydata2" 
   datasrc="sql://select * from ch_album_urls order by t desc" 
   pagesize="15"
@@ -451,18 +485,16 @@ onmouseout="this.style.backgroundColor='';"
 </td>
 <td>
   <input name="title[]" type="hidden" value="[field:title]">
-  [field:title]
-  <!--br/><img src="[field:album_url]" /-->
+  [field:title] (
+  [field:public_id func="getip()"] )
 </td>
 <td><a href="{$app:app}&mod=public&id=[field:id]">[field:from_url]</a></td>
 </tr>
 </t:data>
 
 <tr style="background:white">
-  <!--td width="100">
     <button id="button-collect">采集</button>
     <button id="button-prepublic">预发布</button>
-  </td-->
   <td colspan="3" align="left">
     <div class="pager">
     <t:pager>
@@ -471,7 +503,7 @@ onmouseout="this.style.backgroundColor='';"
     </div>
   </td>
 </tr>
-</html:table>
+</html::jtable-->
 </form>
 
 <br>

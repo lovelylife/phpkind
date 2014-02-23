@@ -5,130 +5,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib}/ui.css" />
-<style>
-
-
-#screen {
-width:100%;
-height: 600px;
-overflow: auto;
-background: #000;
-color: #cccccc;
-}
-
-
-#mydata2 {
-  border:1px solid #CCC;    
-  width: 100%; 
-  background: #FFF; 
-  color:#414141; 
-  font-size: 13px;
-}
-
-#mydata2 a {
-  color: #666;
-  text-decoration: none;
-}
-
-#mydata2 a:hover {
-  color: #000;
-}
-
-/* Grid css style	//border-collapse:collapse; */
-
-.clsGrid {
-	width: 98%;
-	border-top: 1px solid #FFF;
-	border-left: 0px solid #CCC;
-	collapse:separate;    
-	*border-spacing:expression(this.cellSpacing="0px");
-	border-spacing: 0px;
-}
-
-.clsGrid td {
-	padding: 4px;
-/*	background: white; */
-	border: 1px solid #EEE;
-	border-top: 0px solid #CCC;
-	border-left: 0px solid #CCC;
-	border-right: 0px solid #CCC;
-	font-size: 13px;
-}
-
-.clsGrid td.highlight {
-	padding: 4px;
-	background: #E9F2FB;
-
-}
-
-.clsGrid th {
-	padding: 4px;
-	background: #EEE url(th.gif) repeat-x bottom left;
-	color: #777;/*#07519A;EAF3FD*/
-	border-RIGHT: #DDD 1px solid;  
-	BORDER-TOP: #fff 0px solid; 
-	BORDER-LEFT: #FFF 1px solid;
-	BORDER-BOTTOM: #CCC 1px solid;
-	OVERFLOW: hidden; 
-	text-align: left;
-	WHITE-SPACE: nowrap;
-	font-weight: normal;
-	vertical-align: middle;
-	height: 20px;
-}
-
-
-
-/*CSS page style pagination*/
-
-DIV.pager {
-  PADDING-RIGHT: 0px; 
-  PADDING-LEFT: 0px; 
-  FONT-SIZE: 15px; 
-  PADDING-BOTTOM: 10px; 
-  COLOR: #48b9ef; 
-  PADDING-TOP: 10px; 
-  FONT-FAMILY: Arial, Helvetica, sans-serif; 
-  BACKGROUND-COLOR: #fff; 
-  TEXT-ALIGN: left;
-  text-indent:5px;
-}
-
-DIV.pager A {
-  BORDER: #f0f0f0 2px solid;
-  PADDING-TOP: 8px; 
-  PADDING-RIGHT: 12px; 
-  PADDING-BOTTOM: 8px; 
-  PADDING-LEFT: 12px; 
-  MARGIN: 0px 2px; 
-  COLOR: #48b9ef;     
-  TEXT-DECORATION: none
-}
-
-DIV.pager A:hover {
-  BORDER: #ff5a00 2px solid; COLOR: #ff5a00;
-}
-DIV.pager A:active {
-  BORDER: #ff5a00 2px solid; COLOR: #ff5a00;
-}
-DIV.pager SPAN.current {
-  PADDING-TOP: 8px; 
-  PADDING-RIGHT: 12px; 
-  PADDING-BOTTOM: 8px; 
-  PADDING-LEFT: 12px; 
-  MARGIN: 0px 2px 0px 0px;
-  BORDER: #ff5a00 2px solid; 
-  BACKGROUND-COLOR: #ff6c16;
-  
-  COLOR: #fff;  
-}
-
-DIV.pager SPAN.disabled {
-  DISPLAY: none
-}
-
-
-</style>
+<link type="text/css" rel="stylesheet" href="{$themes:path}/style.css" />
 
 <script src="{$app:qlib}/Q.js">
 <!--
@@ -175,11 +52,11 @@ function zol_task_update() {
   var end = 13;
   var begin=0;
   get_content(get_zol_url(begin++), function(jsondata) {
-    Q.$('debug').innerText += "正在更新第"+begin+"页(发现"+jsondata+"个画集)\n";
+    Q.printf("正在更新第"+begin+"页(发现"+jsondata+"个画集)\n");
     if(begin < end) {
       get_content(get_zol_url(begin++), arguments.callee);
     } else {
-      alert('更新成功');
+      Q.$('debug').innerText += '更新成功!';
       //location.reload();
     }  
   })
@@ -222,6 +99,35 @@ function zol_image_list(urls, onget, oncompleted) {
     }  
   })
 }
+
+
+function get_image_urls(public_id, urls, btn) {
+
+  if(public_id <= 0) {
+	  Q.printf("请先绑定画集ID后再采集");
+	  return;
+  }
+  btn.disabled=true;
+  zol_image_list(urls, function(u, data) {
+    g_album_tasks.push({name: u, data: data});
+    Q.printf("从"+u+"采集到"+data.length+"条记录\n");
+  }, 
+  function() { 
+    //console.log(g_album_tasks); 
+    Q.printf('completed!\n');
+    Q.printf('-------------------------------\nstart get image!\n');
+    task_get_images(g_album_tasks, 
+      function(u, data) {
+        Q.printf(json_encode(data)+"\n");
+	     btn.disabled = false; 
+      }, 
+      function() {
+	      Q.printf('end get image!\n');
+      }
+    )
+  });
+}
+
 
 function get_image_list(urls, onok) {
   var url = urls.pop();
@@ -288,7 +194,33 @@ function get_images(tasks, onok) {
   });
 }
 
-
+function bind_album(public_id, title, from_url) {
+  var tasks = [];
+  tasks.push({public_id: public_id, title:title, from_url: from_url});
+  var response_task = [];
+  task_execute({
+    'api' : '/index.php?app=wayixia&mod=albumapi&action=add&inajax=true',
+    'tasks' : tasks,
+    'task_onok' : function(task, response) {
+      var album_id = response.data;
+      Q.printf('request album_id '+album_id+" ok");
+      response_task.push({public_id: album_id, title: title, from_url: task.from_url});
+    },
+    'task_oncompleted' : function() {
+      Q.printf('bind album start');
+      task_execute({
+        'api' : '{$app:module}&action=public-album&inajax=true',
+        'tasks' : response_task,
+        'task_onok' : function(task, response) {
+           Q.printf('bind album [id: '+task.public_id+', title: '+task.title + '] ok');
+        },
+        'task_oncompleted' : function() {
+          Q.printf('bind album completed');
+        }
+      });
+    }
+  });
+}
 
 
 function public_album(tasks, onok) {
@@ -333,6 +265,9 @@ Q.$('update-list').onclick = function() {
 Q.$("form1").onsubmit = function() {
   return false;
 }
+
+
+
 /*
 Q.$('button-collect').onclick=function() 
 {
@@ -351,19 +286,18 @@ Q.$('button-collect').onclick=function()
     Q.printf("从"+u+"采集到"+data.length+"条记录\n");
   }, 
   function() { 
-    console.log(g_album_tasks); 
-    Q.printf('completed!\n');
-    Q.printf('-------------------------------\nstart get image!\n');
+    //console.log(g_album_tasks); 
+    //Q.printf('completed!\n');
+    //Q.printf('-------------------------------\nstart get image!\n');
     task_get_images(g_album_tasks, 
       function(u, data) {
         Q.printf(json_encode(data)+"\n");
       }, 
       function() {
-        Q.printf('end get image!\n'); 
+        Q.printf('采集完成!\n'); 
       }
     )
   });
-
 }
 
 Q.$('button-prepublic').onclick = function(){
@@ -404,7 +338,7 @@ Q.$('button-prepublic').onclick = function(){
     }
   });
 }
-*/
+
 var chkAll = Q.$('idCheckAll');
   if(chkAll) {
         chkAll.onchange = function() {
@@ -415,99 +349,69 @@ var chkAll = Q.$('idCheckAll');
             }
         }
 }
+*/
+
 });
 
 
-function render_title(row) {
-  return  row['title'] + "("+row['public_id']+")";
-}
-
-function render_action(row) {
-  return '<a href="#id'+row['id']+'">更新</a>';
-}
-
 //-->
 </script>
-
 <body>
-<h5>
-desk.zol.com.cn 画集列表列表
-<a id="update-list" href="#">更新</a>|
-<a id="button_collect" href="#">采集</a>
-<a id="发布" href="{$app:app}&mod=public">发布</a>
-</h5>
+<!--button id="button-collect">采集</button>
+<button id="button-prepublic">预发布</button-->
 <form id="form1">
-	
-<html:jtable 
+<html:table 
   id="mydata2" 
-  title="画集列表列表"
-  datasrc="sql://select * from ch_album_urls order by t desc" 
-  rowHeight="70px"
-  pagesize="15"
+  datasrc="data://publicdata" 
   cellpadding="0" 
   cellspacing="0"
-  wstyle="WS_TOOLBAR|WS_PAGING|WS_CHECKBOX|WS_AUTOHEIGHT|WS_TITLEBAR|WS_TITLE"
-  class="clsGrid"
->
-<t:cols> 
-<item width="100" align="left" fieldname="public_id">画集ID</item>
-<item width="400" align="left" fieldname="title" renderer="render_title">画集名称</item>
-<item width="400" align="left" fieldname="from_url">url</item>
-<item width="100" align="center" fieldname="id" renderer="render_action">操作</item>
-</t:cols>
-<t:data>
-</t:data>
-</html:jtable>
-
-
-<!--html::jtable 
-  id="mydata2" 
-  datasrc="sql://select * from ch_album_urls order by t desc" 
-  pagesize="15"
-  cellpadding="0" 
-  cellspacing="0"
-  valueSelected="key:value"
   class="clsGrid"
 >
 <thead style="background:#000; color:white;">
-<th width="10" align="left"><input id="idCheckAll" type=checkbox></th>
-<th width="400" align="left">title/album</th>
-<th width="400" align="left">url</th>
+<!--th width="30" align="left"><input id="idCheckAll" type=checkbox></th-->
+<th align="left">画集ID</th>
+<th align="left">画集名称</th>
+<th align="left">发布地址</th>
+<th width="50" align="middle">图片数</th>
+<th width="200" align="middle">操作</th>
 </thead>
+<tbody>
 <t:data>
 <tr 
 onmouseover="this.style.backgroundColor='#F8F8F8';"
 onmouseout="this.style.backgroundColor='';"
 >
-<td width="50" align="left">
+<!--td align="left">
   <input name="from_url[]" type="hidden" value="[field:from_url]">
   <input name="task_id[]" type="checkbox" value="[field:id]">
-</td>
+</td-->
+<td>[field:public_id]</td>
 <td>
   <input name="title[]" type="hidden" value="[field:title]">
-  [field:title] (
-  [field:public_id func="getip()"] )
+  [field:title][field:index] 
 </td>
-<td><a href="{$app:app}&mod=public&id=[field:id]">[field:from_url]</a></td>
+<td><a href="{$app:app}&mod=public&from_url=[field:from_url func='urlencode(@this)']">[field:from_url]</a></td>
+<td>[field:images_num]</td>
+<td>
+  <button onclick="bind_album([field:public_id], '[field:title]', '[field:from_url]')" [field:is_enabled]>绑定</button>
+  <button style="line-height:25px;" onclick="get_image_urls([field:public_id], ['[field:from_url]'], this)">
+    <img src="{$themes:path}/refresh.png" style="float:left;" /> 更新采集</button> 
+</td>
 </tr>
 </t:data>
-
-<tr style="background:white">
-    <button id="button-collect">采集</button>
-    <button id="button-prepublic">预发布</button>
-  <td colspan="3" align="left">
-    <div class="pager">
-    <t:pager>
-    [[field:index]]
-    </t:pager>
-    </div>
-  </td>
-</tr>
-</html::jtable-->
-</form>
-
+</tbody>
+</html:table>
 <br>
-<a href="#" onclick="Q.$('debug').innerText=''; return false;">[clear]</a>
-<div id="debug" style="background: yellow;height: 260px;overflow: auto;"></div>
+<div class="pager">  {$fields:pager}  </div>
+
+</form>
+<div style="height:5px;"></div>
+<div style="background:#FFF;border:1px solid #CCC; height: 240px;font-size: 14px;overflow: hidden;">
+<div style="height:2px;"></div>
+<button id="update-list">更新画集列表</button>
+<button onclick="Q.$('debug').innerText=''; return false;">清除</button>
+<div style="height:2px;border-bottom: 1px solid #CCC"></div>
+<div id="debug" style="background:#FFF;border:0px solid #CCC; height: 210px;font-size: 14px;overflow: auto;"></div>
+</div>
 </body>
 </html>

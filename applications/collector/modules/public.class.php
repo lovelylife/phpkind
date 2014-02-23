@@ -49,11 +49,13 @@ class CLASS_MODULE_PUBLIC extends CLASS_MODULE {
       try {
         $db = $this->App()->db();
         // get public data
-        $id = $_GET['id'];
-	$sql = "select I.imgSrc, I.pageUrl, I.title, A.public_id as album_id ";
+        $from_url = $_GET['from_url'];
+	$sql = "select I.imgSrc, I.pageUrl, I.title, A.public_id as album_id, A.title as albumtitle ";
 	$sql.= "from ##__prepublic_images AS I ";
 	$sql.= "left join ##__album_urls AS A ";
-	$sql.= "on A.id=I.task_id ";
+	$sql.= "on A.from_url=I.album_from_url ";
+	$sql.= "where I.album_from_url='{$from_url}' ";
+        //echo $sql; 
         $page_size = 15;
         $totalsize = $db ->query_count($sql);
         
@@ -72,6 +74,7 @@ class CLASS_MODULE_PUBLIC extends CLASS_MODULE {
         $t = new CLASS_TEMPLATES($this->App());
         $t->push_data('publicdata', $rs);
         $t->push('pager', $pager->__toString());
+        $t->push('title', $rs[0]['albumtitle']);
 
         $t->render('public');
       } catch(Exception $e) {
@@ -80,8 +83,7 @@ class CLASS_MODULE_PUBLIC extends CLASS_MODULE {
     }
 
     function public_album() {
-      $data = $_POST['data'];
-      $task = $data['task'];
+      $task = $_POST['data'];
       $this->AjaxData($task);
     }
 }

@@ -1,6 +1,5 @@
 function task_execute(context) {
   var context_tasks = context['tasks'];
-
   if(context_tasks.length < 1) 
   {
     Q.printf('no task in list');
@@ -16,22 +15,23 @@ function task_execute(context) {
     var task = tasks.pop();
     Q.Ajax({
       command: api,
-      data: {task: task},
+      data: task,
+      withCredentials: (context['withCredentials']),
       oncomplete: function(xmlhttp) {
-		var resp = null; 
+    var resp = null; 
         try  {
           resp =  Q.json_decode(xmlhttp.responseText);
           if(resp.header==0) {
-			      onok(task, resp);
-          } else {			
+            onok(task, resp);
+          } else {      
             onerr(task, resp);
           }
         } catch (e) {
           Q.printf(xmlhttp.responseText);
-		      onerr(task, resp);
+          onerr(task, resp);
         }
         // continue next task
-		    if(context_tasks.length > 0) {
+        if(context_tasks.length > 0) {
           task_callee(api, tasks, onok, onerr);
         } else {
           if(context.task_oncompleted) {
@@ -48,8 +48,8 @@ function task_execute(context) {
         context.task_onok(task, response);
       }
     },
-		
-	function(task, response) {
-	  Q.printf(response.data+"("+response.header+")");
-	});
+    
+  function(task, response) {
+    Q.printf(response.data+"("+response.header+")");
+  });
 }

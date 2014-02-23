@@ -48,14 +48,29 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
       }
     }
 
-    function index() {
-        try {
-           $t = new CLASS_TEMPLATES($this->App());
-           $t->render('index');
-        } catch(Exception $e) {
-           print_r($e);
-        }
-    }
+  function index() {
+    $db = $this->App()->db();
+    $sql="select *, CASE WHEN public_id <= 0 THEN '' ELSE 'disabled' END as is_enabled  from ch_album_urls order by t desc "; 
+      
+    $page_size = 12;
+    $totalsize = $db ->query_count($sql);
+        
+    $cfg = array(
+          "totalsize" => $totalsize,
+          "pagesize" => $page_size,
+          "pagekey" => "p",
+    );
+
+    // 实例化分页类,初始化构造函数中的总条目数和每页显示条目数
+    $pager = new CLASS_PAGE($cfg);
+    $sql .= $pager->getSQLPage();
+    $rs = array();
+    $db->get_results($sql, $rs);
+    $t = new CLASS_TEMPLATES($this->App());
+    $t->push_data('publicdata', $rs);
+    $t->push('pager', $pager->__toString());
+    $t->render('index');
+  }
 
     function getlist() {
       $data = &$_POST['data'];
@@ -93,25 +108,29 @@ STR;
 
   function get_zol_images_list() {
     $data = &$_POST['data'];
-      $url = $data['url'];
-      $content = gbk2utf($this->getfile($url));
-      $pattern = <<<STR
+    $url = $data['url'];
+    $content = gbk2utf($this->getfile($url));
+    $pattern = <<<STR
 /<li id="img\d*" class="[^\"]+?"><a href="([^\"]+?)">/
 STR;
-      $a = parse_url($url);
-      preg_match_all($pattern, $content, $matches);
+    $a = parse_url($url);
+    preg_match_all($pattern, $content, $matches);
       
-      $db = $this->App()->db();
+    $db = $this->App()->db();
     $len = count($matches[0]);
     $arr = array();
-      for($i=0; $i < $len; $i++ ) {
-        $from_url = $a['scheme']."://".$a['host'].$matches[1][$i];
-        $fields = array(
-          'from_url'=> $from_url,
-        );
-        array_push($arr, $from_url);
-      }
+    for($i=0; $i < $len; $i++ ) {
+      $from_url = $a['scheme']."://".$a['host'].$matches[1][$i];
+      $fields = array('from_url'=> $from_url,);
+      array_push($arr, $from_url);
+    }
     $s = json_encode($arr);
+    $images_num = count($arr);
+    $sql = "update ##__album_urls set images_num='{$images_num}' where from_url='{$url}';";
+    if(!$db->execute($sql)) {
+      $this->errmsg($db->get_error()." \n".$sql);
+      return;
+    }
     $this->AjaxData($arr);
   }
 
@@ -119,12 +138,7 @@ STR;
     $db = $this->App()->db();
     $data = &$_POST['data'];
     $urls = $data['urls'];
-    $from_url = $data['from_url'];
-    $task_id = $this->get_task_id($from_url);
-    if($task_id <= 0) {
-      $this->errmsg('task'.$from_url.'is error or not exist');
-      return;
-    }
+    $album_from_url = $data['from_url'];
 
     $result = array();
     for($i=0; $i<count($urls); $i++) {
@@ -153,9 +167,9 @@ STR;
 
       // 写入待发布数据记录
       // record
-      $fields = array('imgSrc'=>$src, 'pageUrl'=>$from, 'title'=>$title, 'task_id' => $task_id);
+      $fields = array('imgSrc'=>$src, 'pageUrl'=>$from, 'title'=>$title, 'album_from_url' => $album_from_url);
 
-      $sql = $db->insertSQL('prepublic_images', $fields)." ON DUPLICATE KEY UPDATE task_id=VALUES(task_id),title=VALUES(title)";
+      $sql = $db->insertSQL('prepublic_images', $fields)." ON DUPLICATE KEY UPDATE imgSrc=VALUES(imgSrc),title=VALUES(title)";
       $r = $db->execute($sql);
 
       if(!$r) {
@@ -180,16 +194,20 @@ STR;
 
   function public_album() {
     $data = &$_POST['data'];
-    $task_data = $data['task'];
-    $album_id = intval($task_data['public_id']);
-    $task_id = intval($task_data['id']);
-    if($album_id <= 0 || $task_id <= 0) {
-      $this->errmsg('invalid id or public_id '.json_encode($task_data));
+    $public_id = intval($data['public_id']);
+    $from_url = $data['from_url'];
+    if($public_id <= 0) {
+      $this->errmsg('invalid id or public_id '.json_encode($data));
       return;
     }
     
-    $sql = "update ##__album_urls set `public_id`='{$album_id}' where `id`='{$task_id}';";
-    $this->App()->db()->execute($sql);
+    $sql = "update ##__album_urls set `public_id`='{$public_id}' where `from_url`='{$from_url}';";
+    if(!$this->App()->db()->execute($sql)) {
+      $this->errmsg($this->App()->db()->get_error());
+      return;
+    }
+
+    $this->AjaxData($sql);
   }
 
   function getfile($url){

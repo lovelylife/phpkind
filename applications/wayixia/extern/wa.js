@@ -89,7 +89,7 @@ function get_remote_image(img, callback) {
   var stream = fs.createWriteStream(file_name);  
   var r = request(options, function(err, res, body) {
     if(!err && res.statusCode == 200) {
-      console.log("caculate image size");	    
+      console.log("caculate image size");      
       var info = imageinfo(body);
       //console.log(info);
       if(!info) { 
@@ -165,10 +165,10 @@ function check_wa_image(img, api_cookie, callback) {
         callback.onfailed(r);
       } else {
         if(r.data.res_id <= 0) {
-	  callback.onwa();
+    callback.onwa();
         } else {
-	  callback.onsuccess();
-	}
+    callback.onsuccess();
+  }
       }
     } else {
       throw false;
@@ -186,6 +186,7 @@ function http_process(req, response, data_from_agent) {
   // submit to web
   var object = JSON.parse(decodeURIComponent(data_from_agent));
   var data = object.data;
+  console.log(object.data);
   var wayixia_api_cookie = req.headers.cookie;
   var image_cookie = object.data.img.cookie;
 
@@ -212,8 +213,8 @@ function http_process(req, response, data_from_agent) {
             agent: req.headers['user-agent'],
             filename: file_name,
           },
-	  {
-	    onsuccess: function(info) {
+    {
+      onsuccess: function(info) {
               /*
               type: 'image',
               format: 'JPG',
@@ -222,39 +223,39 @@ function http_process(req, response, data_from_agent) {
               height: 561 }
               */
               console.log('get remote image ok!'); 
-	      var wa_image_options = {
-	        server : config.server.name,
-	        res_id : 0,
-	        img : {
+        var wa_image_options = {
+          server : config.server.name,
+          res_id : 0,
+          img : {
                   src: object.data.img.srcUrl,
-	          title: object.data.img.title,
-	          album_id: object.data.img.album_id,
-	          from_url: object.data.img.pageUrl,
-	          file_name: file_name,
-	          file_type: info.format || '',
-	          file_width: info.width || object.data.img.width,
-	          file_height: info.height || object.data.img.height,
-	          file_size: info.file_size,	
-	        }
-	      };  
+            title: object.data.img.title,
+            album_id: object.data.img.album_id,
+            from_url: object.data.img.pageUrl,
+            file_name: file_name,
+            file_type: info.format || '',
+            file_width: info.width || object.data.img.width,
+            file_height: info.height || object.data.img.height,
+            file_size: info.file_size,  
+          }
+        };  
                   
               wa_image(wa_image_options, wayixia_api_cookie, {
                 onsuccess: function(r) {
                   console.log("wa image ok! with code: " + r.header);
-	          echo_json(response, r.header, r.data, r.extra);			
-	        },
-	        onerror: function(err, res) {
+            echo_json(response, r.header, r.data, r.extra);      
+          },
+          onerror: function(err, res) {
                   console.log("wa image ok!" + res.statusCode);
                   echo_json(response, -1, null, null);
                 }
               });
-	    },
-	    onerror: function(err, res) {
+      },
+      onerror: function(err, res) {
               console.log(res.statusCode);
               echo_json(response, -1, null, null);
             }
           }
-	);
+  );
       } 
     }
   ); // end check wa image

@@ -596,7 +596,7 @@ function(){
       json_data.title = document.title,
       json_data.width = config.width;
       json_data.height = config.height;
-      json_data.albumid = 0;
+      json_data.album_id = 0;
       _this.set_image_state(wing_box, 'ing');
       _xdm&&_xdm.request&&_xdm.request(
         {

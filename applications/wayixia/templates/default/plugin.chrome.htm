@@ -72,7 +72,7 @@ function ajax_wa() {
   if(!user_album) 
     user_album = 0;
 
-  g_last_response.albumid = user_album;
+  g_last_response.album_id = user_album;
   document.cookie = 'album_id='+user_album+';';
   
   Q.Ajax({

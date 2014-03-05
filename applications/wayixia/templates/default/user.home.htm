@@ -106,7 +106,7 @@ function store(arr) {
 
 var g_waterfall = null;
 var albums_data = {$fields:images_data};
-albums_data.push({album_name:'待分类', album_id: 0, create_time: '', });
+albums_data.unshift({album_name:'待分类', album_id: 0, create_time: '', });
 var g_store = new store(albums_data);
 
 Q.Ready(function(){

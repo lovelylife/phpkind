@@ -103,7 +103,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     // 获取画集列表
     $sql_albums_list = $theApp->get_albums_sql($uid);
     $albums_list = array();
-    $theApp->db()->get_results($sql_albums_list, $albums_list);
+    $theApp->db()->get_results($sql_albums_list." order by id desc;", $albums_list);
     
     if(empty($albums_list)) {
       $t->push('images_data', '[]');

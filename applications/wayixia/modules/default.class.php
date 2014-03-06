@@ -39,7 +39,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
       $db = &$this->App()->db();
       $tag = $_GET['tag'];
 
-      $sql = "select distinct(file_name), server, file_name, width, height, id, uname as owner, title ";
+      $sql = "select distinct(file_name), server, file_name, width, height, id, uname as owner, title, DATE_FORMAT(create_time, '%Y-%m-%d') as create_time ";
       $sql.= "from ##__nosql_pins group by file_name ";
       $sql.=" order by id DESC ";
       

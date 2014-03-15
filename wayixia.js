@@ -560,6 +560,7 @@ function(){
 
     img.className = 'wayixia_image';
     a.href='javscript:void(0);';
+    a.onclick=function(evt){ evt.preventDefault();};
     inner_img.src=config.imgsrc;
     inner_img.className = 'image';
     inner_img.style.cssText = 'margin-top:'+config.margintop+'px;width:'+config.sizewidth+'px;height:'+config.sizeheight+'px;'

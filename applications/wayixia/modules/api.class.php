@@ -55,6 +55,9 @@ class CLASS_MODULE_API extends CLASS_MODULE {
     case 'wayixia':
       $this->wayixia();
       break;
+    case 'setdesktop':
+      $this->setdesktop();
+      break;
     case 'get-album-list':
       $this->get_album_list();
       break;
@@ -122,6 +125,21 @@ class CLASS_MODULE_API extends CLASS_MODULE {
       $this->errmsg($db->get_error());
       return;
     }
+  }
+
+  // set desktop
+  function setdesktop() {
+    $theApp = &$this->App();
+    $user_key = $theApp->get_user_info('user-key');
+    $uid = $theApp->get_user_info('uid');
+    if(!$user_key || empty($user_key)) {
+      $this->AjaxHeader(-2); // not login
+      $this->AjaxData('you must login!');
+      return;
+    }
+  
+    $pins_id = intval($_GET['id'], 10);
+    $this->App()->notify('set_desktop', array('pins_id' => $pins_id));
   }
 
   // 检查资源是否存在

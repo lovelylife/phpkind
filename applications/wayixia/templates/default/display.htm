@@ -123,6 +123,28 @@ Q.Ready(function() {
     }); 
   }
 
+  Q.$('btn-set-desktop').onclick=function(evt) {
+    Q.Ajax({
+      command: '{$app:app}&mod=api&inajax=true&action=setdesktop&id={$fields:id}',
+      oncomplete: function(xmlhttp) {
+        var resp = Q.json_decode(xmlhttp.responseText);
+        if(resp.header == 0) {
+          alert('设置完成!');  
+        } else if(resp.header == -2) {
+          gotologin('http://wayixia.com/index.php?app=wayixia&mod=user&action=login');
+        } else {
+          alert('error code: ' + resp.header + '\nmessage: ' + resp.data);
+        }
+      },
+      onerror: function(xmlhttp) {
+        alert(xmlhttp.responseText); 
+      }
+    }); 
+    var evt = evt || window.event;
+    if(evt)
+     evt.preventDefault();
+  }
+
 });
 
 -->
@@ -179,7 +201,8 @@ Q.Ready(function() {
           </a>
           <div style="position:absolute; right:8px; top:8px;opacity: 0.8;">
             <div class="btn-group time-limit">
-              <a href="http://{$fields:server/}/{$fields:file_name/}" class="lightwindow btn btn-default" rel="/\\:;*?&lt;&gt;'”|®™©&amp;#[Sushi]" title="图片查看" caption="{$fields:title}" id="btn-view" author="{$fields:nickname}">看大图</a>
+              <!--a href="#" class="btn btn-default" title="将此图片设置为壁纸" caption="{$fields:title}" id="btn-set-desktop" author="{$fields:nickname}">设置壁纸</a-->
+              <a href="http://{$fields:server/}/{$fields:file_name/}" class="lightwindow btn btn-default" rel="/\\:;*?&lt;&gt;'”|®™©&amp;#[Sushi]" title="图片查看" caption="{$fields:title}" id="btn-view" author="{$fields:nickname}">查看原图</a>
 	      <a href="#" class="btn btn-default" style="background: #FFF url({$themes:path}/btn-wa-normal.png) center center no-repeat;" id="btn-wa" title="挖一下">&nbsp;&nbsp;</a>
             </div>
         

@@ -16,7 +16,6 @@ define('MAGIC_QUOTES_GPC', get_magic_quotes_gpc());
 
 // 导入系统配置
 include_once(_KROOT."/config.php");
-
 // 导入系统常用函数库
 include_once(_KROOT."/function.php");
 
@@ -71,12 +70,7 @@ $variables_whitelist = array (
 
 /* PHPKIND reservered { */
   '__DEBUG__',
-    '_PHPKIND_ENVS',
-    '_start',
-
-  '_APP',
-  '_MODULE',
-  '_ACTION',
+  '_start',
 /* } */
 );
 
@@ -150,7 +144,6 @@ include_once(_KROOT.'/command.class.php');
 
 //!初始化应用程序
 //!application frame work
-require(_KROOT.'/apploader.class.php');
-new CLASS_APPLOADER($_GET['app']);
+require(_KROOT.'/apploader2.class.php');
 
 ?>

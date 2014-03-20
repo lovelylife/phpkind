@@ -36,13 +36,12 @@ if(!defined('_BIND_ROOT')) {
 }
 
 // 框架的根目录
-define('_KROOT', str_replace('\\', '/', dirname(__file__)).'/phpkind')
+define('_KROOT', str_replace('\\', '/', dirname(__file__)));
 
 
 function err_handler( $errno , $errstr , $errfile , $errline) {
   if($errno != E_NOTICE && $errno != E_DEPRECATED && $errno != E_WARNING) {
     echo "<pre><h1>PHPKind Exception:<h1>";
-    echo "<h3>Application: </h3>".$_GET['app']."\n";
     echo "<h3>Message: </h3>".$errstr."\n";
     // echo "<h3>File: </h3>".$errfile." : ". $errline."\r\n";
     if($GLOBALS['__DEBUG__']) {
@@ -67,5 +66,8 @@ function print_stack_trace() {
   
   return $html;
 }
+
+// 加载phpkind内核
+include(_KROOT.'/core.php');
 
 ?>

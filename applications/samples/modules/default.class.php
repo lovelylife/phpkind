@@ -54,6 +54,51 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
       print_r($e);
     }
   }
+  function getfile($url){
+    $content = file_get_contents($url);
+    if(FALSE == $content) {
+      if (function_exists('curl_init')) {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; U; Linux i686; zh-CN; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 GTB5');
+        curl_setopt($curl, CURLOPT_HEADER, 0);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $tmpInfo = curl_exec($curl);
+        curl_close($curl);
+        if(FALSE !== stristr($tmpInfo,"HTTP/1.1 200 OK")){ //正确返回数据
+          return $tmpInfo;
+        }else{
+          return FALSE;
+        }
+      }else{
+        // Non-CURL based version...
+         /*
+          $context =
+          array('http' =>
+              array('method' => 'GET',
+                'header' => 'Content-type: application/x-www-form-urlencoded'."\r\n".
+                      'User-Agent: Mozilla/5.0 (X11; U; Linux i686; zh-CN; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 GTB5'."\r\n".
+                      'Content-length: 0'),
+                'content' => ""));
+          $contextid=stream_context_create($context);
+          $sock=fopen($url, 'r', false, $contextid);
+          if ($sock) {
+          $tmpInfo='';
+          while (!feof($sock))
+            $tmpInfo.=fgets($sock, 4096);
+
+          fclose($sock);
+          return $tmpInfo;
+          }else{
+          return FALSE;
+          }*/
+          return false;
+      }
+    }else{
+      return $content;
+    }
+  }
 }
+
 
 ?>

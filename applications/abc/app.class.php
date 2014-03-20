@@ -1,6 +1,6 @@
 <?php
 
-if(!defined('_IPATH')) {
+if(!defined('_PHPKIND')) {
     die('<h3>Forbidden</h3>');
 }
 

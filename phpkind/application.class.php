@@ -45,10 +45,9 @@ class CLASS_APPLICATION {
     $this->_refDICT = array();
     $this->_oDatabases = array();
       
-    $this->_sName = $args['appName'];
-    $this->_sRoot = $args['appRoot'];
-    $this->_sPath = $args['appPath'];
-    $this->_sHost = $args['appHost'];
+    $this->_sRoot = $args['root'];
+    $this->_sPath = $args['path'];
+    $this->_sHost = $args['host'];
 
     $this->_module = $args['module'];  
     $this->_ajaxmode = $args['ajaxmode'];
@@ -61,19 +60,19 @@ class CLASS_APPLICATION {
     $this->_refAPPS['qlib'] = _IPATH.'/qlib';
 
     // 应用程序URL
-    $this->_refAPPS['app'] = _IPATH.'/index.php?app='.$this->_sName;
+    $this->_refAPPS['app'] = $this->_sHost;
 
     //! 模块URL
-    $this->_refAPPS['module'] = $this->_refAPPS['app'] . '&mod='. $this->_module;
+    $this->_refAPPS['module'] = $this->_refAPPS['app'] .'/?'. 'mod='. $this->_module;
 
     // 应用程序相对路径
-    $this->_refAPPS['path']  = _IPATH;
+    $this->_refAPPS['path']  = $this->_sPath;
 
     // 主机域名
     $this->_refAPPS['host']  = &$this->_sHost;
 
     // 导入配置数据
-    $this->_refCONFIG    = require($args['appCfgFile']);
+    $this->_refCONFIG    = require($args['config']);
 
     // 初始化资源和主题路径
     // 导入设置
@@ -114,7 +113,6 @@ class CLASS_APPLICATION {
   }
        
 //! operations
-    function getAppName() { return $this->_sName; }
     function getAppRoot() { return $this->_sRoot; }
     function getAppPath() { return $this->_sPath; }
     function getUrlApp()  { return $this->_refAPPS['app'];}
@@ -154,11 +152,11 @@ class CLASS_APPLICATION {
     return $value;
   }
     
-    function getAPPS($name) { return $this->_refAPPS[$name]; }
-    function getTHEMES($name) { return $this->_refTHEMES[$name]; }
+  function getAPPS($name) { return $this->_refAPPS[$name]; }
+  function getTHEMES($name) { return $this->_refTHEMES[$name]; }
     
     // 支持多数据库，根据名称访问数据对象,默认访问default数据库
-    function& db($name='default') {
+  function& db($name='default') {
     $db = null;
 
     // 检测数据库实例是否存在
@@ -168,39 +166,38 @@ class CLASS_APPLICATION {
       $db = &$this->_oDatabases[$name];
       if( $db != null)
         return $db;
-      }
+    }
 
     $dbs = &$this->_refCONFIG['dbs'];
-        if(is_array($dbs) && array_key_exists($name, $dbs)) {
-      //! 创建数据库实例
+    if(is_array($dbs) && array_key_exists($name, $dbs)) {
+      // 创建数据库实例
       $db = $this->create_database($dbs[$name]);
     }
 
-      return $db;
+    return $db;
+  }
+
+  function add_dictionary(&$dict) { $this->_refDICT[] = $dict; }
+
+  function query_dictionary($name, &$dic) {
+    foreach($this->_refDICT as $tpl) {
+      if($tpl->query_dictionary($name, $dic)) {
+        return true;
+      }
     }
-
-    function add_dictionary(&$dict) { $this->_refDICT[] = $dict; }
-    //function& getDICT() {return $this->_refDICT;}
-
-    function query_dictionary($name, &$dic) {
-        foreach($this->_refDICT as $tpl) {
-        if($tpl->query_dictionary($name, $dic)) {
-          return true;
-            }
-        }
         
-        return false;
-    }
+    return false;
+  }
 
-    private function create_database($dbcfgs) {
-        // print_r($dbcfgs);
+  private function create_database($dbcfgs) {
+    // print_r($dbcfgs);
     //'type' => 'mysql',
-        //'host' => '',
-        //'user' => '',
-        //'pwd' => '',
-        //'dbname' => '',
-        //'lang' => '',
-        //'prefix' => 'ch_',
+    //'host' => '',
+    //'user' => '',
+    //'pwd' => '',
+    //'dbname' => '',
+    //'lang' => '',
+    //'prefix' => 'ch_',
     return createdb($dbcfgs['type'], array(
             'host' => $dbcfgs['host'], 
             'user' => $dbcfgs['user'], 
@@ -208,9 +205,8 @@ class CLASS_APPLICATION {
             'name' => $dbcfgs['dbname'], 
             'prefix' => $dbcfgs['prefix'],
             'lang' => $dbcfgs['lang']
-        ));
-    }
-
+    ));
+  }
 
   private function requireFiles($cfgfile) {
     if(!file_exists($cfgfile)) {
@@ -233,27 +229,9 @@ class CLASS_APPLICATION {
     
   // appMain入口函数
   function appMain($args) {
-    //print_r($_GET);
-    global $_PHPKIND_ENVS;
-    $module_dir = $_PHPKIND_ENVS['_modulesDir'];
-    if(!empty($module_dir))
-      $module_dir .= '/';
-
     // 初始化默认模块
-    $default_module_file = 
-      $this->getAppRoot().$module_dir.'default.class.php';
-
-    //! 检测文件是否存在, 修复应用程序已经放在command工具里面处理，
-    //  加载器不再支持应用程序修复
-    //if(!file_exists($default_module_file)) {
-    // createfolders($app_root.$module_dir);
-    //  if(!copy(_KROOT.'/app_templates/default.class.php', 
-    //    $default_module_file)) {
-    //    //writelog("restore file error.");
-    //    trigger_error('restore file error.', E_USER_ERROR);
-    //  }
-    //}    
-    $module_file = $this->getAppRoot().$module_dir.$this->_module.'.class.php';
+    $default_module_file = $this->getAppRoot().'/modules/default.class.php';
+    $module_file = $this->getAppRoot().'/modules/'.$this->_module.'.class.php';
 
     if(!file_exists($module_file))  {
       trigger_error(

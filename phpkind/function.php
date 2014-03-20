@@ -6,20 +6,17 @@
  $ 返回值: 调试返回true 否则为false
 ------------------------------------------------------*/
 function isdebug() {
-	return ($GLOBALS['__DEBUG__']);
+  return ($GLOBALS['__DEBUG__']);
 }
 
 // 用于打印phpkind环境变量，不包括php的环境变量
 function phpkind_info() {
-	$dumpstr = "\r\n<pre>\n<h4>phpkind enviroments</h4>";
-	$dumpstr .= "_SERVER_ROOT:\t\t\t"._SERVER_ROOT;
-	$dumpstr .= "\r\n_IROOT:\t\t\t\t"._IROOT;
-	$dumpstr .= "\r\n_IPATH:\t\t\t\t"._IPATH;
-	$dumpstr .= "\r\n_KROOT:\t\t\t\t"._KROOT;
-	$dumpstr .= "\r\n_KPATH:\t\t\t\t"._KPATH;	
-	$dumpstr .= "\r\n</pre>\r\n";
+  $dumpstr = "\r\n<pre>\n<h4>phpkind enviroments</h4>";
+  $dumpstr .= "_BIND_ROOT:\t\t\t"._BIND_ROOT;
+  $dumpstr .= "\r\n_KROOT:\t\t\t\t"._KROOT;
+  $dumpstr .= "\r\n</pre>\r\n";
 
-	echo $dumpstr;
+  echo $dumpstr;
 }
 
 
@@ -28,92 +25,92 @@ function phpkind_info() {
  $ 名称: daddslashes
  $ 功能: 去除字符串中单引号的‘\’，即 \' => '
  $ 参数:
- 		$str  		预处理的字符串
- 		$force		强制转换
+     $str      预处理的字符串
+     $force    强制转换
  $ 返回值: 处理结果
 ------------------------------------------------------*/
 function daddslashes($str, $force = false) {
-	// 检查MAGIC_QUOTES_GPC宏是否定义
-	if(!defined('MAGIC_QUOTES_GPC')) {
-		define('MAGIC_QUOTES_GPC', get_magic_quotes_gpc());
-	}
+  // 检查MAGIC_QUOTES_GPC宏是否定义
+  if(!defined('MAGIC_QUOTES_GPC')) {
+    define('MAGIC_QUOTES_GPC', get_magic_quotes_gpc());
+  }
 
-	if(!MAGIC_QUOTES_GPC || $force) {
-		if(is_array($str)) {
-			foreach($str as $key => $val) {
-				$str[$key] = daddslashes($val, $force);
-			}
-		} else {
-			$str = addslashes($str);
-		}
-	}
-	return $str;
+  if(!MAGIC_QUOTES_GPC || $force) {
+    if(is_array($str)) {
+      foreach($str as $key => $val) {
+        $str[$key] = daddslashes($val, $force);
+      }
+    } else {
+      $str = addslashes($str);
+    }
+  }
+  return $str;
 }
 
 function get_path($physicalpath) {
-    return str_ireplace(_BIND_ROOT, '', $physicalpath);
+  return str_ireplace(_BIND_ROOT, '', $physicalpath);
 }
 
 if(!function_exists('str_split')) {
-	function str_split($str) {
-		return preg_split('//', $str, -1, PREG_SPLIT_NO_EMPTY);
-	}
+  function str_split($str) {
+    return preg_split('//', $str, -1, PREG_SPLIT_NO_EMPTY);
+  }
 }
 
 function rndstr($len) {
-	// 生成字母表
-	$chars = str_split("abcdef1234567890");
-	//$chars = str_split("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-	// 打乱字符顺序
-	shuffle($chars);
-	
-	// 字母表长度
-	$charlen = count($chars);
-	
-	// 生成随机字符串
-	$s = "";
-	for($i=0; $i < $len; $i++) {
-		$s .= $chars[rand(0,$charlen)];
-	}
-	return $s;
+  // 生成字母表
+  $chars = str_split("abcdef1234567890");
+  //$chars = str_split("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  // 打乱字符顺序
+  shuffle($chars);
+  
+  // 字母表长度
+  $charlen = count($chars);
+  
+  // 生成随机字符串
+  $s = "";
+  for($i=0; $i < $len; $i++) {
+    $s .= $chars[rand(0,$charlen)];
+  }
+  return $s;
 }
 
 function error($errmsg, $isdie=false) {
-	if($isdie) {
-		die($errmsg);
-	} else {
-		printf('<br>%s<br>', $errmsg);
-	}
-	
+  if($isdie) {
+    die($errmsg);
+  } else {
+    printf('<br>%s<br>', $errmsg);
+  }
+  
 }
 
 // 获得文件扩展名
 function getfileext($filename) {
-	$retval="";
-	$pt=strrpos($filename, ".");
-	if ($pt) $retval=substr($filename, $pt+1, strlen($filename) - $pt);
-	return ($retval);
+  $retval="";
+  $pt=strrpos($filename, ".");
+  if ($pt) $retval=substr($filename, $pt+1, strlen($filename) - $pt);
+  return ($retval);
 }
 
 function createIndex($dir) {
-	if(is_dir($dir) && !empty($dir)) {
-	  $indexfile = fopen($dir.'/index.htm', 'w+');
-	  if($indexfile) {
-		fwrite($indexfile, '403 access denied.');
-		fclose($indexfile);
-	  } else {
-		trigger_error('create dir('.$dir.') index file failed.', E_USER_ERROR);
-	  }
-	}
+  if(is_dir($dir) && !empty($dir)) {
+    $indexfile = fopen($dir.'/index.htm', 'w+');
+    if($indexfile) {
+    fwrite($indexfile, '403 access denied.');
+    fclose($indexfile);
+    } else {
+    trigger_error('create dir('.$dir.') index file failed.', E_USER_ERROR);
+    }
+  }
 }
 
 // 创建文件夹，如果不存在，则创建
 function createfolders($dir, $createindex=true){
        $bSuccess = (is_dir($dir) or (createfolders(dirname($dir), $createindex) and mkdir($dir, 0777)));
-	   if($bSuccess&&$createindex) {
-		createIndex($dir);
-	   }
-	   return $bSuccess;
+     if($bSuccess&&$createindex) {
+    createIndex($dir);
+     }
+     return $bSuccess;
 }
 
 
@@ -136,51 +133,51 @@ function dicQuery($name, &$dic) {
 
 // 写日志文件
 function writelog($str) {
-	global $_APP,$_PHPKIND_ENVS;
+  global $_APP,$_PHPKIND_ENVS;
 
-	$logfile = _KIND_INCLUDE.$_PHPKIND_ENVS['log'];
+  $logfile = _KIND_INCLUDE.$_PHPKIND_ENVS['log'];
 
-	//echo $APP_NAME;
-	if(!empty($_APP['NAME'])) {
-		$logfile .= '/'.$_APP['NAME'];
-	}
+  //echo $APP_NAME;
+  if(!empty($_APP['NAME'])) {
+    $logfile .= '/'.$_APP['NAME'];
+  }
 
-	if(!is_dir($logfile)) {
-		if(!createfolders($logfile)) {
-			die('you have no pemessioned.');
-		}
-	}
+  if(!is_dir($logfile)) {
+    if(!createfolders($logfile)) {
+      die('you have no pemessioned.');
+    }
+  }
 
-	$logfile .= '/'.strftime('%Y%m%d', time()).'.php';
-	$preHeader = '';
-	$bWriteHeader = (!file_exists($logfile));
-	$f = fopen($logfile, 'a');
-	if($f)
-	{
-		if($bWriteHeader) {
-			fwrite($f, "<? die(\"access denied.\"); ?>\n\n");
-		}
-		
-		if(!is_string($str))
-		{
-			$str = var_export($str, true);
-		}
+  $logfile .= '/'.strftime('%Y%m%d', time()).'.php';
+  $preHeader = '';
+  $bWriteHeader = (!file_exists($logfile));
+  $f = fopen($logfile, 'a');
+  if($f)
+  {
+    if($bWriteHeader) {
+      fwrite($f, "<? die(\"access denied.\"); ?>\n\n");
+    }
+    
+    if(!is_string($str))
+    {
+      $str = var_export($str, true);
+    }
 
-		$s = sprintf("\r\nmodule:%s\r\ntime: %s\r\nerror: %s\r\n*****************************************************************\r\n\r\n", 
-			$_APP['NAME'], 
-			strftime("%Y-%m-%d %H:%M:%S", time()), 
-			$str
-		);
-		fwrite($f, stripslashes($s));
-		fclose($f);
-	} else {
-		die('access denied. you have no pemession.');
-	}
+    $s = sprintf("\r\nmodule:%s\r\ntime: %s\r\nerror: %s\r\n*****************************************************************\r\n\r\n", 
+      $_APP['NAME'], 
+      strftime("%Y-%m-%d %H:%M:%S", time()), 
+      $str
+    );
+    fwrite($f, stripslashes($s));
+    fclose($f);
+  } else {
+    die('access denied. you have no pemession.');
+  }
 }
 
 function _die($str) {
-	//header('Content-type: text/html; charset=utf-8');
-	die($str);
+  //header('Content-type: text/html; charset=utf-8');
+  die($str);
 }
 
 // 获得客户端IP

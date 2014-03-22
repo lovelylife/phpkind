@@ -15,10 +15,9 @@
 define('MAGIC_QUOTES_GPC', get_magic_quotes_gpc());
 
 // 导入系统配置
-include_once(_KROOT."/config.php");
+include(_QROOT."/config.php");
 // 导入系统常用函数库
-include_once(_KROOT."/function.php");
-
+include(_QROOT."/function.php");
 // check session path
 {
   $session_path = session_save_path();
@@ -31,7 +30,7 @@ include_once(_KROOT."/function.php");
 
   if($use_own_path) {
     //print_r(get_defined_vars());
-    $session_path = _KROOT.'/session';
+    $session_path = _QROOT.'/session';
     createfolders($session_path);    
   }
 
@@ -54,22 +53,18 @@ if(ini_get('register_globals')) {
 
 // 清除不需要的全局变量，保存系统使用的变量
 $variables_whitelist = array (
-
-    'GLOBALS',
-    '_SERVER',
-    '_GET',
-    '_POST',
-    '_REQUEST',
-    '_FILES',
-    '_ENV',
-    '_COOKIE',
-    '_SESSION',
-    'error_handler',
-    'variables_whitelist',
-    'key',
-
-/* PHPKIND reservered { */
-  '__DEBUG__',
+  'GLOBALS',
+  '_SERVER',
+  '_GET',
+  '_POST',
+  '_REQUEST',
+  '_FILES',
+  '_ENV',
+  '_COOKIE',
+  '_SESSION',
+  'error_handler',
+  'variables_whitelist',
+  'key',
   '_start',
 /* } */
 );
@@ -108,7 +103,7 @@ if(isset($_GET['inajax'])) {
  
 // Ajax 处理
 if($S_AJAX_MODE) {
-  include_once(_KROOT.'/ajax.lib.class.php');
+  include_once(_QROOT.'/ajax.lib.class.php');
   $data = $_POST['postdata'];
 
   // 去掉单引号转义，否则json_decode无法工作
@@ -127,23 +122,18 @@ if($S_AJAX_MODE) {
   }  
 }
 
-// algorys
-include_once(_KROOT."/algory.class.php");
-// dtl libaries
-include_once(_KROOT.'/dtl.class.php');
-// pager
-include_once(_KROOT."/page.class.php");
-include_once(_KROOT.'/configfile.class.php');
 // for templates
-include_once(_KROOT.'/templates.class.php');
-
+require_file(_QROOT."/algory.class.php");
+require_file(_QROOT."/page.class.php");
+require_file(_QROOT."/configfile.class.php");
+require_file(_QROOT.'/dtl.class.php');
+require_file(_QROOT.'/templates.class.php');
 // application frame work
-include_once(_KROOT.'/module.class.php');
-include_once(_KROOT.'/application.class.php');     
-include_once(_KROOT.'/command.class.php');
+require_file(_QROOT.'/module.class.php');
+require_file(_QROOT.'/application.class.php');     
+require_file(_QROOT.'/command.class.php');
 
-//!初始化应用程序
-//!application frame work
-require(_KROOT.'/apploader2.class.php');
+// application loadder
+require_file(_QROOT.'/apploader.class.php');
 
 ?>

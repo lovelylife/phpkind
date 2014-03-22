@@ -27,8 +27,6 @@ class CLASS_DTL {
   // constuct
   function __construct() {  $this->t_ = null;  }
 
-
-
   // php5 construct
   function CLASS_DTL() { $this->__construct(); }
 
@@ -48,6 +46,7 @@ class CLASS_DTL {
       $result = $this->getDataSource();
       $this->data_type_ = $result['type'];
       $this->data_value_ = $result['value'];
+      print_r($this);
     }
   }
 
@@ -98,6 +97,7 @@ class CLASS_DTL {
     if($this->is_datatype_sql()) {
       $db = $theApp->db();
       $sql = $this->getPageSQL($this->data_value_);
+      echo $sql;
       if(!$db->get_results($sql, $records)) 
         trigger_error($db->get_error(), E_USER_ERROR);
     } else if($this->is_datatype_dict()) {
@@ -382,7 +382,5 @@ class CLASS_DTL {
     $this->attributes_[$attrName] = $value;
   }
 }
-
-
 
 ?>

@@ -5,15 +5,13 @@
  $ 参数: 无
  $ 返回值: 调试返回true 否则为false
 ------------------------------------------------------*/
-function isdebug() {
-  return ($GLOBALS['__DEBUG__']);
-}
+function isdebug() { return _QDEBUG; }
 
-// 用于打印phpkind环境变量，不包括php的环境变量
-function phpkind_info() {
-  $dumpstr = "\r\n<pre>\n<h4>phpkind enviroments</h4>";
-  $dumpstr .= "_BIND_ROOT:\t\t\t"._BIND_ROOT;
-  $dumpstr .= "\r\n_KROOT:\t\t\t\t"._KROOT;
+// 用于打印Q.PHP环境变量，不包括php的环境变量
+function qinfo() {
+  $dumpstr = "\r\n<pre>\n<h4>Q.PHP enviroments</h4>";
+  $dumpstr .= "_QDOCUMENT_ROOT:\t\t\t"._QDOCUMENT_ROOT;
+  $dumpstr .= "\r\n_QROOT:\t\t\t\t"._QROOT;
   $dumpstr .= "\r\n</pre>\r\n";
 
   echo $dumpstr;
@@ -47,8 +45,35 @@ function daddslashes($str, $force = false) {
   return $str;
 }
 
-function get_path($physicalpath) {
-  return str_ireplace(_BIND_ROOT, '', $physicalpath);
+
+function require_file($f) {
+  if(!file_exists($f)) {
+    trigger_error("require file {$f} is not exists", E_USER_ERROR);
+  }
+  return require($f);
+}
+
+function get_path($dir) {
+  return str_ireplace(_QDOCUMENT_ROOT, "", $dir);
+}
+
+/*----------------------------------------------------
+ $ 检测链接是否是SSL连接
+ $ @return bool
+------------------------------------------------------*/
+function is_ssl()
+{
+  if(!isset($_SERVER['HTTPS']))
+    return false;
+  if($_SERVER['HTTPS'] === 1) {  //Apache
+    return true;
+  } elseif($_SERVER['HTTPS'] === 'on') { //IIS
+    return true;
+  } elseif($_SERVER['SERVER_PORT'] == 443) { //其他
+    return true;
+  }
+  
+  return false;
 }
 
 if(!function_exists('str_split')) {
@@ -106,11 +131,11 @@ function createIndex($dir) {
 
 // 创建文件夹，如果不存在，则创建
 function createfolders($dir, $createindex=true){
-       $bSuccess = (is_dir($dir) or (createfolders(dirname($dir), $createindex) and mkdir($dir, 0777)));
-     if($bSuccess&&$createindex) {
+  $bSuccess = (is_dir($dir) or (createfolders(dirname($dir), $createindex) and mkdir($dir, 0777)));
+  if($bSuccess&&$createindex) {
     createIndex($dir);
-     }
-     return $bSuccess;
+  }
+  return $bSuccess;
 }
 
 
@@ -173,11 +198,6 @@ function writelog($str) {
   } else {
     die('access denied. you have no pemession.');
   }
-}
-
-function _die($str) {
-  //header('Content-type: text/html; charset=utf-8');
-  die($str);
 }
 
 // 获得客户端IP

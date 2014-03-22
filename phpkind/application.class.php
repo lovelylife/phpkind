@@ -7,30 +7,27 @@
  $ 应用程序框架
  ----------------------------------------------------------------------*/
 
-//! 应用程序基类
+// 应用程序基类
 class CLASS_APPLICATION {
-  // ! application 环境
-  private $_sName;    
-  private $_sRoot;
-  private $_sPath;
-  private $_sHost;
+  // application 环境
+  private $root_;
+  private $path_;
+  private $host_;
+
+  // 模块操作
+  protected $module_;
+  protected $inajax_;
 
   // 数据库集合
-  private $_oDatabases;
+  private $databases_;
     
-  // 模块操作
-  public  $_module;
-  private $_action;
-  private $_ajaxmode;
-
-  // 日志路径
-  private $_sLogPath;
-  private $_sTemplatesPath;
-  private $_sCachePath;
-  private $_sDataPath;
-  private $_sThemesPath;
-  private $_sTheme;
-  private $_sDefaultTheme;
+  // 路径
+  private $path_log_;
+  private $path_template_;
+  private $path_cache_;
+  private $path_data_;
+  private $path_themes_;
+  private $theme_;
         
   // 模板里的变量名称映射
   private $_refCONFIG;
@@ -38,104 +35,105 @@ class CLASS_APPLICATION {
   private $_refTHEMES;    
   private $_refDICT;
 
-  function __construct($args=array()) {
+  function __construct() {
     //! 初始化应用程序环境
     $this->_refTHEMES  = array();
     $this->_refAPPS = array();
     $this->_refDICT = array();
-    $this->_oDatabases = array();
-      
-    $this->_sRoot = $args['root'];
-    $this->_sPath = $args['path'];
-    $this->_sHost = $args['host'];
+    $this->databases_ = array();
+  }
 
-    $this->_module = $args['module'];  
-    $this->_ajaxmode = $args['ajaxmode'];
-    $this->_action   = $args['action'];
+  function CLASS_APPLICATION($args = array()) { $this->__construct($args); }
+ 
+  function initialize($args) {    
+    $this->root_ = $args['root'];
+    $this->path_ = $args['path'];
+    $this->host_ = $args['host'];
 
-    // 应用程序名称
-    $this->_refAPPS['name'] = &$this->_sName;
+    $this->module_ = $args['module'];  
+    $this->inajax_ = $args['inajax'];
 
-    // 添加对QLib库的支持
-    $this->_refAPPS['qlib'] = _IPATH.'/qlib';
-
-    // 应用程序URL
-    $this->_refAPPS['app'] = $this->_sHost;
-
-    //! 模块URL
-    $this->_refAPPS['module'] = $this->_refAPPS['app'] .'/?'. 'mod='. $this->_module;
-
-    // 应用程序相对路径
-    $this->_refAPPS['path']  = $this->_sPath;
-
-    // 主机域名
-    $this->_refAPPS['host']  = &$this->_sHost;
-
+    // 注册模板变量 
+    $this->_refAPPS['path']  = $this->path_;
+    $this->_refAPPS['app']   = $this->host_.$this->path_;
+    $this->_refAPPS['module']= $this->_refAPPS['app'] .'?'. 'mod='. $this->_module;
+    $this->_refAPPS['host']  = &$this->host_;
     // 导入配置数据
-    $this->_refCONFIG    = require($args['config']);
-
+    $this->_refCONFIG = require_file($this->root_.'/config.php');
     // 初始化资源和主题路径
     // 导入设置
     $paths = &$args['settings'];
     if(is_array($paths)) {
-      $this->_sTemplatesPath = 
+      $this->path_template_ = 
         empty($paths['templates']) ? '/templates' : $paths['templates'];
-      $this->_sCachePath = 
+      $this->path_cache_ = 
         empty($paths['cache_dir']) ? '/cache' : $paths['cache_dir'];
-      $this->_sDataPath = 
+      $this->path_data_ = 
         empty($paths['data_dir']) ? '/data' : $paths['data_dir'];
-      $this->_sThemesPath = 
+      $this->path_themes_ = 
         empty($paths['theme_dir']) ? '/themes' : $paths['theme_dir'];
-      $this->_sSkin = 
+      $this->theme_ = 
         empty($paths['theme_current']) ? '/default' : $paths['theme_current'];
     }
 
-    //! 初始化当前使用皮肤
-    if(!empty($_COOKIE['skin'])) {
-      $this->_sSkin = $_COOKIE['skin'];
+    // 初始化当前使用皮肤
+    if(isset($_COOKIE['theme'])) {
+      $this->theme_ = $_COOKIE['theme'];
     } else {
-      $_COOKIE['skin'] = $this->_sSkin;
+      $_COOKIE['theme'] = $this->theme_;
     }
-
     // 取消了js,images,css这些目录，直接使用theme目录
-    $this->_refTHEMES['path'] =
-    $this->_sPath.$this->_sThemesPath.$this->_sSkin; 
+    $this->_refTHEMES['path'] = $this->path_.$this->path_themes_.$this->theme_; 
   
     // 导入包含文件
-    $this->requireFiles($this->_sRoot.'/includes.required.php');
-    // 启动程序
-    $this->appMain($args);
+    $this->requireFiles($this->root_.'/includes.required.php');
   }
 
-  function CLASS_APPLICATION($args = array()) 
-  { 
-    $this->__construct($args); 
-  }
-       
-//! operations
-    function getAppRoot() { return $this->_sRoot; }
-    function getAppPath() { return $this->_sPath; }
-    function getUrlApp()  { return $this->_refAPPS['app'];}
-    function getUrlModule() { return $this->_refAPPS['module'];}
- 
-    function getAppLogPath() { return $this->_sLogPath; }
-    function getTemplatesPath() {return $this->_sTemplatesPath; }
-    function getDataPath()   { return $this->_sDataPath; }
-    function getCachePath()  { return $this->_sCachePath; }
-    function getTheme()       { return $this->_sSkin; }
-    function getDefaultTheme(){ return '/default'; }
-    function getAction()    { return $this->_action;   }
-    function getModule()    { return $this->_module;   }
-    function inAjax()      { return $this->_ajaxmode; }
+  // appMain入口函数
+  function appMain($args) {
+    // 初始化环境
+    $this->initialize($args);
+    // 初始化默认模块
+    $default_module_file = $this->getAppRoot().'/modules/default.class.php';
+    $module_file = $this->getAppRoot().'/modules/'.$this->module_.'.class.php';
+    if(!file_exists($module_file))  
+      trigger_error('module ['.$this->module_.'] not exists.', E_USER_ERROR);
 
-    function& getCONFIG($segName=null) {
-        if(empty($segName)) {
-            return $this->_refCONFIG;
-        } else {
-            return $this->_refCONFIG[$segName];
-        }
+    // 模块文件
+    require_file($module_file);
+
+    // 加载模块
+    $class = 'CLASS_MODULE_'.strtoupper($this->module_);
+    if(class_exists($class)) {
+      $module = new $class;
+      $this->moduleCallback($module);
+      $module->onInitialize($this);
+    } else {
+      trigger_error($class. ' is not defined.');
+    }  
+  }
+  
+  //! operations
+  function getAppRoot() { return $this->root_; }
+  function getAppPath() { return $this->path_; }
+  function getUrlApp()  { return $this->_refAPPS['app'];}
+  function getUrlModule() { return $this->_refAPPS['module'];}
+  function getAppLogPath() { return $this->path_log_; }
+  function getTemplatesPath() {return $this->path_template_; }
+  function getDataPath()   { return $this->path_data_; }
+  function getCachePath()  { return $this->path_cache_; }
+  function getTheme()       { return $this->theme_; }
+  function getDefaultTheme(){ return '/default'; }
+  function inAjax()      { return $this->inajax_; }
+  function& getCONFIG($segName=null) {
+    if(empty($segName)) {
+      return $this->_refCONFIG;
+    } else {
+      return $this->_refCONFIG[$segName];
     }
-    // deliver char is '.', for example: dbs.default.host
+  }
+ 
+  // deliver char is '.', for example: dbs.default.host
   function Config($cfg_name) {
     $subvars = split('\.', $cfg_name);
       $len = count($subvars);
@@ -152,18 +150,16 @@ class CLASS_APPLICATION {
     return $value;
   }
     
-  function getAPPS($name) { return $this->_refAPPS[$name]; }
-  function getTHEMES($name) { return $this->_refTHEMES[$name]; }
     
-    // 支持多数据库，根据名称访问数据对象,默认访问default数据库
+  // 支持多数据库，根据名称访问数据对象,默认访问default数据库
   function& db($name='default') {
     $db = null;
 
     // 检测数据库实例是否存在
-    if(is_array($this->_oDatabases) 
-      && array_key_exists($name, $this->_oDatabases))
+    if(is_array($this->databases_) 
+      && array_key_exists($name, $this->databases_))
     {
-      $db = &$this->_oDatabases[$name];
+      $db = &$this->databases_[$name];
       if( $db != null)
         return $db;
     }
@@ -215,58 +211,24 @@ class CLASS_APPLICATION {
       }
     }
 
-    $require_files = require_once($cfgfile);
+    $require_files = require_file($cfgfile);
     if(is_array($require_files)) {
       foreach($require_files as $file) {
         if(file_exists($file)) {
-          require_once($file);
+          require_file($file);
         } else {
-          require_once($this->getAppRoot().$file);
+          require_file($this->getAppRoot().$file);
         }
       }
     }
   }
     
-  // appMain入口函数
-  function appMain($args) {
-    // 初始化默认模块
-    $default_module_file = $this->getAppRoot().'/modules/default.class.php';
-    $module_file = $this->getAppRoot().'/modules/'.$this->_module.'.class.php';
-
-    if(!file_exists($module_file))  {
-      trigger_error(
-        'module ['.$this->_module.'] not exists.', 
-        E_USER_ERROR
-      );
-    }
-
-    // 模块文件
-    require_once($module_file);
-
-    // 加载模块
-    $class = 'CLASS_MODULE_'.strtoupper($this->_module);
-    if(class_exists($class)) {
-      $module = new $class;
-      $this->moduleCallback($module);
-      $module->onInitialize($this);
-    } else {
-      trigger_error($class. ' is not defined.');
-    }  
-  }
-
   function moduleCallback($module) {}
-
-  function& getRefAPPS() {
-    return $this->_refAPPS;
-  }
-
-  function& getRefTHEMES() {
-    return $this->_refTHEMES;
-  }
-
-  function& getRefCONFIG() {
-    return $this->_refCONFIG;
-  }
+  function getAPPS($name)   { return $this->_refAPPS[$name]; }
+  function getTHEMES($name) { return $this->_refTHEMES[$name]; }
+  function& getRefAPPS()    { return $this->_refAPPS; }
+  function& getRefTHEMES()  { return $this->_refTHEMES; }
+  function& getRefCONFIG()  { return $this->_refCONFIG; }
 }
 
 ?>

@@ -1,17 +1,18 @@
 <?php
 
-
 /*--------------------------------------------------------------------
- $ module: CORE APPLICATION MODULE FRAMEWORK For PHPKind
+ $ module: MODULE FRAMEWORK For Q.PHP
  $ date:   2009-11-10 21:23:28
  $ author: LovelyLife
  $ last modified: 2012-04-24 12:47:47
- $ copyright www.onlyaa.com
+ $ copyright www.qlibs.com
 ----------------------------------------------------------------------*/
 
 class CLASS_MODULE {
   // 应用程序实例
   private $app_;
+  private $action_;
+
   // Ajax请求数据
   public $request;    
   // Ajax应答数据
@@ -20,14 +21,15 @@ class CLASS_MODULE {
   public $errmsgs;
 
   // 构造函数
-  function __construct() { 
+  function __construct() {
+    $this->action_ = $_GET['action'];
     $this->request = &$_POST; 
     $this->response = null;    
     $this->errmsgs = array();
   }
      
   // 构造函数
-  function CLASS_MODULE(){  $this->__construct();  }
+  function CLASS_MODULE(){ $this->__construct();  }
 
   function onInitialize(&$theApp) {
     $this->app_ = $theApp;
@@ -47,14 +49,14 @@ class CLASS_MODULE {
     // 应答包
     $this->response = new CLASS_AJAX_PACKAGE();
     $this->response->set_header(0);        // 正确应答包
-    $this->doAjax($this->App()->getAction());
+    $this->doAjax($this->action_);
     
     echo $this->response->__toString();
   }
     
   // 非Ajax模式入口
   function __domain() {
-    $this->doMain($this->App()->getAction());
+    $this->doMain($this->action_);
   }
     
   // 多态接口，用于处理普通表单的提交的请求

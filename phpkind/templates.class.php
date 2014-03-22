@@ -4,7 +4,7 @@
  $ function to parse the html template to useful stream
  $ created: 2009-6-2 by LovelyLife
  $ lastModified: 2013-03-16 1:40:55
- $ powered by http://onlyaa.com
+ $ powered by http://qlibs.com
 
  $ examples
  vars   
@@ -27,10 +27,6 @@
     直接打印。
 ----------------------------------------------------------------------*/
 
-if(!defined('_PHPKIND')) {
-    die('<h3>Forbidden</h3>');
-}
-
 class CLASS_TEMPLATES {
 
   protected $theApp;
@@ -39,9 +35,9 @@ class CLASS_TEMPLATES {
   // 模板缓冲目录
   private $tplCDir;    
   //! 皮肤
-  private $sSkin;    
+  private $theme_;    
   //! 默认皮肤
-  private $sDefaultSkin;
+  private $default_theme_;
   // 字典
   private $dict;
   // 命名数据缓存
@@ -79,14 +75,14 @@ class CLASS_TEMPLATES {
     if(!file_exists($this->tplCDir)) 
       createfolders($this->tplCDir);
         
-    $this->sSkin = $theApp->getTheme();
-    $this->sDefaultSkin = $theApp->getDefaultTheme();
+    $this->theme_ = $theApp->getTheme();
+    $this->default_theme_ = $theApp->getDefaultTheme();
     $this->tpl_file_ = null;
     $this->tags = array();
     $this->dict = array();
     // 载入字典
     $theApp->add_dictionary($this);
-       $this->cache_data_ = array();
+    $this->cache_data_ = array();
   }
   
   function CLASS_TEMPLATES($theApp) { $this->__construct($theApp); }
@@ -125,7 +121,7 @@ class CLASS_TEMPLATES {
 
     // 初始化标签
     //@require
-    $array = require($this->tpl_tags_file_);
+    $array = require_file($this->tpl_tags_file_);
     foreach($array as $key => $tag_config) {
       $ui_object = $this->create_object($tag_config['nodeName_']);
       $ui_object->unserialize($tag_config);
@@ -209,11 +205,11 @@ class CLASS_TEMPLATES {
     extract($_GET, EXTR_PREFIX_ALL, 'get');
     extract($_POST, EXTR_PREFIX_ALL, 'post');
 
-    require $php_file;
+    require_file($php_file);
   }
 
   private function load_template($view) {
-    $this->tpl_file_ = $this->tplDir.$this->sSkin.'/'.$view.'.htm';
+    $this->tpl_file_ = $this->tplDir.$this->theme_.'/'.$view.'.htm';
     //$cache_file = $this->tplCDir.'/'.$view.'.php';
     // 输出html流
     $template_html = $this->readtemplate($view);
@@ -378,11 +374,11 @@ class CLASS_TEMPLATES {
     $tplname = $params['path'];                      
         
     //! 模板文件全路径         
-    $tplFile = $tplDir.$this->sSkin.'/'.$tplname.'.htm';
+    $tplFile = $tplDir.$this->theme_.'/'.$tplname.'.htm';
 
     //如果指定风格模板文件不存在，则直接调用默认风格的模板文件
     if(!file_exists($tplFile)) {
-      $tplFile = $tplDir.$this->sDefaultSkin.'/'.$tplname.'.htm';
+      $tplFile = $tplDir.$this->default_theme_.'/'.$tplname.'.htm';
       if(!file_exists($tplFile)) {
         trigger_error("template ({$tplname}) is not exists.", E_USER_ERROR);
       }
@@ -478,7 +474,7 @@ class CLASS_TEMPLATES {
                    .$this->theApp->getDataPath()
                    ."/".$attrs['src'].".php";
       if(file_exists($dict_file)) {
-        $arr = require_once($dict_file);
+        $arr = require_file($dict_file);
         if(is_array($arr) && !empty($arr)) {
           $this->dict = array_merge($this->dict, $arr);
         }

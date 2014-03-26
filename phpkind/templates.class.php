@@ -228,10 +228,15 @@ class CLASS_TEMPLATES {
       '$this->import("\\1", "\\2")', 
       $content
     );
-      
+
+    //echo ($phplable?"php":"not"); 
+    preg_match_all('/<(html):(\w+).*?<\/\1:\2>/s', $content, $matches);
+    //print_r($matches);
+
+    #return;
     // 解析html:标签 <html:lablename attrs='value'>tpl</html:label>
     $content = preg_replace_callback(
-      '/<(html):(\w+).+?<\/\1:\2>/is',  //use:'/<(html|cms):(\w+).+?<\/\1:\2>/is',
+      '/<(html):(\w+).*?<\/\1:\2>/s',  //use:'/<(html|cms):(\w+).+?<\/\1:\2>/is',
       array($this, $phplabel?'complie_html_tag':'complie_html_tag_value'),
       $content
     );
@@ -439,9 +444,9 @@ class CLASS_TEMPLATES {
 
   function complie_html_tag_value($matches) {
     // $namespace = $matches[1];
+    print_r($matches);
     $tagName = $matches[2];
     $tag = $matches[0];
-
     $tag_object =  $this->create_object($tagName);
     $tag_object->Parse($tag);
     
@@ -588,7 +593,7 @@ class CLASS_TEMPLATES {
         
     $bfoundfile = file_exists($includefile);
     if(!$bfoundfile) {
-      $includefile = _KROOT."/ui/html.{$tagName}.class.php";
+      $includefile = _QROOT."/ui/html.{$tagName}.class.php";
       $bfoundfile = (file_exists($includefile));
     }
     

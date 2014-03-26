@@ -63,7 +63,7 @@ class CLASS_APPLOADER {
     $appRequiredFile = $appRoot.'/app.required.php';
     if(!file_exists($appRequiredFile)) {
       // 已经不再支持应用程序文件修复，可以使用command工具修复
-      //if(!copy(_KROOT.'/app_templates/app.required.php', $appRequiredFile)) {
+      //if(!copy(_QROOT.'/app_templates/app.required.php', $appRequiredFile)) {
       //  //writelog("restore file error.");
       //    trigger_error('restore file error.', E_USER_ERROR);
       //}

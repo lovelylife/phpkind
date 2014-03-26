@@ -36,7 +36,6 @@ class CLASS_DTL {
     if(!method_exists($this, $onname)) {
       return '[!Q.PHP: "&lt;'.$matches[1].':'.$matches[2].'&gt;" not supported]';
     }
-print_r($this);
     return $this->$onname($matches[3]);
   }
 
@@ -46,7 +45,6 @@ print_r($this);
       $result = $this->getDataSource();
       $this->data_type_ = $result['type'];
       $this->data_value_ = $result['value'];
-      print_r($this);
     }
   }
 
@@ -297,7 +295,6 @@ print_r($this);
   // out put html
   function __toString() 
   {
-    print_r($this); 
     $tpl = $this->t_->complie_php_vars($this->tpl_data_);
     $this->InitDataSource();    
     $out_html_ = $this->onheader();  

@@ -102,7 +102,6 @@ class CLASS_TEMPLATES {
         // 编译模板内容
         $template_html = $this->compile($template_html, $phplabel);
       }
-
       // 序列化Tags, 保存早模板对应的.tags.php文件
       $cfg_file = new CLASS_CONFIG_FILE($this->tpl_tags_file_);
       $config = &$cfg_file->config();
@@ -204,8 +203,7 @@ class CLASS_TEMPLATES {
     extract($this->tags, EXTR_PREFIX_ALL, 'html_tags');
     extract($_GET, EXTR_PREFIX_ALL, 'get');
     extract($_POST, EXTR_PREFIX_ALL, 'post');
-
-    require_file($php_file);
+    require($php_file);
   }
 
   private function load_template($view) {
@@ -229,20 +227,13 @@ class CLASS_TEMPLATES {
       $content
     );
 
-    //echo ($phplable?"php":"not"); 
-    preg_match_all('/<(html):(\w+).*?<\/\1:\2>/s', $content, $matches);
-    //print_r($matches);
-
-    #return;
     // 解析html:标签 <html:lablename attrs='value'>tpl</html:label>
     $content = preg_replace_callback(
-      '/<(html):(\w+).*?<\/\1:\2>/s',  //use:'/<(html|cms):(\w+).+?<\/\1:\2>/is',
+      '/<(html):(\w+).+?<\/\1:\2>/s',  //use:'/<(html|cms):(\w+).+?<\/\1:\2>/is',
       array($this, $phplabel?'complie_html_tag':'complie_html_tag_value'),
       $content
     );
-
     //$content = $this->complie_php_vars($content);
-    
     $content = preg_replace_callback(
       '/\{\$+(globals|themes|fields|v|cfg|get|post|app):(\w+)((\.\w+)*)(\s+\w+="[^"]*")*\s*\/?\}/is', 
         array($this, $phplabel?'compile_vars':'compile_values'),
@@ -261,7 +252,6 @@ class CLASS_TEMPLATES {
   }
 
   function compile_vars($matches) {
-    //print_r($matches);
     // 检测转义符号$, $$=>$, $$$=>$$
     if(preg_match('/\{\${2,}/', $matches[0])) {
       // print_r($matches);
@@ -279,7 +269,6 @@ class CLASS_TEMPLATES {
     $expression = $vartype.'_'.$varname;
     //! 解析属性
     $attrs = CLASS_DTL::parse_attrs($matches[0]);
-        
     if($subvars != '') {
       $sTemp = '';
       $arr = split('\.', $subvars);
@@ -305,7 +294,7 @@ class CLASS_TEMPLATES {
   }
     
   function compile_values($matches) {
-    // print_r($matches);    
+    print_r($matches);    
     // 检测转义符号$, $$=>$, $$$=>$$    
     if(preg_match('/\{\${2,}/', $matches[0])) {    
       // print_r($matches);    
@@ -319,7 +308,7 @@ class CLASS_TEMPLATES {
       return '';    
     }    
     
-        // 获取变量值, 处理子值    
+    // 获取变量值, 处理子值    
     $varname = $matches[2];    
     $subvars = $matches[3];    
     $value = $this->$vartype($varname);    
@@ -353,11 +342,8 @@ class CLASS_TEMPLATES {
     
     // 调用函数    
     if(isset($attrs["func"])) {    
-      //print($value);    
       $func = str_ireplace('@this', '\''.$value.'\'', $attrs['func']);    
-      // print($func."\n");    
       if(isdebug()) {    
-        // echo '$value = '.stripslashes($func).';';    
         eval('$value = '.stripslashes($func).';');    
       } else {    
         @eval('$value = '.stripslashes($func).';');    
@@ -444,7 +430,7 @@ class CLASS_TEMPLATES {
 
   function complie_html_tag_value($matches) {
     // $namespace = $matches[1];
-    print_r($matches);
+    //print_r($matches);
     $tagName = $matches[2];
     $tag = $matches[0];
     $tag_object =  $this->create_object($tagName);
@@ -598,7 +584,7 @@ class CLASS_TEMPLATES {
     }
     
     if($bfoundfile) {      
-      include_once($includefile);      
+      require_once($includefile);      
       if(class_exists($className)) {
         $instance = new $className();
         $instance->setTemplate($this);

@@ -16,8 +16,7 @@ class CLASS_DTL_LIST extends CLASS_DTL {
   function CLASS_DTL_LIST() { $this->__construct(); }
   
   function ondata($item_tpl) {
-    print_r($this);      
-	  $this->value_selected = $this->getAttribute('valueSelected');
+    $this->value_selected = $this->getAttribute('valueSelected');
     $this->key_selected = $this->getAttribute('keySelected');
     $this->mask_selected = $this->getAttribute('maskSelected');
     if($this->is_datatype_sql()) {

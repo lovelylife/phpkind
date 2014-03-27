@@ -33,11 +33,7 @@ class CLASS_TEMPLATES {
   // 模板路径
   private $tplDir;
   // 模板缓冲目录
-  private $tplCDir;    
-  //! 皮肤
-  private $theme_;    
-  //! 默认皮肤
-  private $default_theme_;
+  private $tpl_cache_dir_;    
   // 字典
   private $dict;
   // 命名数据缓存
@@ -67,16 +63,14 @@ class CLASS_TEMPLATES {
         
     //  模板和缓冲路径
     $this->tplDir  = $appRoot.$theApp->getTemplatesPath();  
-    $this->tplCDir = $appRoot.$theApp->getCachePath();
+    $this->tpl_cache_dir_ = $appRoot.$theApp->getCachePath();
 
     if(!file_exists($this->tplDir))
       createfolders($this->tplDir);
 
-    if(!file_exists($this->tplCDir)) 
-      createfolders($this->tplCDir);
+    if(!file_exists($this->tpl_cache_dir_)) 
+      createfolders($this->tpl_cache_dir_);
         
-    $this->theme_ = $theApp->getTheme();
-    $this->default_theme_ = $theApp->getDefaultTheme();
     $this->tpl_file_ = null;
     $this->tags = array();
     $this->dict = array();
@@ -88,9 +82,9 @@ class CLASS_TEMPLATES {
   function CLASS_TEMPLATES($theApp) { $this->__construct($theApp); }
   
   function load($view) {
-    // 解析成php的标签，直接使用变量值
+    // 解析成php的标签，直接使用变量值 
     $phplabel = true;
-    $this->tpl_cache_file_ = $this->tplCDir.'/'.$view.'.php';
+    $this->tpl_cache_file_ = $this->tpl_cache_dir_.'/'.str_replace('/', '-', $view).'.php';
     $this->tpl_tags_file_ = $this->tpl_cache_file_.".tags.php";
     $need_complie = !file_exists($this->tpl_cache_file_);
   
@@ -160,7 +154,7 @@ class CLASS_TEMPLATES {
     $cache_file ='';
     do 
     {
-      $cache_file = $this->tplCDir.'/tmp.'.$c.'.php';
+      $cache_file = $this->tpl_cache_dir_.'/tmp.'.$c.'.php';
       $c++;
     } while(file_exists($cache_file));
 
@@ -207,8 +201,8 @@ class CLASS_TEMPLATES {
   }
 
   private function load_template($view) {
-    $this->tpl_file_ = $this->tplDir.$this->theme_.'/'.$view.'.htm';
-    //$cache_file = $this->tplCDir.'/'.$view.'.php';
+    $this->tpl_file_ = $this->tplDir.'/'.$view.'.htm';
+    //$cache_file = $this->tpl_cache_dir_.'/'.$view.'.php';
     // 输出html流
     $template_html = $this->readtemplate($view);
 
@@ -289,7 +283,6 @@ class CLASS_TEMPLATES {
     }
 
     // echo $expression;
-         
     return '<?='.$expression.'?>';
   }
     
@@ -365,11 +358,11 @@ class CLASS_TEMPLATES {
     $tplname = $params['path'];                      
         
     //! 模板文件全路径         
-    $tplFile = $tplDir.$this->theme_.'/'.$tplname.'.htm';
+    $tplFile = $tplDir.'/'.$tplname.'.htm';
 
     //如果指定风格模板文件不存在，则直接调用默认风格的模板文件
     if(!file_exists($tplFile)) {
-      $tplFile = $tplDir.$this->default_theme_.'/'.$tplname.'.htm';
+      $tplFile = $tplDir.'/'.$tplname.'.htm';
       if(!file_exists($tplFile)) {
         trigger_error("template ({$tplname}) is not exists.", E_USER_ERROR);
       }
@@ -382,7 +375,7 @@ class CLASS_TEMPLATES {
     // 暂不解析
     // 解析{#template name="tplname"/} 子模板
     $tpldata = preg_replace(
-       '/\{#template\s+([^\/}]+?)\s*\/?\}/ie',
+       '/\{#template\s+([^\}]+?)\s*\/?\}/ie',
        '$this->readtemplate("\\1")', 
        $tpldata
     );
@@ -395,7 +388,7 @@ class CLASS_TEMPLATES {
   }
 
   public function setCDir($newdir) {
-    $this->tplCDir = $newdir;
+    $this->tpl_cache_dir_ = $newdir;
   }
   
   // 处理模板指令

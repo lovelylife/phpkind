@@ -84,7 +84,6 @@ class CLASS_APPLICATION {
     }
     // 取消了js,images,css这些目录，直接使用theme目录
     $this->_refTHEMES['path'] = ($this->path_ == '/'?'':$this->path_).$this->path_themes_.$this->theme_; 
-    //print_r($this->_refTHEMES); 
     // 导入包含文件
     $this->requireFiles($this->root_.'/includes.required.php');
   }
@@ -138,7 +137,6 @@ class CLASS_APPLICATION {
     $subvars = split('\.', $cfg_name);
     $len = count($subvars);
     $value = $this->_refCONFIG[$subvars[0]];
-      //print_r($subvars);
     for($i=1; $i<$len; $i++) {
       $key = $subvars[$i];
       if(is_array($value) && array_key_exists($key, $value)) {

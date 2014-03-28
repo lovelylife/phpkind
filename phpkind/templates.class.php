@@ -287,7 +287,6 @@ class CLASS_TEMPLATES {
   }
     
   function compile_values($matches) {
-    print_r($matches);    
     // 检测转义符号$, $$=>$, $$$=>$$    
     if(preg_match('/\{\${2,}/', $matches[0])) {    
       // print_r($matches);    
@@ -409,12 +408,8 @@ class CLASS_TEMPLATES {
 
     // 创建标签对象
     $id = $tag_object->getAttribute('id');
-    if(empty($id)) {
-      //print_r($html_object);
-      $this->error(
-        htmlspecialchars("must have an id attribute. \n{$tag}"));
-    }
-
+    if(empty($id)) 
+      $this->error(htmlspecialchars("must have an id attribute. \n{$tag}"));
     $this->tags[$id] = $tag_object;
     
     // 返回标签id
@@ -422,8 +417,6 @@ class CLASS_TEMPLATES {
   }
 
   function complie_html_tag_value($matches) {
-    // $namespace = $matches[1];
-    //print_r($matches);
     $tagName = $matches[2];
     $tag = $matches[0];
     $tag_object =  $this->create_object($tagName);

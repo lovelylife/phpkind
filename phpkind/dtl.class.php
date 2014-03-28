@@ -95,7 +95,6 @@ class CLASS_DTL {
     if($this->is_datatype_sql()) {
       $db = $theApp->db();
       $sql = $this->getPageSQL($this->data_value_);
-      echo $sql;
       if(!$db->get_results($sql, $records)) 
         trigger_error($db->get_error(), E_USER_ERROR);
     } else if($this->is_datatype_dict()) {
@@ -145,7 +144,7 @@ class CLASS_DTL {
   }
   
   function parse_item($value, $attrs_str) {
-    // print_r($attrs);
+    //print_r($attrs);
     $attrs = CLASS_DTL::parse_attrs($attrs_str);
 
     // 处理字典

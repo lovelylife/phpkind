@@ -56,7 +56,7 @@ class CLASS_APPLICATION {
     // 注册模板变量 
     $this->_refAPPS['path']  = $this->path_;
     $this->_refAPPS['app']   = $this->host_.$this->path_;
-    $this->_refAPPS['module']= $this->_refAPPS['app'] .'?'. 'mod='. $this->_module;
+    $this->_refAPPS['module']= $this->_refAPPS['app'] .'?'. 'mod='. $this->module_;
     $this->_refAPPS['host']  = &$this->host_;
     // 导入配置数据
     $this->_refCONFIG = require_file($this->root_.'/config.php');

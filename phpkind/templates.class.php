@@ -352,16 +352,16 @@ class CLASS_TEMPLATES {
     // 导入模板
   function readtemplate($tplname) {        
     $tplDir = &$this->tplDir;                              
-    //! 解析模板文件名, 暂时不支持模板传参数 {t:参数名称}
+    // 解析模板文件名, 暂时不支持模板传参数 {t:参数名称}
     $params = parse_url($tplname);
     $tplname = $params['path'];                      
         
     //! 模板文件全路径         
-    $tplFile = $tplDir.'/'.$tplname.'.htm';
+    $tplFile = $tplDir.'/'.$tplname;
 
-    //如果指定风格模板文件不存在，则直接调用默认风格的模板文件
+    //如果文件不存在则搜索带.htm后缀的
     if(!file_exists($tplFile)) {
-      $tplFile = $tplDir.'/'.$tplname.'.htm';
+      $tplFile = $tplFile.'.htm';
       if(!file_exists($tplFile)) {
         trigger_error("template ({$tplname}) is not exists.", E_USER_ERROR);
       }

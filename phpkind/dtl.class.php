@@ -240,6 +240,7 @@ class CLASS_DTL {
 
   function getPager() {
     if(!$this->pager_) {
+       
       // page
       $page_size = intval($this->getAttribute("pagesize"));
       $sql = $this->data_value_;
@@ -259,7 +260,7 @@ class CLASS_DTL {
         $this->pager_ = new CLASS_PAGE($cfg);
       } 
     }
-
+ 
     return $this->pager_;
   }
 
@@ -295,7 +296,7 @@ class CLASS_DTL {
   function __toString() 
   {
     $tpl = $this->t_->complie_php_vars($this->tpl_data_);
-    $this->InitDataSource();    
+    $this->initDataSource();    
     $out_html_ = $this->onheader();  
     // 解析t:标签,例如 <t:data>tpl</t:data>
     $out_html_ .= preg_replace_callback(

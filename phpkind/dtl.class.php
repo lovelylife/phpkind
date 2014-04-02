@@ -368,11 +368,11 @@ class CLASS_DTL {
   // 读取标签属性
   function getAttribute($attrName) {
     $s = $this->attributes_[$attrName];
-    if(!empty($s)) {
+    if(is_string($s)) {
       return $this->t_->complie_php_vars($s);
     }
 
-    return '';
+    return $s;
   }
     
     //设置标签属性

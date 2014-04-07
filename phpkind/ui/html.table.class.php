@@ -19,7 +19,6 @@ class CLASS_DTL_TABLE extends CLASS_DTL {
   }
 
   function ondata($item_tpl) {
-
     if($this->is_viewtype_tree()) {
       $records = $this->query_data();
       return $this->query_tree_data_tpl($records, $item_tpl);

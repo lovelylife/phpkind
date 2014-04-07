@@ -52,7 +52,7 @@ class CLASS_TEMPLATES {
   // 构造函数
   function __construct($theApp) {    
     if(!is_object($theApp)) {
-      trigger_error("theApp paramter is invalid.", E_USER_ERROR);
+      trigger_error("theApp parameter is invalid.", E_USER_ERROR);
     }
 
     $this->tplvarscache = array();
@@ -62,11 +62,11 @@ class CLASS_TEMPLATES {
     $appRoot = $theApp->getAppRoot();
         
     //  模板和缓冲路径
-    $this->tplDir  = $appRoot.$theApp->getTemplatesPath();  
-    $this->tpl_cache_dir_ = $appRoot.$theApp->getCachePath();
+    $this->tpl_dir_  = $theApp->getTemplatesDir();  
+    $this->tpl_cache_dir_ = $theApp->getCacheDir();
 
-    if(!file_exists($this->tplDir))
-      createfolders($this->tplDir);
+    if(!file_exists($this->tpl_dir_))
+      createfolders($this->tpl_dir_);
 
     if(!file_exists($this->tpl_cache_dir_)) 
       createfolders($this->tpl_cache_dir_);
@@ -201,7 +201,7 @@ class CLASS_TEMPLATES {
   }
 
   private function load_template($view) {
-    $this->tpl_file_ = $this->tplDir.'/'.$view.'.htm';
+    $this->tpl_file_ = $this->tpl_dir_.'/'.$view.'.htm';
     //$cache_file = $this->tpl_cache_dir_.'/'.$view.'.php';
     // 输出html流
     $template_html = $this->readtemplate($view);
@@ -276,7 +276,6 @@ class CLASS_TEMPLATES {
 
     // 调用函数
     if(isset($attrs["func"])) {
-      //print($attrs["func"]);
       $expression = str_ireplace('@this', '$'.$expression, $attrs['func']);
     } else {
       $expression = '$'.$expression;
@@ -285,7 +284,7 @@ class CLASS_TEMPLATES {
     // echo $expression;
     return '<?='.$expression.'?>';
   }
-    
+
   function compile_values($matches) {
     // 检测转义符号$, $$=>$, $$$=>$$    
     if(preg_match('/\{\${2,}/', $matches[0])) {    
@@ -351,14 +350,12 @@ class CLASS_TEMPLATES {
 
     // 导入模板
   function readtemplate($tplname) {        
-    $tplDir = &$this->tplDir;                              
+    $tplDir = &$this->tpl_dir_;                              
     // 解析模板文件名, 暂时不支持模板传参数 {t:参数名称}
     $params = parse_url($tplname);
     $tplname = $params['path'];                      
-        
     //! 模板文件全路径         
     $tplFile = $tplDir.'/'.$tplname;
-
     //如果文件不存在则搜索带.htm后缀的
     if(!file_exists($tplFile)) {
       $tplFile = $tplFile.'.htm';
@@ -383,7 +380,7 @@ class CLASS_TEMPLATES {
   }
       
   public function setDir($newdir) {
-    $this->tplDir = $newdir;
+    $this->tpl_dir_ = $newdir;
   }
 
   public function setCDir($newdir) {
@@ -447,8 +444,7 @@ class CLASS_TEMPLATES {
       $this->load_dicFromDatabase($attrs);
     } else {
       // 加载xml字典
-      $dict_file = $this->theApp->getAppRoot()
-                   .$this->theApp->getDataPath()
+      $dict_file = $this->theApp->getDataDir()
                    ."/".$attrs['src'].".php";
       if(file_exists($dict_file)) {
         $arr = require_file($dict_file);

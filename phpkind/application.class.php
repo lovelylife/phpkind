@@ -22,10 +22,10 @@ class CLASS_APPLICATION {
   private $databases_;
     
   // 路径
-  private $path_log_;
-  private $path_template_;
-  private $path_cache_;
-  private $path_data_;
+  private $dir_log_;
+  private $dir_template_;
+  private $dir_cache_;
+  private $dir_data_;
   private $path_themes_;
   private $theme_;
         
@@ -64,12 +64,12 @@ class CLASS_APPLICATION {
     // 导入设置
     $paths = &$args['settings'];
     if(is_array($paths)) {
-      $this->path_template_ = 
-        empty($paths['templates']) ? '/templates' : $paths['templates'];
-      $this->path_cache_ = 
-        empty($paths['cache_dir']) ? '/cache' : $paths['cache_dir'];
-      $this->path_data_ = 
-        empty($paths['data_dir']) ? '/data' : $paths['data_dir'];
+      $this->dir_template_ = $this->root_.
+        (empty($paths['templates']) ? '/templates' : $paths['templates']);
+      $this->dir_cache_ = $this->root_.
+        (empty($paths['cache_dir']) ? '/cache' : $paths['cache_dir']);
+      $this->dir_data_ = $this->root_.
+        (empty($paths['data_dir']) ? '/data' : $paths['data_dir']);
       $this->path_themes_ = 
         empty($paths['theme_dir']) ? '/themes' : $paths['theme_dir'];
       $this->theme_ = 
@@ -117,10 +117,10 @@ class CLASS_APPLICATION {
   function getAppPath() { return $this->path_; }
   function getUrlApp()  { return $this->_refAPPS['app'];}
   function getUrlModule() { return $this->_refAPPS['module'];}
-  function getAppLogPath() { return $this->path_log_; }
-  function getTemplatesPath() {return $this->path_template_; }
-  function getDataPath()   { return $this->path_data_; }
-  function getCachePath()  { return $this->path_cache_; }
+  function getAppLogDir() { return $this->dir_log_; }
+  function getTemplatesDir() {return $this->dir_template_; }
+  function getDataDir()   { return $this->dir_data_; }
+  function getCacheDir()  { return $this->dir_cache_; }
   function getTheme()       { return $this->theme_; }
   function getDefaultTheme(){ return '/default'; }
   function inAjax()      { return $this->inajax_; }

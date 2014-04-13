@@ -16,6 +16,7 @@ class CLASS_APPLICATION {
 
   // 模块操作
   protected $module_;
+  protected $action_;
   protected $inajax_;
 
   // 数据库集合
@@ -51,6 +52,7 @@ class CLASS_APPLICATION {
     $this->host_ = $args['host'];
 
     $this->module_ = $args['module'];  
+    $this->action_ = $args['action'];  
     $this->inajax_ = $args['inajax'];
 
     // 注册模板变量 
@@ -92,12 +94,17 @@ class CLASS_APPLICATION {
   function appMain($args) {
     // 初始化环境
     $this->initialize($args);
+    
     // 初始化默认模块
     $default_module_file = $this->getAppRoot().'/modules/default.class.php';
     $module_file = $this->getAppRoot().'/modules/'.$this->module_.'.class.php';
     if(!file_exists($module_file))  
       trigger_error('module ['.$this->module_.'] not exists.', E_USER_ERROR);
-
+    
+    // 访问控制
+    if(!$this->access_control($this->module_, $this->action_)) {
+      trigger_error("have no authority", E_USER_ERROR);
+    }
     // 模块文件
     require_file($module_file);
 
@@ -105,25 +112,29 @@ class CLASS_APPLICATION {
     $class = 'CLASS_MODULE_'.strtoupper($this->module_);
     if(class_exists($class)) {
       $module = new $class;
-      $this->moduleCallback($module);
-      $module->onInitialize($this);
+      if($this->inAjax()) {
+        $module->__doAjax($this, $this->action_);
+      } else {
+        $module->__doMain($this, $this->action_);
+      }
     } else {
-      trigger_error($class. ' is not defined.');
+      trigger_error($class. ' is not found.');
     }  
   }
   
   //! operations
-  function getAppRoot() { return $this->root_; }
-  function getAppPath() { return $this->path_; }
-  function getUrlApp()  { return $this->_refAPPS['app'];}
-  function getUrlModule() { return $this->_refAPPS['module'];}
-  function getAppLogDir() { return $this->dir_log_; }
-  function getTemplatesDir() {return $this->dir_template_; }
-  function getDataDir()   { return $this->dir_data_; }
-  function getCacheDir()  { return $this->dir_cache_; }
-  function getTheme()       { return $this->theme_; }
-  function getDefaultTheme(){ return '/default'; }
-  function inAjax()      { return $this->inajax_; }
+  function getAppRoot()      { return $this->root_; }
+  function getAppPath()      { return $this->path_; }
+  function getUrlApp()       { return $this->_refAPPS['app'];}
+  function getUrlModule()    { return $this->_refAPPS['module'];}
+  function getAppLogDir()    { return $this->dir_log_; }
+  function getTemplatesDir() { return $this->dir_template_; }
+  function getDataDir()      { return $this->dir_data_; }
+  function getCacheDir()     { return $this->dir_cache_; }
+  function getTheme()        { return $this->theme_; }
+  function getDefaultTheme() { return '/default'; }
+  function inAjax()          { return $this->inajax_; }
+
   function& getCONFIG($segName=null) {
     if(empty($segName)) {
       return $this->_refCONFIG;
@@ -150,7 +161,7 @@ class CLASS_APPLICATION {
     
     
   // 支持多数据库，根据名称访问数据对象,默认访问default数据库
-  function& db($name='default') {
+  function db($name='default') {
     $db = null;
 
     // 检测数据库实例是否存在
@@ -221,7 +232,6 @@ class CLASS_APPLICATION {
     }
   }
     
-  function moduleCallback($module) {}
   function getAPPS($name)   { return $this->_refAPPS[$name]; }
   function getTHEMES($name) { return $this->_refTHEMES[$name]; }
   function& getRefAPPS()    { return $this->_refAPPS; }

@@ -9,54 +9,37 @@
 ----------------------------------------------------------------------*/
 
 class CLASS_MODULE {
-  // 应用程序实例
   private $app_;
-  private $action_;
-
-  // Ajax请求数据
-  public $request;    
-  // Ajax应答数据
+  public  $request;    
   private $response;      
-  // Ajax错误返回信息
-  public $errmsgs;
+  private $errmsgs;
 
   // 构造函数
   function __construct() {
-    $this->action_ = $_GET['action'];
     $this->request = &$_POST; 
     $this->response = null;    
     $this->errmsgs = array();
   }
      
   // 构造函数
-  function CLASS_MODULE(){ $this->__construct();  }
-
-  function onInitialize(&$theApp) {
-    $this->app_ = $theApp;
-    // 模块毁掉预处理
-    
-    // 入口函数
-    if($theApp->inAjax()) {
-      $this->__doajax();
-    } else {
-      $this->__domain();
-    }
-  }
-    
+  function CLASS_MODULE() { $this->__construct(); }
+  
   // Ajax模式入口
-  function __doajax() {
+  function __doajax(&$app, $action) {
+    $this->app_ = $app;	  
     header('Content-Type: text/html; charset=utf-8'); 
     // 应答包
     $this->response = new CLASS_AJAX_PACKAGE();
     $this->response->set_header(0);        // 正确应答包
-    $this->doAjax($this->action_);
+    $this->doAjax($action);
     
     echo $this->response->__toString();
   }
     
   // 非Ajax模式入口
-  function __domain() {
-    $this->doMain($this->action_);
+  function __domain(&$app, $action) {
+    $this->app_ = $app;
+    $this->doMain($action);
   }
     
   // 多态接口，用于处理普通表单的提交的请求

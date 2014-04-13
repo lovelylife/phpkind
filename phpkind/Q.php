@@ -52,7 +52,7 @@ function err_handler( $errno , $errstr , $errfile , $errline) {
 function print_stack_trace() {
   $array =debug_backtrace();
   unset($array[0]);
-  $html = "<h3>File: </h3>";
+  $html = "<h3>Stack: </h3>";
   $count = 0;
   foreach($array as $row) {
     if($count > 0) {

@@ -121,7 +121,11 @@ class CLASS_APPLICATION {
       trigger_error($class. ' is not found.');
     }  
   }
-  
+
+  function access_control($module, $action) {
+    return true;
+  }
+
   //! operations
   function getAppRoot()      { return $this->root_; }
   function getAppPath()      { return $this->path_; }
@@ -219,14 +223,14 @@ class CLASS_APPLICATION {
         die('file['.$cfgfile.'] not founded.');
       }
     }
-
+    
     $require_files = require_file($cfgfile);
     if(is_array($require_files)) {
       foreach($require_files as $file) {
         if(file_exists($file)) {
-          require_file($file);
+          require($file);
         } else {
-          require_file($this->getAppRoot().$file);
+          require($this->getAppRoot().$file);
         }
       }
     }

@@ -1,12 +1,9 @@
 <?php
 
-if(!defined('_IPATH')) {
-    die('<h3>Forbidden</h3>');
-}
 
 //@todo test include 
-include_once(_IROOT.'/phpweibosdk/saetv2.ex.class.php' );
-include_once(_IROOT.'/phpqqsdk/qq.sdk.class.php' );
+include_once(_QROOT.'/phpweibosdk/saetv2.ex.class.php' );
+include_once(_QROOT.'/phpqqsdk/qq.sdk.class.php' );
 
 class CLASS_MODULE_OPENAPI extends CLASS_MODULE {
 

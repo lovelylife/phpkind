@@ -1,20 +1,16 @@
 <?php
 
-if(!defined('_IPATH')) {
-    die('<h3>Forbidden</h3>');
-}
-
-class CLASS_WAYIXIA_APPLICATION extends CLASS_APPLICATION {
+class APPLICATION extends CLASS_APPLICATION {
     
-  function __construct($args) {
-    parent::__construct($args);
+  function __construct() {
+    parent::__construct();
   }
     
-  function CLASS_WAYIXIA_APPLICATION($args) {
-    $this->__construct($args);
+  function APPLICATION() {
+    $this->__construct();
   }
   
-  function appMain($args) {    
+  function appMain($args) {
     parent::appMain($args);
   }
 

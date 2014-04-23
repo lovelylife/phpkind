@@ -1,8 +1,5 @@
 <?php
 
-if(!defined('_IPATH')) {
-    die('<h3>Forbidden</h3>');
-}
 
 class CLASS_MODULE_API extends CLASS_MODULE {
 

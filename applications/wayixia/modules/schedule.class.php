@@ -1,9 +1,5 @@
 <?php
 
-if(!defined('_IPATH')) {
-    die('<h3>Forbidden</h3>');
-}
-
 class CLASS_MODULE_SCHEDULE extends CLASS_MODULE {
 
   function __construct() { parent::__construct(); }

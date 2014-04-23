@@ -1,8 +1,4 @@
 <?php
-if(!defined('_IPATH')) {
-    die('<h3>Forbidden</h3>');
-}
-
 
 class CLASS_MODULE_DIMG extends CLASS_MODULE {  
 

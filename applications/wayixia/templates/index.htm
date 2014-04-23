@@ -1,1 +1,125 @@
-403 access denied.
+<!DOCTYPE html>
+<html>
+<head>
+<title> 挖一下，让更多人分享 |图片|美图|存储|- www.wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+<script src="{$themes:path/}/Q.js"></script>
+<script src="{$themes:path/}/waterfall.js"></script>
+</head>
+
+<body>
+	
+{#template user.menubar/}
+
+<br>
+<br><br>
+<br><br>
+<div class="main-width" align="left">
+  <div class="btn-group time-limit">
+    <a href="{$app:module}" class="btn btn-primary">最新分享</a>
+    <a href="/recommend/album" class="btn btn-default">推荐画集</a>
+    <a href="/recommend/user" class="btn btn-default">推荐用户</a>
+  </div>
+</div>
+<br>
+<br>
+<div class="wf-main" id="wf-main">
+  <!--div class="box wf-cld">
+    <a href="{$app:path}/helper/whatis" style="font-size:14px;">什么是挖一下?</a>
+    <br><br>
+    <a href="{$app:path}/helper/install">
+      <span class="uploadBtn small" style="width:195px;color:#333;">
+      <span> 开始使用 >> </span></span>
+    </a>
+    <br><br>
+  </div-->
+</div>
+<div class="wf-main" align="left">
+  <div class="pager">
+    <span class="disabled"> &lt;  Prev</span>
+    {$fields:pager}
+  </div>
+
+  {#template footer/}
+</div>
+
+
+<textarea id="wf-template" style="display:none;">
+  <a href="{$cfg:urls.image/}/[[id]]" target="_self" class="img x">
+    <img src="http://[[server]]/thumb/[[file_name]]" width=[[width]] height=[[height]] alt="">
+  </a>
+  <p class="description">[[title]]</p>
+  <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
+  <div class="convo attribution clearfix">
+    <p class="NoImage">
+      <a href="{$cfg:urls.image/}/[[id]]" target="_blank">[[create_time]]</a>
+    </p>
+  </div>
+</textarea>
+
+<script type="text/javascript">
+
+
+function store(arr) {
+  var _this = this;
+  this.data = (arr instanceof Array)?arr:[];
+
+  this.pop = function(len) {
+    var arr = [];
+	while(len >= 0 && _this.data.length > 0) {
+	  arr.push(_this.data.shift());
+	  len--;
+	}
+	return arr;
+  }
+}
+
+
+var images_data = {$fields:images_data/};
+var g_store = new store(images_data);
+
+function getScrollTop(){     
+  var scrollTop=0;     
+  if(document.documentElement&&document.documentElement.scrollTop){     
+    scrollTop=document.documentElement.scrollTop;     
+  } else if(document.body){     
+    scrollTop=document.body.scrollTop;     
+  }     
+
+  return scrollTop;     
+}     
+
+Q.Ready(function(){
+
+  g_waterfall = new Waterfall({
+	"container":"wf-main",
+	"colWidth":248,
+	"colCount":4,
+	"template":Q.$('wf-template').value,
+	"animate" : new alpha(),
+  });
+
+  g_waterfall.append(g_store.pop(10));
+
+  var nav = Q.$('nav');
+  var nav_menu = Q.$('nav_wrapper');
+  Q.addEvent(window, 'scroll', 
+    function() {
+      var pos = Q.absPosition(nav);
+      if(pos.top <= getScrollTop()) {
+        nav_menu.className = 'main_in_wrapper floating';
+      } else {
+        nav_menu.className = 'main_in_wrapper';
+      }
+    }
+  , false)
+});
+
+
+</script>
+</body>
+</html>
+

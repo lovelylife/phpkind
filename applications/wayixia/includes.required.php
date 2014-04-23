@@ -9,12 +9,12 @@
 */
 
 return array(
-  _KROOT.'/database.class.php',    // for database
-  _KROOT.'/page.class.php',
-  _KROOT.'/simpleimage.class.php',
-  _KROOT.'/qimage.class.php',
-  _KROOT.'/q-rpc.php',
-  _KROOT.'/smtp.class.php',
+  _QROOT.'/database.class.php', 
+  //_QROOT.'/page.class.php',
+  _QROOT.'/simpleimage.class.php',
+  _QROOT.'/qimage.class.php',
+  _QROOT.'/q-rpc.php',
+  _QROOT.'/smtp.class.php',
   '/rc4crypt.class.php',
   '/function.php',
 );

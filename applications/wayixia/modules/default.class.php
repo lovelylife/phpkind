@@ -35,57 +35,53 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
   }
 
   function index() {
-    try {
-      $db = &$this->App()->db();
-      $tag = $_GET['tag'];
+    $db = &$this->App()->db();
+    $tag = $_GET['tag'];
 
-      $sql = "select distinct(file_name), server, file_name, width, height, id, uname as owner, title, DATE_FORMAT(create_time, '%Y-%m-%d') as create_time ";
-      $sql.= "from ##__nosql_pins group by file_name ";
-      $sql.=" order by id DESC ";
+    $sql = "select distinct(file_name), server, file_name, width, height, id, uname as owner, title, DATE_FORMAT(create_time, '%Y-%m-%d') as create_time ";
+    $sql.= "from ##__nosql_pins group by file_name ";
+    $sql.=" order by id DESC ";
       
 
-      $page_size = 50;
-      $count_sql =  "select sum(size) totalsize from ";
-      $count_sql.= "(select count(distinct file_name) size from ##__nosql_pins group by file_name) d; ";
+    $page_size = 50;
+    $count_sql =  "select sum(size) totalsize from ";
+    $count_sql.= "(select count(distinct file_name) size from ##__nosql_pins group by file_name) d; ";
       
-      $count_row = $this->App()->db()->get_row($count_sql);
-      if(empty($count_row)) {
-        $totalsize = 0;
-      } else {
-        $totalsize = $count_row['totalsize'];
-      }
-      //print_r($count_row);
-      $cfg = array(
+    $count_row = $this->App()->db()->get_row($count_sql);
+    if(empty($count_row)) {
+      $totalsize = 0;
+    } else {
+      $totalsize = $count_row['totalsize'];
+    }
+    //print_r($count_row);
+    $cfg = array(
         "totalsize" => $totalsize,
         "pagesize" => $page_size,
         "pagekey" => "p",
         "html" => true,
         "tpl" => "/index/".urlencode($tag)."{pid}",
-      );
+    );
 
-      // 实例化分页类,初始化构造函数中的总条目数和每页显示条目数
-      $pager = new CLASS_PAGE($cfg);
+    // 实例化分页类,初始化构造函数中的总条目数和每页显示条目数
+    $pager = new CLASS_PAGE($cfg);
       
-      $sql .= $pager->getSQLPage();
+    $sql .= $pager->getSQLPage();
 
-      $rs = array();
-      $db->get_results($sql, $rs);
+    $rs = array();
+    $db->get_results($sql, $rs);
 
-      $t = new CLASS_TEMPLATES($this->App());
-      if(empty($rs)) {
-        $t->push('images_data', '[]');
-      } else {
-        $t->push('images_data', json_encode($rs));
-      } 
+    $t = new CLASS_TEMPLATES($this->App());
+    if(empty($rs)) {
+      $t->push('images_data', '[]');
+    } else {
+      $t->push('images_data', json_encode($rs));
+    } 
 
-      $t->push('tag', $tag);
-      $t->push('pager', $pager->__toString());
+    $t->push('tag', $tag);
+    $t->push('pager', $pager->__toString());
 
-      // 显示界面
-      $t->render('index');
-    } catch(Exception $e) {
-      print_r($e);
-    }
+    // 显示界面
+    $t->render('index');
   }
 
   function display() {

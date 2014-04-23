@@ -95,7 +95,8 @@ class CLASS_MODULE_SCHEDULE extends CLASS_MODULE {
     $sql.= "from ch_users_images I ";
     $sql.= "right join ch_users_albums A on A.id=I.album_id ";
     $sql.= "left join ##__users U on U.uid=A.uid ";
-    $sql.= "group by A.id;";
+    $sql.= "group by A.id ";
+    $sql.= ";";
     $rs = array();
     if(!$db->get_results($sql, $rs)) 
       trigger_error($db->get_error(), E_USER_ERROR);
@@ -132,6 +133,7 @@ class CLASS_MODULE_SCHEDULE extends CLASS_MODULE {
     $sql.= "U.name as uname  ";
     $sql.= "from ##__images_resource R, ##__users U, ##__users_images I, ##__users_albums A ";
     $sql.= "where R.id=I.res_id and A.uid=U.uid and A.id=I.album_id ";
+    $sql.= "order by A.id desc limit 0,200";
     $sql.= ";";
     $rs = array();
     if(!$db->get_results($sql, $rs))

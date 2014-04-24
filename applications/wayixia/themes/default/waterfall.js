@@ -8,6 +8,7 @@ function Waterfall(param){
   this.mouseover = param.mouseover|| function() {};
   this.mouseout = param.mouseout|| function() {};
   this.click = param.click|| function() {};
+  this.onloaditems = param.onloaditems || function(timerout) {};
   this.item_callback = param.item_callback || function(name, row) { return row[name]; }
   this.init(param.animate);
   
@@ -15,6 +16,7 @@ function Waterfall(param){
 
 Waterfall.prototype = {
   animateObject : null,
+  cache_scroll_handler: null,
   getByClass: function(cls, p) {
         var arr = [],
         reg = new RegExp("^(\s*" + cls + ")", "g"); //\s+|$
@@ -83,8 +85,8 @@ Waterfall.prototype = {
   init: function(animate) {
     var _this = this;
     _this.animateObject = animate;
-
-    Q.addEvent(window, 'scroll', function() { _this.onscroll() }, false);
+    _this.cache_scroll_handler = function() { _this.onscroll();};
+    Q.addEvent(window, 'scroll', _this.cache_scroll_handler, false);
     _this.refresh();
   },
 
@@ -122,27 +124,63 @@ Waterfall.prototype = {
   onscroll : function() {
     //滚动条未达到页尾则返回
     var _this = this;
-
+    
     if(!_this.needload()) return;
       // console.log('load new data');
-    _this.append(g_store.pop(5));
-      Q.removeEvent(window, 'scroll');
-      setTimeout(function(){ Q.addEvent(window, 'scroll', function() { _this.onscroll() }, false); }, 2000);  
+      //_this.append(g_store.pop(5));
+      Q.removeEvent(window, 'scroll', _this.cache_scroll_handler);
+      _this.onloaditems(function() { 
+        setTimeout(function(){ Q.addEvent(window, 'scroll', _this.cache_scroll_handler, false); }, 2000);});  
   },
 
+  append_html : function(items) {
+    var _this = this;
+    var div = document.createElement('div');
+    div.innerHTML = items;
+    var len = div.childNodes.length;
+
+    for (var i = 0; i < len; i++) {
+      var e = div.childNodes[i];
+      if(e && e.nodeType && e.nodeType == Q.ELEMENT_NODE) {
+        _this.create_item(_this.id, div.childNodes[i]);
+      }
+    }
+
+    _this.id.style.height = _this.maxArr(_this.col) + "px";
+    _this.animateObject && _this.animateObject.play();
+
+  },
+
+  create_item : function(container, new_element) {
+    var _this = this;
+    var pre_width = 192;
+    //new_element.style.opacity = 0.0;
+    //new_element.data = item;
+    container.appendChild(new_element);
+    _this.bind_event(new_element);
+
+    var ming = _this.getMinCol(_this.col);
+    new_element.style.left = ming * _this.colWidth + "px";
+    new_element.style.top = _this.col[ming] + "px";
+    //new_element.style.height = 300 + 'px';
+    _this.col[ming] += new_element.offsetHeight + 15;
+    _this.animateObject && _this.animateObject.push(new_element);
+  },
+ 
   append : function(items) {
     var _this = this;
     var tpl = _this.template;
     var len = items.length;
+
     for (var i = 0; i < len; i++) {
-        _this.create_item(_this.id, items[i], tpl);
+        _this.create_item_with_template(_this.id, items[i], tpl);
     }
 
     _this.id.style.height = _this.maxArr(_this.col) + "px";
     _this.animateObject && _this.animateObject.play();
   },
 
-  create_item : function(container, item, tpl) {
+  create_item_with_template : function(container, item, tpl) {
     var _this = this;
     var pre_width = 192;
     tpl = tpl.replace(/\[\[(\w+)\]\]/ig, 
@@ -153,9 +191,9 @@ Waterfall.prototype = {
           return (item.height * pre_width) / (item.width*1.0); 
         }
        
-	if(_this.item_callback) {
-	  return _this.item_callback(w2, item);
-	}
+	      if(_this.item_callback) {
+	        return _this.item_callback(w2, item);
+	      }
         return item[w2];
       }
     );

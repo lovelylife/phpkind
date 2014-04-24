@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title> 挖一下，让更多人分享 |图片|美图|存储|- www.wayixia.com</title>
+<title> 挖一下，让更多人分享 |图片|美女|壁纸|片面设计|- www.wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- 使用QLib控件是必须包含样式表 -->
 <link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
@@ -14,7 +14,6 @@
 	
 {#template user.menubar/}
 
-<br>
 <br><br>
 <br><br>
 <div class="main-width" align="left">
@@ -25,9 +24,8 @@
   </div>
 </div>
 <br>
-<br>
 <div class="wf-main" id="wf-main">
-  <!--div class="box wf-cld">
+  <!--div class="box wf-cld" style="height:600px;">
     <a href="{$app:path}/helper/whatis" style="font-size:14px;">什么是挖一下?</a>
     <br><br>
     <a href="{$app:path}/helper/install">
@@ -36,7 +34,25 @@
     </a>
     <br><br>
   </div-->
+  <html:list id="pins" datasrc="data://imagesdata">
+  <t:data>	  
+  <div class="box wf-cld">
+  <a href="{$cfg:urls.image/}/[field:id]" target="_self" class="img x">
+    <img src="http://[field:server]/thumb/[field:file_name]" width="192" height="[field:height]" alt="">
+  </a>
+  <p class="description">[field:title]</p>
+  <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
+  <div class="convo attribution clearfix">
+    <p class="NoImage">
+      <a href="{$cfg:urls.image/}/[field:id]" target="_blank">[field:create_time]</a>
+    </p>
+  </div>
+  </div>
+  </t:data>
+  </html:list>
+
 </div>
+
 <div class="wf-main" align="left">
   <div class="pager">
     <span class="disabled"> &lt;  Prev</span>
@@ -47,39 +63,7 @@
 </div>
 
 
-<textarea id="wf-template" style="display:none;">
-  <a href="{$cfg:urls.image/}/[[id]]" target="_self" class="img x">
-    <img src="http://[[server]]/thumb/[[file_name]]" width=[[width]] height=[[height]] alt="">
-  </a>
-  <p class="description">[[title]]</p>
-  <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
-  <div class="convo attribution clearfix">
-    <p class="NoImage">
-      <a href="{$cfg:urls.image/}/[[id]]" target="_blank">[[create_time]]</a>
-    </p>
-  </div>
-</textarea>
-
 <script type="text/javascript">
-
-
-function store(arr) {
-  var _this = this;
-  this.data = (arr instanceof Array)?arr:[];
-
-  this.pop = function(len) {
-    var arr = [];
-	while(len >= 0 && _this.data.length > 0) {
-	  arr.push(_this.data.shift());
-	  len--;
-	}
-	return arr;
-  }
-}
-
-
-var images_data = {$fields:images_data/};
-var g_store = new store(images_data);
 
 function getScrollTop(){     
   var scrollTop=0;     
@@ -90,19 +74,31 @@ function getScrollTop(){
   }     
 
   return scrollTop;     
-}     
+} 
+
+g_page_num = 3;
 
 Q.Ready(function(){
 
   g_waterfall = new Waterfall({
 	"container":"wf-main",
-	"colWidth":248,
-	"colCount":4,
-	"template":Q.$('wf-template').value,
+	"colWidth":240,
+	"colCount":5,
+	"template": '', // Q.$('wf-template').value,
 	"animate" : new alpha(),
+  "onloaditems" : function(timerout) {
+    Q.Ajax({
+      command: "{$app:app}?mod=waterfall&action=index&p=" + (++g_page_num),
+      data: {},
+      oncomplete: function(xmlhttp) {
+        g_waterfall.append_html(xmlhttp.responseText);
+        timerout();
+      }
+    })
+  },
   });
 
-  g_waterfall.append(g_store.pop(10));
+  //g_waterfall.append(g_store.pop(10));
 
   var nav = Q.$('nav');
   var nav_menu = Q.$('nav_wrapper');

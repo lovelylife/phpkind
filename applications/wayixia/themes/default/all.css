@@ -32,8 +32,8 @@ ul,ol {list-style-type:none;}
 }
 
 .main-width {
-  max-width: 990px;  /* max resolution - 25px to accomadate for the vertical  scrollbar */
-  min-width: 990px;  /* min resolution - 25px */
+  max-width: 1200px;  /* max resolution - 25px to accomadate for the vertical  scrollbar */
+  min-width: 1200px;  /* min resolution - 25px */
   margin: 0 auto;    /* auto horizontal margins will cause the layout to be horizontally centered (usually) */
   font-size:13px;
 }
@@ -1859,7 +1859,7 @@ a.album-icons:hover {
   visibility:hidden
 }
 
-.wf-main{position: relative; margin: 0 auto;width: 990px; overflow: hidden;}
+.wf-main{position: relative; margin: 0 auto;width: 1200px; overflow: hidden;}
 
 .bat-mode .box {
   over-flow:hidden;
@@ -1871,8 +1871,8 @@ a.album-icons:hover {
 }
 
 .box {
-    position:absolute;
-  width:198px;
+  position:absolute;
+  width:192px;
   padding:15px 15px 0;
   font-size:12px;
   background-color:#fff;

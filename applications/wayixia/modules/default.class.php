@@ -34,12 +34,12 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $db = &$this->App()->db();
     $tag = $_GET['tag'];
 
-    $sql = "select distinct(file_name), server, file_name, width, height, id, uname as owner, title, DATE_FORMAT(create_time, '%Y-%m-%d') as create_time ";
+    $sql = "select distinct(file_name), server, file_name, (height*192/width*1.0) as height, id, uname as owner, title, DATE_FORMAT(create_time, '%Y-%m-%d') as create_time ";
     $sql.= "from ##__nosql_pins group by file_name ";
     $sql.=" order by id DESC ";
       
 
-    $page_size = 50;
+    $page_size = 30;
     $count_sql =  "select sum(size) totalsize from ";
     $count_sql.= "(select count(distinct file_name) size from ##__nosql_pins group by file_name) d; ";
       
@@ -67,12 +67,15 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $db->get_results($sql, $rs);
 
     $t = new CLASS_TEMPLATES($this->App());
+    /*
     if(empty($rs)) {
       $t->push('images_data', '[]');
     } else {
       $t->push('images_data', json_encode($rs));
     } 
+     */
 
+    $t->push_data('imagesdata', $rs);
     $t->push('tag', $tag);
     $t->push('pager', $pager->__toString());
 

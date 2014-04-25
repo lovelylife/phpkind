@@ -3,20 +3,16 @@
 <head>
 <title> 挖一下，让更多人分享 |图片|美女|壁纸|片面设计|- www.wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<!-- 使用QLib控件是必须包含样式表 -->
-<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
 <link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
 <script src="{$themes:path/}/Q.js"></script>
 <script src="{$themes:path/}/waterfall.js"></script>
 </head>
-
 <body>
-	
 {#template user.menubar/}
 
 <br><br>
 <br><br>
-<div class="main-width" align="left">
+<div class="wf-main" align="left">
   <div class="btn-group time-limit">
     <a href="{$app:module}" class="btn btn-primary">最新分享</a>
     <a href="/recommend/album" class="btn btn-default">推荐画集</a>
@@ -35,7 +31,7 @@
     <br><br>
   </div-->
   <html:list id="pins" datasrc="data://imagesdata">
-  <t:data>	  
+  <t:data>    
   <div class="box wf-cld">
   <a href="{$cfg:urls.image/}/[field:id]" target="_self" class="img x">
     <img src="http://[field:server]/thumb/[field:file_name]" width="192" height="[field:height]" alt="">
@@ -54,38 +50,20 @@
 </div>
 
 <div class="wf-main" align="left">
-  <div class="pager">
-    <span class="disabled"> &lt;  Prev</span>
-    {$fields:pager}
-  </div>
-
   {#template footer/}
 </div>
 
 
 <script type="text/javascript">
-
-function getScrollTop(){     
-  var scrollTop=0;     
-  if(document.documentElement&&document.documentElement.scrollTop){     
-    scrollTop=document.documentElement.scrollTop;     
-  } else if(document.body){     
-    scrollTop=document.body.scrollTop;     
-  }     
-
-  return scrollTop;     
-} 
-
 g_page_num = 3;
-
 Q.Ready(function(){
 
   g_waterfall = new Waterfall({
-	"container":"wf-main",
-	"colWidth":240,
-	"colCount":5,
-	"template": '', // Q.$('wf-template').value,
-	"animate" : new alpha(),
+  "container":"wf-main",
+  "colWidth":240,
+  "colCount":5,
+  "template": '', // Q.$('wf-template').value,
+  "animate" : new alpha(),
   "onloaditems" : function(timerout) {
     Q.Ajax({
       command: "{$app:app}?mod=waterfall&action=index&p=" + (++g_page_num),
@@ -97,21 +75,6 @@ Q.Ready(function(){
     })
   },
   });
-
-  //g_waterfall.append(g_store.pop(10));
-
-  var nav = Q.$('nav');
-  var nav_menu = Q.$('nav_wrapper');
-  Q.addEvent(window, 'scroll', 
-    function() {
-      var pos = Q.absPosition(nav);
-      if(pos.top <= getScrollTop()) {
-        nav_menu.className = 'main_in_wrapper floating';
-      } else {
-        nav_menu.className = 'main_in_wrapper';
-      }
-    }
-  , false)
 });
 
 

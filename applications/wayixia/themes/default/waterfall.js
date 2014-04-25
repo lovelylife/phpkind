@@ -129,8 +129,8 @@ Waterfall.prototype = {
       // console.log('load new data');
       //_this.append(g_store.pop(5));
       Q.removeEvent(window, 'scroll', _this.cache_scroll_handler);
-      _this.onloaditems(function() { 
-        setTimeout(function(){ Q.addEvent(window, 'scroll', _this.cache_scroll_handler, false); }, 2000);});  
+      _this.onloaditems(function(){ Q.addEvent(window, 'scroll', _this.cache_scroll_handler, false)});  
+      //Q.removeEvent(window, 'scroll', _this.cache_scroll_handler);
   },
 
   append_html : function(items) {

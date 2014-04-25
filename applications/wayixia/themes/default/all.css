@@ -32,8 +32,8 @@ ul,ol {list-style-type:none;}
 }
 
 .main-width {
-  max-width: 1200px;  /* max resolution - 25px to accomadate for the vertical  scrollbar */
-  min-width: 1200px;  /* min resolution - 25px */
+  max-width: 99px;  /* max resolution - 25px to accomadate for the vertical  scrollbar */
+  min-width: 990px;  /* min resolution - 25px */
   margin: 0 auto;    /* auto horizontal margins will cause the layout to be horizontally centered (usually) */
   font-size:13px;
 }

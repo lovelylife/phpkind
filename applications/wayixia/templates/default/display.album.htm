@@ -75,7 +75,7 @@ function check_image_width(img) {
         <div class="profile-basic">
         <dl style="padding:5px 0;">
           <dt>
-          <img src="{$app:path}{$cfg:site.avatar}/user92.{$fields:uid}.jpg" style="border:1px solid #CCC;width:92px; height:92px;" onerror="check_error(this);">
+          <img src="{$app:host}{$cfg:site.avatar}/user92.{$fields:uid}.jpg" style="border:1px solid #CCC;width:92px; height:92px;" onerror="check_error(this);">
           </dt>
 	  <dd class="name" style="margin-left: 90px;text-indent:15px;overflow:hidden;text-overflow:ellipsis;">
 	    <a href="/user/{$fields:uid}" title="{$fields:uname}" ><nobr>{$fields:uname/}</nobr></a>
@@ -98,7 +98,7 @@ function check_image_width(img) {
           maskSelected="curr"
         >
         <t:data>
-        <a href="{$app:path/}/paintings/[field:id]" >
+        <a href="{$app:host/}/paintings/[field:id]" >
             <span class="uploadBtn small" style="width:195px;color:#333;margin: 3px 0px; text-indent: 10px;text-align:left;">
             <span> [field:name] </span></span>
           </a>
@@ -136,14 +136,14 @@ function check_image_width(img) {
       </a>
     </div>
   </div>
-  <a href="{$app:path}/pins/[[id]]" target="_self" class="img x">
+  <a href="{$app:host}/pins/[[id]]" target="_self" class="img x">
     <img src="http://[[server]]/thumb/[[file_name]]" width=[[width]] height=[[height]] alt="">
   </a>
   <p class="description">[[title]]</p>
   <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
   <div class="convo attribution clearfix">
     <p class="NoImage">
-      <a href="{$app:path}/pins/[[id]]" target="_self">[[from_host]]
+      <a href="{$app:host}/pins/[[id]]" target="_self">[[from_host]]
       </a>
     </p>
   </div>

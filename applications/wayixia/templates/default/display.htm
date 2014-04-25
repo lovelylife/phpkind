@@ -167,12 +167,12 @@ Q.Ready(function() {
     <div id="left-column">
       <div style="background: #FFF; height:45px;margin-top: 1px; border-bottom: #F1F1F1;line-height: 45px;font-size: 15px;">
         <dt style="float: left; width: 88px; ">
-        <img src="{$app:path}{$cfg:site.avatar}/user48.{$fields:uid}.jpg" 
+        <img src="{$app:host}{$cfg:site.avatar}/user48.{$fields:uid}.jpg" 
         style="border:1px solid #CCC; width:48px;margin:20px;" onerror="check_error(this);">
         </dt>
         <dd style="margin-left: 88px;line-height: 32px; height: 32px;">
 	<h3 style="padding-top:12px; margin:0;font-size: 18px; overflow:hidden; width:500px; height: 32px;text-overflow:ellipsis;" title="{$fields:title func="htmlspecialchars(@this)"}">
-            <!--a href="{$app:path}/user/{$fields:uid}"-->
+            <!--a href="{$app:host}/user/{$fields:uid}"-->
 	    <nobr>{$fields:title}</nobr>
 	      <!--{$fields:uname}-->&nbsp;
             <!--/a-->

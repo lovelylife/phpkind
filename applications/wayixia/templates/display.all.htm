@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title> 来自 {$fields:user_name/} 分享的图集- wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+
+-->
+</script>
+
+<script src="{$themes:path/}/waterfall.js"></script>
+<script>
+<!--
+
+function check_width() {
+  if(Q.$('tweenimg').width > Q.$('tweenimg').parentNode.offsetWidth) {
+    Q.$('tweenimg').style.width = "100%";
+  }
+}
+
+function check_error(img) {
+  img.src = '{$themes:path}/icon48.png';
+}
+
+function check_image_width(img) {
+  var img_width = img.width;
+  var img_height = img.height;
+  if(img_width > img_height) {
+    img.style.height = "100%"; 
+  } else {
+    img.style.width = "100%";
+  }
+}
+
+-->
+</script>
+
+<body>
+
+{#template user.menubar/}
+
+
+<br><br><br><br>
+<div id="main">
+  <div id="page">
+    <div class="main-width">
+      <h3 style="font-size: 16px; font-weight:normal;">{$fields:user_name} 分享的图片 </h3>
+    </div>
+    <br>
+    <div class="wf-main" id="wf-main">
+        
+        <br><br>
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div class="clear"></div>
+  {#template user.footer}
+</div>
+<br><br>
+
+<textarea id="wf-template" style="display:none;">
+<div class="actions hidden">
+    <div class="right">
+      <a href="" onclick="return false;" class="like btn btn11 wbtn">
+         <strong><em></em>赞</strong><span></span>
+	  </a>
+    </div>
+    <div class="left">
+      <a title="快速转采" href="" onclick="return false;" class="thunderpin btn btn11 wbtn">
+        <strong><em></em></strong><span></span>
+      </a>
+      <a href="#" class="repin btn btn11 wbtn">
+        <strong>转采</strong><span></span>
+      </a>
+    </div>
+  </div>
+  <a href="{$app:host}/pins/[[id]]" target="_self" class="img x">
+    <img src="http://[[server]]/thumb/[[file_name]]" width=[[width]] height=[[height]] alt="">
+  </a>
+  <p class="description">[[title]]</p>
+  <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
+  <div class="convo attribution clearfix">
+    <p class="NoImage">
+      <a href="{$cfg:urls.pins}/[[id]]" target="_self">[[from_host]]</a>
+    </p>
+  </div>
+</div>
+</textarea>
+
+<script type="text/javascript">
+
+function store(arr) {
+  var _this = this;
+  this.data = (arr instanceof Array)?arr:[];
+
+  this.pop = function(len) {
+    var arr = [];
+	while(len >= 0 && _this.data.length > 0) {
+	  arr.push(_this.data.shift());
+	  len--;
+	}
+	return arr;
+  }
+}
+var g_waterfall = null;
+var albums_data = {$fields:images_data};
+var g_store = new store(albums_data);
+
+function getScrollTop(){     
+         var scrollTop=0;     
+         if(document.documentElement&&document.documentElement.scrollTop){     
+           scrollTop=document.documentElement.scrollTop;     
+         }else if(document.body){     
+           scrollTop=document.body.scrollTop;     
+         }     
+         return scrollTop;     
+       }     
+
+Q.Ready(function(){
+  g_waterfall = new Waterfall({
+	"container":"wf-main",
+	"colWidth":238,
+	"colCount":4,
+	"template":Q.$('wf-template').value,
+  });
+
+
+
+  g_waterfall.append(g_store.pop(10));
+
+});
+
+</script>
+
+</body>
+</html>

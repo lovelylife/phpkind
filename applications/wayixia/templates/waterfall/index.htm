@@ -1,0 +1,19 @@
+
+  <html:list id="pins" datasrc="data://imagesdata">
+  <t:data>	  
+  <div class="box wf-cld">
+  <a href="{$cfg:urls.image/}/[field:id]" target="_self" class="img x">
+    <img src="http://[field:server]/thumb/[field:file_name]" width="192" height="[field:height]" alt="">
+  </a>
+  <p class="description">[field:title]</p>
+  <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
+  <div class="convo attribution clearfix">
+    <p class="NoImage">
+      <a href="{$cfg:urls.image/}/[field:id]" target="_blank">[field:create_time]</a>
+    </p>
+  </div>
+  </div>
+  </t:data>
+  </html:list>
+
+

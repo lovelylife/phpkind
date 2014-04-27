@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> 登录 - 挖一下</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+<style>
+<!--
+html {
+  overflow:hidden;
+  background: #FFF;
+}
+
+#button-ok {
+  height: 30px;    
+  width: 210px;
+}
+
+#button-cancel {
+  background: #FFF url(no_icon.gif) 10px center no-repeat;
+}
+
+#login-area {
+  display: block;
+  padding-left: 0px; 
+  text-align: left;
+  line-height: 30px;
+  font-size: 14px;
+}
+
+#login-area h3 span{
+  background: #59677f;
+  color: #FFF;
+  font-size: 16px;
+}
+
+#login-pwd, #login-name {
+  width: 200px;
+}
+
+-->
+</style>
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+-->
+</script>
+
+<script type="text/javascript" language="javascript">
+<!--
+
+var login_error = {};
+login_error[-1] = '重复登录';
+login_error[-2] = '用户名或密码为空';
+login_error[-3] = '用户不存在或者密码错误';
+
+
+
+function ajax_login() {
+  // 处理用户登录
+  var username = Q.$('login-name').value;
+  var userpwd = Q.$('login-pwd').value;
+
+  Q.Ajax({
+    command: '{$app:module}&action=do-login&inajax=true',
+    data: {name: username, pwd: userpwd },
+    oncomplete : function(xmlhttp) {
+      // console.log(xmlhttp.responseText);
+      try {
+        var resp = eval('('+xmlhttp.responseText+')');
+        if(resp && resp.header == 0) {
+          // 登录成功
+          //Q.$('login-area').style.display = 'none';
+          //Q.$('errmsg').style.display = '';
+          if(Q.GET('logintype') == 'close') {
+            window.close();
+          } else if(Q.GET('logintype') == "refer") {
+            location.href = decodeURIComponent(Q.GET('refer'));
+          } else {
+            top.location.reload();
+          }
+        } else {
+          var err = login_error[resp.header];
+          if(err) {
+            error('登录失败!('+err+')');
+          } else {
+            error('登录失败!(未知错误)');
+          }
+        }
+      } catch (e) {
+         error('登录失败!('+e+')');
+      }      
+    }
+  });
+}
+
+var alpha_object = new alpha();
+
+function error(msg) {
+  Q.$("error").style.opacity = 1;
+  Q.$("error").innerHTML = msg;
+  setTimeout(function() {
+	alpha_object.push(Q.$("error"));
+	alpha_object.play();
+  }, 3000); 
+}
+
+function alpha() {
+  var _this = this;
+
+  this.data = [];
+  this.play = function() {
+	if(_this.data.length == 0) {
+	   return;
+	}
+	e = _this.data[0];
+	var op = parseFloat(e.style.opacity, 10);
+	op = op - 0.1;
+	if(op >= 0.1) {
+	  e.style.opacity = op;
+	} else {
+	  e.style.opacity = 0.0;
+	  _this.data.shift();
+	}
+	setTimeout(function() { _this.play();}, 40);
+  }
+
+  this.push = function(e) {
+    
+	_this.data.push(e);
+  }
+
+  this.completed = function() {return _this.data.length == 0; };
+}
+
+function deactive_window() {
+  if(Q.GET('logintype') == "close") {
+    window.close();
+  } else {
+    parent.click_deactivate();;
+  }    
+}
+
+Q.Ready(function(){
+
+  Q.$('button-ok').onclick = function() {
+    ajax_login();
+  }
+
+  Q.$('button-cancel').onclick = Q.$('link-qq').onclick = Q.$('link-weibo').onclick = function() {
+    setTimeout(function() {deactive_window();}, 500);
+  };
+
+  // Q.$('login-area').style.display='none';
+  Q.$('login-forgetpwd').href='{$app:module}&action=forgetpwd';
+  Q.$('login-forgetpwd').target = '_blank';
+  Q.$('login-register').href='{$app:module}&action=register';
+  Q.$('login-register').target = '_blank';
+
+});
+-->
+</script>
+</head>
+
+<body style="background: #FFF;">
+
+
+<div id="image-box" align="center">
+  <div>
+    <div id="button-cancel" style="height: 20px;" align="right">
+	    &nbsp;<img src="{$themes:path}/login_close.png" style="width: 15px; margin-right: 15px; margin-top: 10px;" />
+    </div>
+    <div id="login-area" class="regmain" style="margin-top:0;">
+      <div class="right" style="border:0px;background:none;padding-top:0;border-left: 1px solid #CCC; height: 165px;">
+        <h3><span>合作网站登录 挖一下</span></h3>
+        <p style="line-height:40px;padding-top:10px;"> 
+          <a id="link-weibo" href="{$fields:sina_weibo_url}" target="_blank">
+            <div class="icon_sina_login"><em></em><span>新浪微博</span></div>
+          </a>
+	  <a id="link-qq" href="{$fields:qq_login_url}" target="_blank">
+            <div class="icon_qq_login"><em></em><span>QQ</span></div>
+          </a>
+        </p>
+      </div>
+      <div class="left" style="padding-left: 15px;">
+        <!--h3><span>用户登录</span></h3-->
+        <p> 用户名<br>
+          <input type="text" id="login-name"/>
+        </p>
+        <p> 密码<br>
+           <input type="password" id="login-pwd"/><br/>
+           (<a href="{$app:module}&action=forgetpwd" target="_blank" id="login-forgetpwd">忘记密码</a> 
+           | <a href="{$app:module}&action=register" target="_blank" id="login-register">注册</a>)<br/>
+        </p>
+        <div id="action-bar" align="left" style="margin-top: 10px;">
+          <button id="button-ok" class="button"> 登 录 </button>
+          <span id="error" style="margin-left:15px; margin-top:3px;display:inline;color:red;"></span>
+          <!--input type="button" id="button-cancel" class="uploadBtn small" value=" 取 消 " hidefocus /-->&nbsp;&nbsp;
+        </div>
+      </div>
+      <div style="clear:both;"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

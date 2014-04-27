@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> 注册新用户 Powered By PHPKind</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
+<style>
+<!--
+
+.btn {
+	background: #FFF;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	margin-left: 5px;
+	width: 80px;
+	font-size: 14px;
+	height: 30px;
+	line-height:30px;
+	padding: 0 30px;
+}
+
+#button-ok {
+	background: #FFF url(yes_icon.gif) 10px center no-repeat;
+}
+
+#button-cancel {
+  background: #FFF url(no_icon.gif) 10px center no-repeat;
+}
+
+#image-box {
+  margin: 0px; 
+}
+
+
+#login-area {
+display: block;
+padding-left: 20px; 
+text-align: left;
+}
+
+-->
+</style>
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+-->
+</script>
+
+<script type="text/javascript" language="javascript">
+<!--
+
+Q.Ready(function(){
+
+  var button_ok = Q.$('button-ok');
+  button_ok.hideFocus = true;
+  button_ok.disabled = true;
+
+  var button_cancel = Q.$('button-cancel');
+  button_cancel.hideFocus = true;
+  button_cancel.onclick=function() {
+    parent.click_deactivate();
+  };
+
+  // Q.$('login-area').style.display='none';
+  Q.$('login-forgetpwd').href=g_server+'?app=wayixia&mod=user&action=forgetpwd';
+  Q.$('login-forgetpwd').target = '_blank';
+  Q.$('login-register').href=g_server+'?app=wayixia&mod=user&action=register';
+  Q.$('login-register').target = '_blank';
+
+});
+-->
+</script>
+</head>
+
+<body>
+
+
+<div id="image-box" align="center">
+	<div>
+		<div id="login-area">
+		    <h3> 用户登录 </h3>
+			用户名:<br><input type="text" id="login-name"/>
+			<br>密码:<br>
+			<input type="password" id="login-pwd"/>
+			<br/>(<a href="#" target="_blank" id="login-forgetpwd">忘记密码</a> | <a href="#" target="_blank" id="login-register">注册</a>)
+		</div>
+	</div>
+	<div id="action-bar" align="right">
+	<input type="button" id="button-ok" class="btn" value=" 确 定 " hidefocus/>
+    <input type="button" id="button-cancel" class="btn" value=" 取 消 " hidefocus />&nbsp;&nbsp;
+	</div>
+</div>
+
+</body>
+</html>

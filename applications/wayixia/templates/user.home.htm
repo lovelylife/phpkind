@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> 用户中心 - {$fields:username} - 挖一下 </title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+<style>
+#create-new-album {
+  width: 100px;
+}
+</style>
+
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.tween;
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+import utils.xml;
+import ui.wndx-1-0-2;
+-->
+</script>
+<script src="{$themes:path/}/waterfall.js"></script>
+
+<body>
+<script type="text/javascript">
+<!--
+
+function check_error(img) {
+  if(img.iserror) {
+    return;
+  }
+  img.iserror = true;
+  img.src='{$themes:path}/album-empty.png';
+  img.width=200;
+  //img.height=200;
+}
+
+function check_load(img) {
+  //console.log("ok:"+img);
+  //Q.printf(img.src);
+}
+
+var g_test_window = null;
+
+Q.Ready(function() {
+	Q.$('my-beibao').onclick=function() {
+	  Q.$('cnthld').className = 'beibao';
+	}
+
+	Q.$('my-settings').onclick=function() {
+	  Q.$('cnthld').className = 'settings';
+	}
+
+	Q.$('create-new-album').onclick=function() {
+	    var content = '<div id="create-album-panel" style=" line-height: 30px;padding:10px;">名称: <br/><input type="text" id="album-name" style="height: 20px;"> <br/></div>';
+	    g_test_window = new Q.MsgBox({
+		  title : '创建画集',
+		  content: content,
+		  onok : function() {
+		    var album_name = Q.$('album-name').value;
+			if(!album_name) {
+			  alert('输入不能为空!');
+			  return false;
+			}
+
+			Q.Ajax({
+			  command: '{$app:app}&mod=album&action=create-new&inajax=true',
+			  data : {album_name:album_name},
+			  oncomplete : function(xmlhttp) {
+			    try
+			    {
+				  var resp = eval('('+xmlhttp.responseText+')');
+				  if(resp.header == 0) {
+				    location.reload();
+				    g_test_window.close();
+				  } else {
+				    alert(resp.data);
+				  }
+			    } catch (e) {
+				  alert(xmlhttp.responseText);
+			    }				
+			  }
+			});
+			return false;
+		  }
+		});
+	}
+});
+
+function store(arr) {
+  var _this = this;
+  this.data = (arr instanceof Array)?arr:[];
+
+  this.pop = function(len) {
+    var arr = [];
+	while(len >= 0 && _this.data.length > 0) {
+	  arr.push(_this.data.shift());
+	  len--;
+	}
+	return arr;
+  }
+}
+
+var g_waterfall = null;
+var albums_data = {$fields:images_data};
+albums_data.unshift({album_name:'待分类', album_id: 0, create_time: '', });
+var g_store = new store(albums_data);
+
+Q.Ready(function(){
+  g_waterfall = new Waterfall({
+	"container":"wf-main",
+	"colWidth":238,
+	"colCount":4,
+	"template":Q.$('wf-template').value,
+//	"mouseover": function(e) { alert('over'); },
+//	"mouseout": function(e) { alert('out');},
+  });
+
+  g_waterfall.append(g_store.pop(10));
+
+});
+
+//-->
+</script>
+
+{#template user.menubar}
+
+<div id="wrapper" class="skin01" style="margin-top: 40px;"> 
+<div class="bground"> 
+  <div id="content">  
+  <div id="cnthld" class="beibao" style="display: block;"> 
+  <ul class="content-tab"> 
+  <li class="beibao-tab">
+    <a id="my-beibao" href="{$app:module}&action=home" class="tab-title songti tabbtn" hidefocus="">
+	  <span class="tab-title-tag">管理</span>画集
+    </a>  
+  </li>
+  <li class="settings-tab">
+    <a id="my-settings" href="{$app:module}&action=detail" class="tab-title songti tabbtn" hidefocus="">
+      <span class="tab-title-tag">设置</span>资料
+    </a>  
+  </li>
+  <li class="tieba-tab">
+    <a id="my-settings" href="{$app:module}&action=avatar" class="tab-title songti tabbtn" hidefocus="">
+      <span class="tab-title-tag">设置</span>头像
+    </a>  
+  </li>
+  </ul> 
+  <div class="cnthld-main clearfix">
+	<div class="col leftside"> 
+	  <div class="plzhld" data-fill="tab_content">
+	    <div class="action-bar"> <p>共有<b color="red">{$fields:albums_num}</b>个画集  &nbsp;&nbsp;&nbsp; </p>
+		<div style="position:absolute; right:0; bottom:0; width:300px; height: 48px; line-height: 50px;text-align:right;margin-right: 15px;">
+            <button id="create-new-album" class="uploadBtn small">创建新画集</button>
+          </div>
+		</div>
+		<br>
+		<div class="wf-main" id="wf-main" style="margin-left:20px;">
+		</div>
+	  </div>
+	  <br><br><br><br>
+	  </div> 
+	  
+	  <div class="leftside-shadow"></div> 
+	</div> 
+  </div>
+  </div> 
+  </div> 
+  {#template user.footer /} 
+</div>
+
+<textarea id="wf-template" style="display:none;">
+  <a href="{$app:app}&mod=album&id=[[album_id]]" target="_self" class="img x" style="display:block;position:relative;overflow:hidden; height:120px;">
+    <img
+		src="[[file_name]]" 
+		onerror="check_error(this);" 
+		onload="check_load(this)"
+		style="position:absolute;"
+	>
+  </a>
+  <p class="description"><br>
+    <!--br>[[create_time]]{$app:host}{$cfg:site.front_cover_dir}/{$fields:uid}/{$fields:album_id}<br-->
+  </p>
+  <div class="convo attribution clearfix">
+    <p class="NoImage">
+      <a href="{$app:app}&mod=album&id=[[album_id]]" style="font-size:15px;">
+      [[album_name]]</a>
+    </p>
+  </div>
+</textarea>
+
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> [[document_name]] Powered By XMLBOOK </title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+import ui.simpletree;
+-->
+</script>
+
+<script type="text/javascript" language="javascript">
+<!--
+
+var alpha_object = new alpha();
+
+function error(msg) {
+  Q.$("error").style.opacity = 1;
+  Q.$("error").innerHTML = msg;
+  setTimeout(function() {
+	alpha_object.push(Q.$("error"));
+	alpha_object.play();
+  }, 3000); 
+}
+
+function alpha() {
+  var _this = this;
+
+  this.data = [];
+  this.play = function() {
+	if(_this.data.length == 0) {
+	   return;
+	}
+	e = _this.data[0];
+	var op = parseFloat(e.style.opacity, 10);
+	op = op - 0.1;
+	if(op >= 0.1) {
+	  e.style.opacity = op;
+	} else {
+	  e.style.opacity = 0.0;
+	  _this.data.shift();
+	}
+	setTimeout(function() { _this.play();}, 40);
+  }
+
+  this.push = function(e) {
+    
+	_this.data.push(e);
+  }
+
+  this.completed = function() {return _this.data.length == 0; };
+}
+
+var g_dirTree = null;
+
+Q.Ready(function(){
+
+    g_dirTree = new __simpleTreeL({
+		Render : Q.$('dir-tree-render'),
+		Name : "[[document_title]]",
+		IsOpen : true
+	});
+
+	var nItem = g_dirTree.createNode(g_dirTree.getRoot(), "test", false);
+	//g_dirTree.setItemIcon(nItem, 'treeIconFolder');
+	g_dirTree.setItemData(nItem, 'testddd');
+	var nItem = g_dirTree.createNode(g_dirTree.getRoot(), "555", false);
+	//g_dirTree.setItemIcon(nItem, 'treeIconFolder');
+	g_dirTree.setItemData(nItem, 'testddd');
+	var nItem = g_dirTree.createNode(nItem, "test5test55", false);
+	//g_dirTree.setItemIcon(nItem, 'treeIconFolder');
+	g_dirTree.setItemData(nItem, 'testddd');
+});
+-->
+</script>
+</head>
+
+<body>
+
+
+<table border=1 cellspacing=1 cellpadding="10">
+<tr>
+<th colspan=2>testdfadfadfadf</th>
+</tr>
+<tr>
+  <td>
+
+  <div id="dir-tree-render" style="height:300px;">
+  </div>
+  [[document_tree]]</td>
+  <td>
+    [[document_content]]
+	<div class="simpletree_container simpletree">
+	<ul class="">
+		<li class="treeNode">
+		  <div class="expand last_expand_on" style="left: -20px;"></div>
+		  <a style="padding-left: 5px;"><span class="icon default"></span><span class="textNode">[[document_title]]</span></a>
+		  <ul class="">
+			<li class="treeNode">
+			  <div class="expand child" style="left: 0px;"></div>
+			  <a style="padding-left: 25px;"><span class="icon treeIconFolder"></span><span class="textNode">test</span></a>
+			  <ul class=""></ul></li>
+			<li class="treeNode">
+			  <div class="expand last_child" style="left: 0px;"></div>
+			  <a style="padding-left: 25px; background-color: rgb(194, 207, 241); background-position: initial initial; background-repeat: initial initial;"><span class="icon treeIconFolder"></span><span class="textNode">555</span></a>
+			  <ul class=""></ul>
+			</li>
+			<li class="treeNode">
+			  <div class="expand last_child" style="left: 20px;"></div>
+			  <a style="padding-left: 45px; background-color: rgb(194, 207, 241); background-position: initial initial; background-repeat: initial initial;"><span class="icon treeIconFolder"></span><span class="textNode">555</span></a>
+			  <ul class=""></ul>
+			</li>
+		  </ul>
+		</li>
+	</ul>
+	</div-->
+  </td>
+</tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> 挖一下，让更多人分享~ Powered By wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+<style>
+.pic {
+position: absolute;
+width: 50px;
+height: 50px;
+overflow: hidden;
+margin:0;
+padding:0;
+}
+
+.xx {
+  margin:0;
+  width: 88px;
+  height: 50px;
+  display: block;
+  padding: 0 0 0 60px;
+  word-wrap: break-word;
+  font-size:15px;
+}
+
+#button_bat_mode {
+  width: 100px;
+}
+#button_move{
+width: 100px;
+}
+#button_delete{
+width: 50px;
+}
+#button_complete{
+width: 50px;
+}
+</style>
+
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.tween;
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+import utils.xml;
+import ui.wndx-1-0-2;
+
+
+-->
+</script>
+<script type="text/javascript" src="{$themes:path}/lightwindow/prototype.js"></script>
+<script type="text/javascript" src="{$themes:path}/lightwindow/scriptaculous.js?load=effects"></script>
+<script type="text/javascript" src="{$themes:path}/lightwindow/lightwindow.js"></script>
+<link rel="stylesheet" href="{$themes:path}/lightwindow/css/lightwindow.css" type="text/css" media="screen" />
+
+
+<script src="{$themes:path/}/waterfall.js"></script>
+
+<body>
+<script type="text/javascript">
+<!--
+var g_test_window = null;
+var g_current_album_id = parseInt('{$fields:id}', 10);
+
+function show_button(id) {
+  var id = Q.$(id);
+  id.style.display = '';
+}
+
+function hide_button(id) {
+  var id = Q.$(id);
+  id.style.display = 'none';
+}
+
+function show_error_box(msg) {
+  Q.MsgBox({
+      title : '操作提示：',
+      content: msg, 
+      onok: function() { return true; }
+  });
+}
+
+function get_selected_post_data() {
+  var pics = [];
+  for(var key in g_selected_items) {
+    pics.push(key);
+  }
+
+  return pics;
+}
+
+function remove_selected_pics() {
+
+  for(var key in g_selected_items) {
+    //delete g_selected_items[pic.data['id']];
+    var e = g_selected_items[key];
+    e.parentNode.removeChild(e);
+  }
+
+  g_selected_items = {};
+  g_selected_count = 0;
+}
+
+
+function delete_pictures(pics) {
+  if(pics.length < 1) {
+    show_error_box('还没有选择图片哦!');
+    return false;
+  }
+
+  if(!window.confirm("确认删除吗?")) {
+    return false;
+  }
+
+  var data=[];
+  for(var i=0; i < pics.length; i++) {
+    data.push(parseInt(pics[i], 10));
+  }
+  
+  Q.Ajax({
+    command: '{$app:app}&mod=imageeditor&action=delete-image&inajax=true',
+    data : {album_id: g_current_album_id, pictures: data},
+    oncomplete : 
+      function(xmlhttp) {
+        try {
+          var resp = eval('('+xmlhttp.responseText+')');
+          switch(resp.header) {
+          case 0: {
+              show_error_box('删除成功');
+              remove_selected_pics();
+              g_waterfall.refresh();
+            }
+            break;
+          case -2:
+            show_error_box('操作失败，图片不存在或无权删除该图片');
+            break;
+          default:
+            show_error_box(resp.data);
+          }
+        } catch (e) {
+          alert(e+"\n"+xmlhttp.responseText);
+        }
+      }
+    }
+  );
+}
+
+function move_pictures(pics) {
+  var content = '<html:select id="user_albums" datasrc="data://useralbums" style="width: 300px; height:25px; margin-top: 20px;"> \
+  <t:data><option value="[field:value]">[field:text]</option></t:data> \
+  <option value="0" selected>待分类</option> \
+  </html:select>';
+  g_test_window = new Q.MsgBox({
+    title : '移动至...',
+      content: content,
+      onok : function() {
+        if(pics.length < 1) {
+          show_error_box('还没有选择图片哦!');
+          return false;
+        }
+
+        if(g_current_album_id == parseInt(Q.$('user_albums').value, 10)) {
+          alert('已经是【'+Q.$('user_albums').options[Q.$('user_albums').selectedIndex].text+'】画集了哦!');
+          return false;
+        }
+
+        Q.Ajax({
+          command: '{$app:module}&action=move&inajax=true',
+          data : {pictures:pics, album_id: Q.$('user_albums').value},
+          oncomplete : 
+            function(xmlhttp) {
+              try {
+                var resp = eval('('+xmlhttp.responseText+')');
+                if(resp.header == 0) {
+                  show_error_box('移动成功');
+                  remove_selected_pics();
+                  g_waterfall.refresh();
+                } else {
+                  show_error_box(resp.data);
+                }
+              } catch (e) {
+                alert(e+"\n"+xmlhttp.responseText);
+              }
+            }
+          }
+        );
+        return true;
+      }
+    });
+}
+
+Q.Ready(function() {
+  Q.$('my-beibao').onclick=function() {
+    Q.$('cnthld').className = 'beibao';
+  }
+
+  Q.$('my-settings').onclick=function() {
+    Q.$('cnthld').className = 'settings';
+  }
+
+  Q.$('button_bat_mode').onclick=function() {
+    hide_button(this);
+    show_button('button_move');
+    show_button('button_delete');
+    show_button('button_complete');
+
+    Q.$('wf-main').className = 'wf-main bat-mode';
+    g_waterfall.refresh();
+  }
+
+  Q.$('button_move').onclick=function() {
+    var pictures = get_selected_post_data();
+    if(pictures.length < 1) {
+      show_error_box('还没有选择图片哦!');
+      return false;
+    }
+    move_pictures(pictures);
+  }
+
+  Q.$('button_delete').onclick=function() {
+    var pictures = get_selected_post_data();
+    delete_pictures(pictures);
+  }
+
+  Q.$('button_complete').onclick=function() {
+    show_button('button_bat_mode');
+    hide_button('button_move');
+    hide_button('button_delete');
+    hide_button('button_complete');
+
+    Q.$('wf-main').className = 'wf-main';
+    g_waterfall.refresh();
+  }
+
+  hide_button('button_move');
+  hide_button('button_delete');
+  hide_button('button_complete');
+
+});
+
+//-->
+</script>
+<script type="text/javascript">
+
+function album_action_show(id, visible) {
+  var e = document.getElementById("action_bar_"+id);
+  if(e) {
+    e.style.visibility = visible?'visible':'hidden';
+  }
+}
+
+function store(arr) {
+  var _this = this;
+  this.data = (arr instanceof Array)?arr:[];
+
+  this.pop = function(len) {
+    var arr = [];
+    while(len >= 0 && _this.data.length > 0) {
+      arr.push(_this.data.shift());
+      len--;
+    }
+    return arr;
+  }
+}
+
+var g_waterfall = null;
+var albums_data = {$fields:images_data};
+var g_store = new store(albums_data);
+var g_selected_items = {};
+var g_selected_count = 0;
+
+Q.Ready(function(){
+  g_waterfall = new Waterfall({
+  "container":"wf-main",
+  "colWidth":238,
+  "colCount":4,
+  "template":Q.$('wf-template').value,
+  "mouseover": function(e) {
+      if(Q.$('wf-main').className != 'wf-main bat-mode') {
+        return;
+      }
+
+      if("box wf-cld mouseselected" == e.className) 
+        return;
+      e.className="box wf-cld mouseover"
+    },
+  "mouseout": function(e) {
+      if(Q.$('wf-main').className != 'wf-main bat-mode') {
+        return;
+      }
+      if("box wf-cld mouseselected" == e.className) 
+        return;
+      e.className="box wf-cld"
+    },
+  "click" : function(e) {
+      if(Q.$('wf-main').className != 'wf-main bat-mode') {
+        return;
+      }
+      if("box wf-cld mouseover" != e.className) {
+        e.className="box wf-cld";
+        delete g_selected_items[e.data['id']];
+        g_selected_count--;
+      } else {
+        e.className="box wf-cld mouseselected";
+        g_selected_items[e.data['id']] = e;
+        g_selected_count++;
+      }
+   },
+  
+  });
+
+  g_waterfall.append(g_store.pop(30));
+});
+
+</script>
+
+
+{#template user.menubar}
+
+<div id="wrapper" class="skin01" style="margin-top: 40px;"> 
+<div class="bground"> 
+  <!--div id="head"> 
+  {#template user.infoheader}
+  </div--> 
+  <div id="content">  
+  <div id="cnthld" class="beibao" style="display: block;"> 
+  <ul class="content-tab"> 
+  <li class="beibao-tab">
+    <a id="my-beibao" href="{$app:module}&id={$get:id}" class="tab-title songti tabbtn" hidefocus="">
+    <span class="tab-title-tag">查看</span>内容
+    </a>  
+  </li>
+  <li class="settings-tab">
+    <a id="my-settings" href="{$app:module}&action=edit&id={$get:id}" class="tab-title songti tabbtn" hidefocus="">
+      <span class="tab-title-tag">画集</span>设置
+    </a>  
+  </li>
+  <!--li class="tieba-tab"><a id="tiebatab" href="#" class="tab-title songti tabbtn" hidefocus="" data-click="tieba"><span class="tab-title-tag"></span>贴吧</a> </li-->
+  </ul> 
+  <div class="cnthld-main clearfix">
+    <div class="col leftside" style=""> 
+      <div class="plzhld" data-fill="tab_content">
+        <div class="action-bar"> 
+          <p>
+          <a href="{$app:app}&mod=user&action=home">我的画集 </a> >> 
+          <b style="color:red;">{$fields:album_name}</b> </p>
+          <div style="position:absolute; right:0; bottom:0; width:300px; height: 48px; line-height: 50px;text-align:right;margin-right: 15px;">
+            <button id="button_bat_mode" class="uploadBtn small">批量处理图片</button>
+            <button id="button_move" class="uploadBtn small">移动至...</button>
+            <button id="button_delete" class="uploadBtn small">删除</button>
+            <button id="button_complete" class="uploadBtn small">完成</button>
+          </div>
+        </div>
+        <br>
+        <div class="wf-main" id="wf-main" style="margin-left:20px;padding-left:10px;">
+        </div>
+      </div>
+      <br><br><br><br>
+    </div> 
+  
+    <div class="leftside-shadow"></div> 
+  </div> 
+  <!--div class="col rightside"> 
+    <div class="plzhld p1" data-fill="friend_content"></div> 
+  </div--> 
+  </div>
+  </div> 
+  </div> 
+
+  {#template user.footer}
+  </div> 
+</div>
+
+<textarea id="wf-template" style="display:none;">
+  <div class="actions hidden">
+    <div class="right">
+      <a href="" onclick="return false;" class="like btn btn11 wbtn">
+         <strong><em></em>赞</strong><span></span>
+    </a>
+    </div>
+    <div class="left">
+      <a title="快速转采" href="" onclick="return false;" class="thunderpin btn btn11 wbtn">
+        <strong><em></em></strong><span></span>
+      </a>
+      <a href="#" class="repin btn btn11 wbtn">
+        <strong>转采</strong><span></span>
+      </a>
+    </div>
+  </div>
+  <a href="http://[[server]]/[[file_name]]" class="lightwindow img x" rel="/\\:;*?<>'”|®™©&#[Sushi]" title="图片查看" caption="[[title]]" author="yourself">
+    <img src="http://[[server]]/thumb/[[file_name]]" width=[[width]] height=[[height]] alt="">
+  </a>
+  <p class="description">&nbsp;<!--[[title]]{$app:app}&mod=imageeditor&action=edit&id=[[id]]--></p>
+  <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
+  <div 
+    onmouseover="album_action_show('[[id]]',true)" 
+    onmouseout="album_action_show('[[id]]',false)"
+    class="convo attribution clearfix" style="overflow:hidden;" nowrap
+  >
+    <p class="NoImage">
+      <a href="#" target="_self">[[create_date]]</a>
+    </p>
+    <div id="action_bar_[[id]]" style="position:absolute; right:0; bottom:0; width:100px; height: 35px; line-height: 35px;text-align:center;visibility:hidden;">
+      <a href="{$app:app}&mod=imageeditor&action=edit&id=[[id]]" class="album-icons album-icons-edit">&nbsp;</a>
+      <!--a href="#" class="album-icons album-icons-delete">&nbsp;</a>
+      <a href="#" class="album-icons album-icons-check">&nbsp;</a-->
+    </div>
+  </div>
+  <div style="display:none;" class="comments muted"></div>
+  <!--div style="position:absolute; left:0; right:0; bottom:0; height: 35px; background: #000; opacity: 0.6;color: white; line-height: 35px;">
+  test
+   width:100px;height:100px;margin: -50px 0 0 -50px ;left:50%; top:50%; right:50%;bottom:50%;
+  </div-->
+<!--/div-->
+  <div class="select-mask">
+    <div style="margin: 30px 20px; line-height: 23px;">
+      [[create_date]]
+      <br>[[title]]
+    </div>
+  </div>
+</textarea>
+
+
+
+</body>
+</html>

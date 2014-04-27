@@ -220,59 +220,54 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
   }
 
   function login($tpl) {
-    try {
-      // 已经登录
-      if($this->App()->check_user_logon(false)) {
-        $this->App()->goto_url("您已经登录... 3秒后自动返回<a href=\"".$this->App()->getUrlApp()."\">首页</a>", $this->App()->getUrlApp(), 3000);
-        return;
-      }     
+    // 已经登录
+    if($this->App()->check_user_logon(false)) {
+      $this->App()->goto_url("您已经登录... 3秒后自动返回<a href=\"".$this->App()->getUrlApp()."\">首页</a>", $this->App()->getUrlApp(), 3000);
+      return;
+    }     
       
-      /* todo
-      // 检查SSL
-      if(!$this->is_ssl()) {
-        $https = "https://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];        header('location: '. $https);
-        return;
-      }
-      */
+    /* todo
+    // 检查SSL
+    if(!$this->is_ssl()) {
+      $https = "https://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];        header('location: '. $https);
+      return;
+    }
+    */
 
-      $t = new CLASS_TEMPLATES($this->App());
+    $t = new CLASS_TEMPLATES($this->App());
 
-      $login_type = $_GET['logintype'];
-      $refer_url = $_SERVER['HTTP_REFERER'];
-      if(!empty($_GET['refer'])) {
+    $login_type = $_GET['logintype'];
+    $refer_url = $_SERVER['HTTP_REFERER'];
+    if(!empty($_GET['refer'])) {
         $refer_url = $_GET['refer'];
-      }
-
-      // sina weibo login
-      include_once(_IROOT.'/phpweibosdk/saetv2.ex.class.php' );
-      $sina_weibo_callback = $this->Config('openapi.sinaweibo.callback').'&logintype='.$login_type.'&refer='.$refer_url;
-      $o = new SaeTOAuthV2( 
+    }
+    // sina weibo login
+    include_once(_QROOT.'/tp/phpweibosdk/saetv2.ex.class.php' );
+    $sina_weibo_callback = $this->Config('openapi.sinaweibo.callback').'&logintype='.$login_type.'&refer='.$refer_url;
+    $o = new SaeTOAuthV2( 
       $this->Config('openapi.sinaweibo.WB_AKEY') , 
       $this->Config('openapi.sinaweibo.WB_SKEY') );
-      $code_url = $o->getAuthorizeURL($sina_weibo_callback);
-      // sina weibo api
-      $t->push('sina_weibo_url', $code_url);
+    $code_url = $o->getAuthorizeURL($sina_weibo_callback);
+    // sina weibo api
+    $t->push('sina_weibo_url', $code_url);
 
-      // QQ ////////////////////////////////////////////////////////////
-      include_once(_IROOT.'/phpqqsdk/qq.sdk.class.php');
-      $qq_callback = $this->Config('openapi.qq.callback').'&logintype='.$login_type.'&refer='.$refer_url;
-      $o_qq = new Oauth2();
-      $qq_login_url = $o_qq->get_authorized_url(
-        $this->Config('openapi.qq.appid'), 
-        $this->Config('openapi.qq.scope'), 
-        $qq_callback
-      );
+    // QQ ////////////////////////////////////////////////////////////
+    include_once(_QROOT.'/tp/phpqqsdk/qq.sdk.class.php');
+    $qq_callback = $this->Config('openapi.qq.callback').'&logintype='.$login_type.'&refer='.$refer_url;
+    $o_qq = new Oauth2();
+    $qq_login_url = $o_qq->get_authorized_url(
+       $this->Config('openapi.qq.appid'), 
+       $this->Config('openapi.qq.scope'), 
+       $qq_callback
+    );
 
-      $t->push('qq_login_url', $qq_login_url);
+    $t->push('qq_login_url', $qq_login_url);
 
-      // refer url
-      $t->push('refer', urlencode($refer_url));
+    // refer url
+    $t->push('refer', urlencode($refer_url));
 
-      // show page
-      $t->render($tpl);
-    } catch(Exception $e) {
-      print_r($e);
-    }
+    // show page
+    $t->render($tpl);
   }
 
   function logout() {

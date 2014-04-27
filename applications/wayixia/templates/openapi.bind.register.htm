@@ -1,0 +1,242 @@
+{#dict src="ui.dictionary"}
+<!DOCTYPE html>
+<html>
+<head>
+<title> 创建账号 - wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/test.css" />
+
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/waterfall.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/registeruser.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/user.css">
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/style.css" />
+<style>
+#form_username {
+  width: 300px;
+  height: 30px;
+}
+
+#form_gender {
+  width: 305px;
+  height:36px;
+}
+
+#submit-button {
+  width: 305px;
+}
+</style>
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+-->
+</script>
+
+<script type="text/javascript" language="javascript">
+<!--
+
+var alpha_object = new alpha();
+
+function error(msg) {
+  Q.$("error").style.opacity = 1;
+  Q.$("error").innerHTML = msg;
+  setTimeout(function() {
+	alpha_object.push(Q.$("error"));
+	alpha_object.play();
+  }, 3000); 
+}
+
+function alpha() {
+  var _this = this;
+
+  this.data = [];
+  this.play = function() {
+	if(_this.data.length == 0) {
+	   return;
+	}
+	e = _this.data[0];
+	var op = parseFloat(e.style.opacity, 10);
+	op = op - 0.1;
+	if(op >= 0.1) {
+	  e.style.opacity = op;
+	} else {
+	  e.style.opacity = 0.0;
+	  _this.data.shift();
+	}
+	setTimeout(function() { _this.play();}, 40);
+  }
+
+  this.push = function(e) {
+    
+	_this.data.push(e);
+  }
+
+  this.completed = function() {return _this.data.length == 0; };
+}
+
+function check_submit_button() {
+   var arr = [
+   'msg-username',
+   'msg-gender',
+   ];
+   var disabled = false;
+   for(var i=0; i<arr.length; i++) {
+     if(Q.$(arr[i]).innerHTML != '') {
+     disabled = true;
+     break;
+   }
+   }
+   Q.$('submit-button').disabled = disabled;
+}
+
+Q.Ready(function(){
+  Q.$("form_username").onblur = function(){
+    if(!this.value) {
+      Q.$("msg-username").innerHTML = "请输入昵称";
+      check_submit_button();
+    } else {
+      var username = this.value;
+      Q.Ajax({
+        command: "{$app:app}&mod=user&action=check-username&inajax=true&username="+username,
+        oncomplete: function (xmlhttp){//成功
+          try {
+            var resp = eval('('+xmlhttp.responseText+')');
+            if(resp.header != 0) {
+              Q.$("msg-username").innerHTML = resp.data;
+            } else {
+              Q.$("msg-username").innerHTML = '';
+            }
+          } catch (e) {
+            Q.$("msg-username").innerHTML = xmlhttp.responseText;
+          }
+          check_submit_button();
+        }
+        });
+    }
+  };
+
+  Q.$("form_gender").onblur = Q.$('form_gender').onchange = function() {
+    if(!(this.value == 0 || this.value == 1)) {
+      Q.$("msg-gender").innerHTML = "请选择性别";
+    } else {
+      Q.$("msg-gender").innerHTML = "";
+    }
+    check_submit_button();
+  };
+
+
+  Q.$('submit-button').onclick = function() {
+    // check data 
+    var data = {
+      'name' : Q.$('form_username').value,
+      'open_id': Q.$('form_open_id').value,
+//      'login_type': Q.$('form_login_type').value,
+      'sex': Q.$('form_username').value,
+    };
+
+    Q.Ajax({
+      command: "{$app:module}&action=do-bind-register&inajax=true",
+      data: data,
+      oncomplete : function(xmlhttp) {
+          try {
+            var resp = eval('('+xmlhttp.responseText+')');
+            if(resp.header != 0) {
+              error(resp.data);
+            } else {
+              Q.$("msg-username").innerHTML = '';
+              // ok
+	      var login_type = Q.$('form_login_type').value;
+	      var refer = Q.$('form_refer').value;
+	      if(login_type != 1) {
+	        location.href = refer?refer : "http://wayixia.com";
+	      } else {
+	        window.close();
+              }
+              //if(Q.GET('t') == '1') {
+              //  window.close();
+              //} else if(Q.GET('t') == 2) {
+              //  location.href = decodeURIComponent(Q.GET('refer'));
+              //} else {
+              //  parent.location.reload();
+              //}
+
+           }
+          } catch (e) {
+            error(xmlhttp.responseText);
+          }
+          check_submit_button();
+      } 
+    }); 
+  };
+});
+-->
+</script>
+</head>
+
+<body>
+
+{#template user.menubar/}
+
+<div id="wrapper" class="skin01" style="margin-top: 40px;"> 
+<div: class="bground"> 
+  <div id="content">  
+  <div id="cnthld" class="beibao" style="display: block;"> 
+  <ul class="content-tab"> 
+  <li class="beibao-tab">
+    <a id="my-beibao" href="#" class="tab-title songti tabbtn" hidefocus="">
+      <span class="tab-title-tag"></span>创建账号
+    </a>  
+  </li>
+  </ul> 
+  <div class="cnthld-main clearfix">
+    <div class="loadingtpl">LOADING...</div> 
+  <div class="col leftside"> 
+    <div class="plzhld" data-fill="tab_content">
+      <br><br>
+        <div class="regmain">
+     <div align="left" style="width: 500px; margin-left: 25px; font-size: 14px; line-height: 40px;">
+       <input type="hidden" id="form_refer" value="{$fields:refer}" />
+       <input type="hidden" id="form_open_id" value="{$fields:open_id}" />
+       <input type="hidden" id="form_login_type" value="{$fields:login_type}" />
+       <div>
+         <p>昵称<br />
+         <input type="text" id="form_username" size="30" maxlength="30" value="{$fields:name}"/>
+           <span class="msg" id="msg-username"></span>
+         </p>
+         <p>
+           性别<br />
+	   <html:select id="form_gender" datasrc="dict://dicGender"> 
+             <option value="-1" selected>未选择</option>
+             <t:data>
+             <option value="[field:value]">[field:text]</option>
+             </t:data>
+	   </html:select> 
+           <span class="msg" id="msg-gender"></span>
+         </p>
+         <p>
+           <br/>
+           <button id='submit-button' class="uploadBtn small" disabled/> 创 建 </button>
+           <br/>
+           <span id="error" style=" margin-top:3px;color:red;">&nbsp;</span>
+           <br /><br />
+        </p>
+      </div>
+      </form>
+      </div>
+    </div>
+    </div>
+    <div class="leftside-shadow"></div> 
+  </div> 
+  </div>
+  </div> 
+  </div> 
+  
+  <div id="foot"> <div class="mod-footer"> <div class="bottom-line2"> <p>© WAYIXIA.COM <em class="s-bottom-copyright">&nbsp;&nbsp;&nbsp;&nbsp;</em></p> </div></div> </div> </div> 
+
+  <a class="mod-go-top-btn" href="#" onclick="return false" style="display: none; position: fixed; bottom: 5px; right: 66.5px;"></a> 
+</div>
+
+</body>
+</html>

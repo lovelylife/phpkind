@@ -1,0 +1,43 @@
+
+<script src="{$themes:path}/login.js"></script>
+<div class="wf-main" style="z-index:3;">
+	<div class="regtop" style="height:100px;">
+		<ul id="user-menu">
+	<?php 
+	  $name = $theApp->get_user_info('name');
+	  if(empty($name)) {
+	?>	
+			<li><a href="{$app:app}">首页</a></li>
+			<li><a href="{$app:app}&mod=user&action=register">注册</a></li>
+			<li><a href="{$app:app}&mod=user&action=regular-login" >登录</a></li>
+	<?php
+	  } else {
+	?>
+	     <li>欢迎回来，<b> <?php echo $name;?> </b></li>
+		 <li><a href="{$app:app}&mod=user&action=logout">退出</a></li>	     <li><a href="{$app:app}&mod=user&action=home"> 个人中心 </a></li>        
+		 <li><a href="{$app:app}">首页</a></li>
+	<?php 
+	  }
+	?>
+		</ul>
+		
+	</div>
+</div>
+
+<div id="nav" class="clearfix" style="visibility: visible;">
+<div id="nav_wrapper" class="main_in_wrapper">
+<div class="main_wrapper  wrapper_for_margin">
+<div class="wrapper_for_middle" style="width: 966px;">
+<ul class="main" style="width: 989px;">
+<li class="item"><a href="{$app:host/}/index/" title="发现与分享给朋友" label="分享" style="padding-left: 16px; padding-right: 17px;" class="home">发现与分享</a></li>
+<html:list
+	id="mydatamenu" 
+	datasrc="sql://select * from ##__album_class order by `orders`" 
+	keySelected="name"
+	valueSelected="{$v:tag}"
+	maskSelected="curr"
+>
+<t:data><li class="item [field:selected]"><a href="{$app:host/}/index/[field:name func="urlencode(@this)"]" title="[field:name]" label="[field:name]" style="padding-left: 16px; padding-right: 17px;" class="[field:selected]">[field:name]</a></li></t:data>
+</html:list>
+
+</ul></div></div></div></div>

@@ -1,21 +1,6 @@
 
 @charset "UTF-8";
 
-
-body,h1,h2,h3,h4,h5,h6,hr,p,blockquote,dl,dt,dd,ul,ol,li,pre,form,fieldset,legend,button,input,textarea,th,td {
-  margin:0;
-  padding:0
-}
-
-body {
-  background-color: #fff;
-  color: #000;
-  margin: 0;      /* void out browser-defined gutterspace */
-  padding: 0;
-    font-family: Arial, SimSun; font-size:14px;/* calibri, the "IN" font for reading text on screens */
-  min-height:100%;
-}
-
 img {border:0;}
 
 ul,ol {list-style-type:none;}
@@ -32,8 +17,8 @@ ul,ol {list-style-type:none;}
 }
 
 .main-width {
-  max-width: 99px;  /* max resolution - 25px to accomadate for the vertical  scrollbar */
-  min-width: 990px;  /* min resolution - 25px */
+  max-width: 1090px;  /* max resolution - 25px to accomadate for the vertical  scrollbar */
+  min-width: 1090px;  /* min resolution - 25px */
   margin: 0 auto;    /* auto horizontal margins will cause the layout to be horizontally centered (usually) */
   font-size:13px;
 }
@@ -86,7 +71,7 @@ div.panel p,div {
 
 #left-column {
   float: left;
-  width: 620px;        /* width of main column as a percent of the 
+  width: 720px;        /* width of main column as a percent of the 
                  available horizontal space */
   margin-right:10px;
   background-color:#fff;
@@ -96,7 +81,7 @@ div.panel p,div {
 }
 
 #left-column div.panel {
-  margin-right: 0.25em;
+/*  margin-right: 0.25em; */
 }
 
 #right-column {
@@ -460,16 +445,6 @@ li#btn-more table.more-open {
   right:0
 }
 
-
-
-
-body {
-  font-family:Verdana, Arial, Helvetica, sans-serif;
-  padding:0px;
-  margin:0px;
-  list-style:none;
-}
-
 html{
   background:#FFF;
 }
@@ -612,9 +587,7 @@ hr:empty {/*¼æÈÝFirefox*/
 
 /*ÕýÎÄ*/
 .main{
-  width:100%;
-  margin-top:6px;
-  float:right;
+  margin: 0;
 }
 
 .footer{
@@ -718,20 +691,6 @@ button[disabled] {
 button img {
   float: left; position: relative; top: 2px; margin-right: 3px;
 }
-
-/*
-input[type="submit"],input[type="reset"],input[type="button"] {
-  color: #666;
-  background: #fff url(../../images/system/button.gif) repeat-x;
-  border: 1px outset #CCC;
-  cursor: pointer;
-  height:25px;
-  padding-left: 5px;
-  padding-right: 4px;
-  margin: 5px 4px;
-  -moz-border-radius: 1px;
-}
-*/
 
 input[type="submit"]:hover,
 input[type="reset"]:hover,
@@ -1141,6 +1100,16 @@ body,button,input,select,textarea {
   font-family:arial,\5b8b\4f53,sans-serif
 }
 
+body {
+  background-color: #fff;
+  color: #000;
+  margin: 0;      /* void out browser-defined gutterspace */
+  padding: 0;
+  font-family: Arial, SimSun; font-size:14px;/* calibri, the "IN" font for reading text on screens */
+  height:100%;
+  min-height:100%;
+}
+
 h1,h2,h3,h4,h5,h6 {
   font-size:100%
 }
@@ -1220,7 +1189,7 @@ pre.wordwrap {
 }
 
 #content, #foot {
-  width:990px;
+  width:1090px;
   margin:0 auto
 }
 
@@ -1237,7 +1206,7 @@ pre.wordwrap {
 }
 
 #cnthld {
-  width:990px;
+  width:1090px;
   position:relative;
   _margin-top:-35px
 }
@@ -1246,7 +1215,7 @@ pre.wordwrap {
   height:39px;
   position:relative;
   padding-top:42px;
-  background:transparent url(../img/tab_bg_6cd047bc.png) repeat-x 0 0;
+  /* background:transparent url(../img/tab_bg_6cd047bc.png) repeat-x 0 0; */
   padding-left:20px;
   border-right:0px solid #c7d8ee;
   border-left:0px solid #c7d8ee
@@ -1310,9 +1279,11 @@ pre.wordwrap {
 #cnthld.beibao .content-tab .beibao-tab .tab-title .tab-title-tag,#cnthld.settings .content-tab .settings-tab .tab-title .tab-title-tag,#cnthld.tieba .content-tab .tieba-tab .tab-title .tab-title-tag,#cnthld.zhidao .content-tab .zhidao-tab .tab-title .tab-title-tag,#cnthld.wenku .content-tab .wenku-tab .tab-title .tab-title-tag,#cnthld.xiangce .content-tab .xiangce-tab .tab-title .tab-title-tag,#cnthld.space .content-tab .space-tab .tab-title .tab-title-tag,#cnthld.baike .content-tab .baike-tab .tab-title .tab-title-tag {
   display:inline
 }
+
 .col {
   float:left
 }
+
 .cnthld-main {
   background-color:#f1f4f6;
   border-style:solid;
@@ -2245,3 +2216,14 @@ a.btn-refresh:hover{color:#e01a1a}
   right: 30px;
   background: url(seg-title-arrow.png) -20px top no-repeat;
 }
+
+/* pins-action */
+.pins-action {
+  background-image: url(image-prev.png) no-repeat;  
+}
+
+.pins-fullscreen {
+  background-position: 0 100px; 
+}
+
+  

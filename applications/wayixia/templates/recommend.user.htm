@@ -1,0 +1,207 @@
+<!DOCTYPE>
+<html>
+<head>
+<title> 推荐用户 - wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+import utils.tween;
+-->
+</script>
+
+<script src="{$themes:path/}/common.js"></script>
+<script src="{$themes:path/}/waterfall.js"></script>
+<script>
+<!--
+
+function check_error(img_) {
+  img_.src = '{$themes:path}/icon48.png';
+}
+
+function do_follow_album(album_id) {
+  follow_album('{$app:app}&mod=album&action=follow&inajax=true', album_id);
+}
+
+-->
+</script>
+
+<body>
+	
+{#template user.menubar/}
+
+<br>
+<br><br>
+<br><br>
+<div class="main-width" align="left">
+  <div class="btn-group time-limit">
+    <a href="{$app:app}" class="btn btn-default">最新分享</a>
+    <a href="/recommend/album" class="btn btn-default">推荐画集</a>
+    <a href="/recommend/user" class="btn btn-primary">推荐用户</a>
+  </div>
+</div>
+
+<div id="main">
+  <div id="page" class="wf-main">
+    <div class="wf-main">
+      <!--h3 style="font-size: 16px; font-weight:normal">
+      推荐挖客
+      </h3-->
+      <br/>
+    </div>
+    <div class="wf-main user-style" id="wf-main">
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div class="clear"></div>
+  {#template user.footer}
+</div>
+<br><br>
+
+<textarea id="wf-template" style="display:none;">
+  <div class="user-profile" style="width:429px;border-right: 1px solid #F2F5F5;float: left;">
+    <div class="profile-basic">
+      <dl style="padding:12px 0;">
+      <dt>
+        <a href="{$cfg:urls.user}/[[uid]]" target="_self" class="img x">
+          <img src="{$cfg:site.avatar}/user92.[[uid]].jpg" width=92 height=92 class="normalFace" style="border:1px solid #CCC; width:100%;" onerror="check_error(this);"></a>
+      </dt>
+        <dd class="name"><a href="{$cfg:urls.user}/[[uid]]" title="挖客" style="font-size: 16px;">[[name]]</a></dd>
+	<dd class="count">
+	  <a href="{$cfg:urls.user}/[[uid]]" class="info-link">	
+            <span>  [[num_images]]  <p>图片</p></span>
+          </a>
+          <a href="{$cfg:urls.paintingslist}/[[uid]]" class="info-link">
+            <span> [[num_albums]] <br> <p>画集</p></span>
+          </a>
+	</dd>
+        <!--dd class="privacy-set"><a href="#">&nbsp;&nbsp;1222222222222</a></dd-->
+      </dl>
+      <div class="description" style="color: #999;height: 40px; background: #FAFAFA; margin:10px 10px 0px 0px;">[[description]]&nbsp;</div>
+      <div style="height:10px;">&nbsp;</div>
+    </div>
+  </div>
+  <div class="album-list">
+    [[albumlist]]	  
+  </div>
+  <!--div class="convo attribution clearfix">
+    <p class="NoImage">
+      <a href="{$app:host}/pins/[[id]]" target="_self">[[owner]]
+      </a>
+    </p>
+  </div-->
+</textarea>
+
+<textarea id="album_template" style="display:none;">
+<span class="album">
+  <div class="ablum-name" style="font-size:14px; overflow:hidden; width:100px;text-overflow : ellipsis;float:left">
+    <nobr><a href="{$cfg:urls.paintings}/[[album_id]]">[[album_name]]</a></nobr>
+  </div>
+  <div class="ablum-name-right" style="overflow:hidden; width:55px; text-overflow : ellipsis; margin-left: 90px;text-align: right;">
+    <nobr>([[num_images]])</nobr>
+  </div>
+  <div class="album-body">
+    [[images]]
+  </div>
+  <div class="ablum-bottom" align="right"><button class="button" onclick="do_follow_album([[album_id]])">关注</button></div>
+</span>
+</textarea>
+
+<textarea id="image_template" style="display:none;">
+  <a href="{$cfg:urls.image}/[[id]]" target="_self">
+    <div class="album-item" style="background:url(http://[[server]]/thumb/[[file_name]]) 50% 50% no-repeat"> </div>
+  </a>
+</textarea>
+
+<script type="text/javascript">
+
+function store(arr) {
+  var _this = this;
+  this.data = (arr instanceof Array)?arr:[];
+
+  this.pop = function(len) {
+    var arr = [];
+	while(len >= 0 && _this.data.length > 0) {
+	  arr.push(_this.data.shift());
+	  len--;
+	}
+	return arr;
+  }
+}
+
+function parse_images(tpl, item) {
+  tpl = tpl.replace(/\[\[(\w+)\]\]/ig, 
+    function(w,w2,w3,w4) {
+      return item[w2];
+    }
+  );
+  return tpl;
+}
+
+function parse_album(tpl, item) {
+  tpl = tpl.replace(/\[\[(\w+)\]\]/ig, 
+    function(w,w2,w3,w4) {
+      if(w2=="images") {
+        var str = "";
+        var images_arr = [];
+	try {
+          images_arr = item['data_images'];
+        } catch(e) {
+        }
+        var len = images_arr.length;
+	if(len>6) {
+	  len = 6;
+	}
+	for(var i=0; i < len; i++) {
+          str += parse_images(Q.$('image_template').value, images_arr[i]);
+        }
+        return str;
+      }
+      return item[w2];
+    }
+  );
+  return tpl;
+}
+
+var g_waterfall = null;
+var g_store = new store({$fields:users});
+
+Q.Ready(function(){
+  g_waterfall = new Waterfall({
+	"container":"wf-main",
+	"colWidth":990,
+	"colCount":1,
+	"template":Q.$('wf-template').value,
+	"item_callback": function(name, item) {
+	  if(name == "albumlist") {
+	    var str = "";
+	    var albums = [];
+	    try {
+	      albums = Q.json_decode(item['data_albums']);
+	    } catch(e) {
+	    
+	    }
+            for(var i=0; i < albums.length; i++) {
+	      str += parse_album(Q.$('album_template').value, albums[i]);
+	    }
+	    return str;
+	  } else {
+	    return item[name];
+	  }
+	}
+  });
+
+  g_waterfall.append(g_store.pop(6));
+
+});
+
+</script>
+
+</body>
+</html>

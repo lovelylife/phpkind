@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> 挖一下，让更多人分享~ Powered By wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+import utils.xml;
+import ui.calendar;
+-->
+</script>
+<script type="text/javascript">
+<!--
+
+function enable_controls(enabled) {
+  Q.$('form_name').disabled = !enabled;
+  Q.$('form_gender').disabled = !enabled;
+  Q.$('form_bothday').disabled = !enabled;
+  Q.$('form_description').disabled = !enabled;
+  Q.$('submit-button').disabled = !enabled;
+}
+
+function get_form_data() {
+  var data = {};
+  data.uid = Q.$('form_uid').value;
+  data.name = Q.$('form_name').value;
+  data.gender = Q.$('form_gender').value;
+  data.bothday = Q.$('form_bothday').value;
+  data.description = Q.$('form_description').value;
+  if(data.description.length > 64) {
+    alert('签名字数不能超过64个字符');
+    return false;
+  }
+
+  return data;
+}
+
+Q.Ready(function() {
+
+  // 初始化签名
+  Q.$('form_description').onkeydown = function(evt) {
+    Q.$('last_bytes').innerHTML = "还剩"+(64-this.value.length)+"字";
+  }
+
+  Q.$('last_bytes').innerHTML = "还剩"+(64-Q.$('form_description').value.length)+"字";
+
+  Q.$('submit-button').onclick = function() {
+    var data = get_form_data();
+    enable_controls(!data);
+    Q.Ajax({
+      command : "{$app:module}&action=do-save-detail&inajax=true",
+      data: data,
+      oncomplete: function(xmlhttp) {
+        try {
+          var resp = eval('('+xmlhttp.responseText+')');
+          if(resp.header == 0) {
+            alert('设置成功');
+            location.reload();
+          } else {
+            alert(resp.data);
+          }
+        } catch (e) {
+          alert(xmlhttp.responseText);
+        }
+        enable_controls(true);
+      },
+      onerror: function(xmlhttp) {
+        enable_controls(true);
+      }
+    });
+  }
+
+
+});
+//-->
+</script>
+
+<body>
+
+{#template user.menubar}
+
+<div id="wrapper" class="skin01" style="margin-top: 40px;"> 
+<div class="bground"> 
+  <!--div id="head"> 
+  {#template user.infoheader}
+  </div--> 
+  <div id="content">  
+  <div id="cnthld" class="settings" style="display: block;"> 
+  <ul class="content-tab"> 
+  <li class="beibao-tab">
+    <a id="my-beibao" href="{$app:module}&action=home" class="tab-title songti tabbtn" hidefocus="">
+    <span class="tab-title-tag">我的</span>画集
+    </a>  
+  </li>
+  <li class="settings-tab">
+    <a id="my-settings" href="{$app:module}&action=detail" class="tab-title songti tabbtn" hidefocus="">
+      <span class="tab-title-tag">设置</span>资料
+    </a>  
+  </li>
+  <li class="tieba-tab">
+    <a id="my-settings" href="{$app:module}&action=avatar" class="tab-title songti tabbtn" hidefocus="">
+      <span class="tab-title-tag">设置</span>头像
+    </a>  
+  </li>
+  </ul> 
+  <div class="cnthld-main clearfix">
+  <div class="col leftside"> 
+    <div class="plzhld" data-fill="tab_content">
+    <div class="action-bar">
+    <p>带 <b style="color:red;">*</b> 项为必填项 </p>
+    </div>
+    <div style="padding-left:20px;padding-top:10px; line-height: 40px;">
+      <p> 名称(<font color="#999999">不可修改</font>)：<br>
+        <input 
+          name="name" 
+          type="text" 
+          id="form_name" size="30" maxlength="30"
+          value="{$fields:name}"
+          disabled
+        />
+        <input type="hidden" value="{$fields:uid}" id="form_uid"/>
+        <span class="msg" id="msg-name"></span>
+      </p>
+      <p> 性别：<br>
+        <html:select 
+          id="form_gender" 
+          datasrc="dict://dicGender" 
+          keySelected="value"
+          valueSelected="{$fields:gender}"
+          maskSelected="selected"
+          style="width: 220px; height:30px;" 
+         >
+         <t:data>
+         <option value="[field:value]" [field:selected]>[field:text] </option>
+         </t:data>
+        </html:select>
+
+        <span class="msg" id="msg-gender"></span>
+      </p>
+      <p> 出生年月:<br>
+        <input 
+          name="both" 
+          type="text" 
+          id="form_bothday" 
+          value="{$fields:bothday}"
+          size="30" maxlength="30"
+          readonly="readonly"
+          onClick="showcalendar(event, this);" 
+          onFocus="showcalendar(event, this);if(this.value=='0000-00-00')this.value=''"
+        /> 
+        <span class="msg" id="msg-bothday"></span></p>
+        <p> 个性签名：(<span id="last_bytes">剩余64字</span>)<br>
+        <textarea id="form_description" cols="70" rows="5" maxlength="64" />{$fields:description}</textarea>
+        <span class="msg" id="msg-description"></span></p>
+        <p align="left"> 
+          <br/>
+          <button id='submit-button' class="uploadBtn small">保 存</button>
+        </p>
+    </div>
+
+    </div>
+    <br><br><br><br>
+    </div> 
+  
+    <div class="leftside-shadow"></div> 
+  </div> 
+  <!--div class="col rightside"> 
+    <div class="plzhld p1" data-fill="friend_content"></div> 
+  </div--> 
+  </div>
+  </div> 
+  </div> 
+  
+  {#template user.footer} 
+</div> 
+  
+
+</body>
+</html>
+
+{#dict src="ui.dictionary"}

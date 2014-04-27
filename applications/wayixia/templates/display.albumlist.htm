@@ -1,0 +1,148 @@
+<!DOCTYPE>
+<html>
+<head>
+<title> {field:albumname} - wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+import utils.tween;
+-->
+</script>
+
+<script src="{$themes:path/}/common.js"></script>
+<script src="{$themes:path/}/waterfall.js"></script>
+
+<script>
+<!--
+
+function check_error(img_) {
+  img_.src = '{$themes:path}/icon48.png';
+}
+
+function do_follow_album(album_id) {
+  follow_album('{$app:app}&mod=album&action=follow&inajax=true', album_id);
+}
+
+-->
+</script>
+
+<body>
+
+{#template user.menubar/}
+
+<br>
+<br><br>
+<br><br>
+
+<div id="main">
+  <div id="page" class="wf-main">
+    <div class="wf-main">
+      <h3 style="font-size: 16px; font-weight:normal">
+        <a href="{$cfg:urls.user}/{$fields:uid}"> {$fields:uname} </a>分享的画集 
+      </h3>
+      <br/>
+    </div>
+    <div class="wf-main album-style" id="wf-main">
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div class="clear"></div>
+  {#template user.footer}
+</div>
+<br><br>
+
+<textarea id="wf-template" style="display:none;">
+  <div class="album-list">
+    <span class="album">
+      <div class="ablum-name" style="font-size:14px; overflow:hidden; width:150px;text-overflow : ellipsis;float:left;">
+        <a href="{$cfg:urls.paintings}/[[album_id]]"><nobr>[[album_name]]</nobr></a>
+      </div>
+      <div class="ablum-name-right" style=" overflow:hidden; width:35px;text-overflow : ellipsis; margin-left: 140px;text-align: right;"><nobr>([[num_images]])</nobr></div>
+      <div class="album-body">
+        [[images]]
+      </div>
+      <!--div class="ablum-bottom" align="right"><button class="button">关注</button></div-->
+    </span>
+  </div>
+  <div class="convo attribution clearfix">
+    <p class="NoImage">
+      <!--a href="/index.php?app=wayixia&mod=album&id=[[album_id]]" style="font-size:15px;">
+      [[album_name]]</a--><button class="button" onclick="do_follow_album([[album_id]])">关注</button>
+    </p>
+  </div>
+</textarea>
+
+<textarea id="image_template" style="display:none;">
+<a href="{$cfg:urls.image}/[[id]]" target="_self">
+  <div class="album-item" style="background:url(http://[[server]]/thumb/[[file_name]]) 50% 50% no-repeat"> </div>
+</a>
+</textarea>
+
+<script type="text/javascript">
+	
+function parse_images(tpl, item) {
+  tpl = tpl.replace(/\[\[(\w+)\]\]/ig, 
+    function(w,w2,w3,w4) {
+      return item[w2];
+    }
+  );
+  return tpl;
+}
+
+function store(arr) {
+  var _this = this;
+  this.data = (arr instanceof Array)?arr:[];
+
+  this.pop = function(len) {
+    var arr = [];
+	while(len >= 0 && _this.data.length > 0) {
+	  arr.push(_this.data.shift());
+	  len--;
+	}
+	return arr;
+  }
+}
+var g_waterfall = null;
+var g_store = new store({$fields:albums});
+
+Q.Ready(function(){
+  g_waterfall = new Waterfall({
+	"container":"wf-main",
+	"colWidth":238,
+	"colCount":4,
+	"template":Q.$('wf-template').value,
+ 	"item_callback": function(name, item) {
+	  if(name == "images") {
+	    var str = "";
+	    var images_arr = [];
+	    try {
+	      images_arr = Q.json_decode(item['data_images']);
+	      } catch(e) {
+	      //console.log(item['data_images']);
+	      //console.log(e); 
+	    }
+            for(var i=0; i < images_arr.length; i++) {
+	      str += parse_images(Q.$('image_template').value, images_arr[i]);
+	    }
+	    return str;
+	  } else {
+	    return item[name];
+	  }
+	}
+  });
+
+  g_waterfall.append(g_store.pop(12));
+
+});
+
+</script>
+
+</body>
+</html>
+

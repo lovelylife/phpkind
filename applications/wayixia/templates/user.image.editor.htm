@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> 编辑图片 - wayixia.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 使用QLib控件是必须包含样式表 -->
+<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
+<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+
+<script src="{$app:qlib}/Q.js">
+<!--
+import utils.stl;
+import utils.json2;
+import utils.ajax;
+import utils.xml;
+import ui.wndx-1-0-2;
+import ui.select;
+-->
+</script>
+<script src="{$themes:path/}/waterfall.js"></script>
+
+<body>
+<script type="text/javascript">
+<!--
+var g_ctrl_select = null;
+
+Q.Ready(function() {
+
+  Q.$('button-back').onclick=function() {
+    history.go(-1);
+  }
+
+  // save settings
+  Q.$('button-save').onclick=function() {
+    Q.$('button-delete').disabled = true;
+    this.disabled = true;
+    var data = {};
+    data['id'] = Q.$('image_id').value;
+    data['album_id'] = Q.$('users_albums_id').value;
+    data['title'] = Q.$('image_title').value
+    
+    Q.Ajax({
+      command: '{$app:module}&action=edit&inajax=true',
+      data : data,
+      oncomplete : function(xmlhttp) {
+        try {
+          var resp = eval('('+xmlhttp.responseText+')');
+          switch(resp.header) {
+          case 0:
+            alert('操作成功');
+            break;
+          case -2:
+            alert('操作失败，图片不存在或无权删除该图片');
+            break;
+          default:
+            alert(resp.data);
+          }
+        } catch (e) {
+          alert(xmlhttp.responseText);
+        }
+        Q.$('button-save').disabled = false;
+        Q.$('button-delete').disabled = false;
+      }
+    });
+  }
+
+  Q.$('button-delete').onclick=function() {
+    var data = [];
+    data.push(Q.$('image_id').value);
+
+    if(!window.confirm("确认删除吗?")) {
+      return;
+    }
+
+    Q.Ajax({
+      command: '{$app:module}&action=delete-image&inajax=true',
+      data : {album_id: {$fields:album_id}, pictures: data},
+      oncomplete : function(xmlhttp) {
+        try {
+          var resp = eval('('+xmlhttp.responseText+')');
+          switch(resp.header) {
+          case 0:
+            alert('操作成功');
+            history.go(-1);
+            break;
+          case -2:
+            alert('操作失败，图片不存在或无权删除该图片');
+            break;
+          default:
+            alert(resp.data);
+          }
+        } catch (e) {
+          alert(xmlhttp.responseText);
+        }
+        Q.$('button-save').disabled = false;
+        Q.$('button-delete').disabled = false;
+      }
+    });
+  }
+//  g_ctrl_select = new Q.selector(Q.$('users_albums_id'));
+});
+
+function check_width() {
+
+    var img_width = Q.$('tweenimg').offsetWidth;
+		var img_height = Q.$('tweenimg').offsetHeight;
+		var max_width = Q.$('tweenimg').parentNode.offsetWidth;
+		var max_height = Q.$('tweenimg').parentNode.offsetHeight;
+		var result = max_width * img_height - max_height * img_width;
+		var width = 0;
+		var height = 0;
+		if(result<0) {
+		// 宽度
+			//img.width = max_width;
+			width  = max_width;
+			height = (max_width*img_height)/(img_width*1.0);
+		} else {
+			//img.height = max_height;
+			height = max_height;
+			width  = (img_width*height)/(img_height*1.0);
+		}
+		
+		Q.$('tweenimg').style.width = width+'px';
+		Q.$('tweenimg').style.height = height+'px';
+		Q.$('tweenimg').style.marginTop = ((max_height-height)/2)+'px';
+
+  //if(Q.$('tweenimg').width > Q.$('tweenimg').parentNode.offsetWidth) {
+  //  Q.$('tweenimg').style.width = "100%";
+  //}
+}
+
+//-->
+</script>
+
+{#template user.menubar}
+
+<div id="wrapper" class="skin01" style="margin-top: 40px;"> 
+<div class="bground"> 
+  <!--div id="head"> 
+	{#template user.infoheader}
+  </div--> 
+  <div id="content">  
+  <div id="cnthld" class="beibao" style="display: block;"> 
+  <ul class="content-tab"> 
+  <li class="beibao-tab">
+    <a id="my-beibao" href="#" class="tab-title songti tabbtn" hidefocus="">
+	  <span class="tab-title-tag"></span>编辑
+    </a>  
+  </li>
+  </ul> 
+  <div class="cnthld-main clearfix">
+  <div class="col leftside"> 
+    <div class="plzhld" data-fill="tab_content">
+      <div class="action-bar"> 
+        <p>
+         <a href="{$app:app}&mod=user&action=home">我的画集 </a> 
+        </p>
+      </div>
+      <br>
+      <div style="padding-left:20px;padding-top:10px; line-height: 40px;">
+        <div style="background:; width:425px; margin-right: 30px;height:400px;float: right; border: 1px solid #F1F1F1; text-align:center; line-height:400px;">
+          <img id="tweenimg" src="http://{$fields:server/}/{$fields:file_name/}" onload="check_width()"/>
+        </div>
+        <div style="margin-right:460px; width:600px;">
+          <p> 所属分类：<br>
+            <html:select 
+              id="users_albums_id" 
+              datasrc="data://useralbums" 
+              style="width: 460px; height: 30px;"
+              keySelected="value"
+              valueSelected="{$fields:album_id}"
+              maskSelected="selected"
+            >
+              <t:data>
+                <option value="[field:value]" [field:selected]>[field:text]</option>
+              </t:data>
+            </html:select>
+            <span class="msg" id="msg-album_class"></span>
+          </p>
+          <p> 描述：<br>
+              <textarea id="image_title" type="text" cols="88" rows="5" maxlength="255">{$fields:title}</textarea>
+              <input id="image_id" value="{$fields:id}" type="hidden"/>
+            <span class="msg" id="msg-username"></span>
+          </p>
+          <p> <br>
+            <button class="uploadBtn small" id='button-save'>保 存</button>
+            <button class="uploadBtn small" id='button-delete'>删 除</button>
+            <button class="uploadBtn small" id='button-back'>返 回</button>
+          </p>
+        </div>
+      </div>
+	  </div>
+	  <br><br><br><br>
+	  </div> 
+	
+	  <div class="leftside-shadow"></div> 
+	</div> 
+	<div class="col rightside"> 
+	  <div class="plzhld p1" data-fill="friend_content">
+    </div> 
+	</div> 
+  </div>
+  </div> 
+  </div> 
+  
+  {#template user.footer}
+</div> 
+</body>
+</html>

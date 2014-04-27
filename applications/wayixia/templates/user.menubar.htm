@@ -1,0 +1,45 @@
+<div id="user-title-bar">
+<!--div id="user-title-bar-background"></div-->	
+<div class="main-width">
+  <div class="nav-menu" style="height:40px;">
+    <ul id="user-menu">
+      <li class="nav_item start-button">
+        <a href="{$app:host}" title="返回首页">&nbsp;
+          <!--dt>
+            <dl style="height: 200px;"><a href="{$app:app}&mod=user&action=home"> 个人中心 </a></dl>       
+            <dl style="position:absolute;left:0;right:0;bottom:0;background:#FAFAFA;border-top:1px #F5F2F2 solid;text-align:right;"><a href="{$app:app}&mod=user&action=home"> 个人中心 </a></dl>       
+	  </dt-->
+        </a>
+      </li>
+<?php 
+    $url = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] ;
+    $url = urlencode($url) ;
+    $name = $theApp->get_user_info('name');
+    if(empty($name)) {
+?>  
+      <li class="nav_item" style="float:right;"><a href="{$app:app}?mod=user&action=register">注册</a></li>
+      <li class="nav_item" style="float:right;"><a href="{$app:app}?mod=user&action=regular-login&refer=<?php echo $url; ?>" >登录</a></li>
+<?php
+    } else {
+?>
+      <li class="nav_item user-setting" style="padding-right: 0; float:right;">
+        <a href="#">
+          <dt>
+            <dl><a href="{$app:app}?mod=user&action=home"> 个人中心 </a></dl>
+            <!--dl><a href="{$app:app}&mod=user&action=follow"> 我的关注 </a></dl-->
+            <dl><a href="{$app:app}?mod=user&action=avatar"> 设置头像 </a></dl>       
+            <dl><a href="/help/install" style="color:#FF3300;"> 安装采集工具 </a></dl>
+            <dl><a href="{$app:app}?mod=user&action=logout">退出</a></dl>
+          </dt>
+        </a>
+      </li>
+      <li class="nav_item" style="float:right;"><a href="{$app:app}?mod=user&action=home"><b><?php echo $name;?></b></a></li>
+<?php 
+    }
+?>
+    </ul>
+    
+  </div>
+</div>
+
+</div>

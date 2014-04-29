@@ -63,8 +63,11 @@ class CLASS_MODULE_CACHE extends CLASS_MODULE {
     $c->append(_QROOT.'/../qlib/utils/xml.js');
     $c->append(_QROOT.'/../qlib/utils/json2.js');
     $c->append(_QROOT.'/../qlib/utils/ajax.js');
+    $c->append(_QROOT.'/../qlib/ui/wndx-1-0-2.js');
     $c->append(_QROOT.'/../qlib/utils/tween.js');
-    //$c->append(_QROOT.'/../qlib/ui/jtable.js');
+    $c->append(_QROOT.'/../qlib/ui/calendar.js');
+    $c->append(_QROOT.'/../qlib/ui/wndx-1-0-2.js');
+    $c->append($resource_dir.'/waterfall.js');
 
     // write to cache file
     $output_file = $resource_dir.'/Q.js';

@@ -94,7 +94,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
 
 
     // 获取画集封面
-    $album_front_dir = _IROOT.$this->Config('site.front_cover_dir').'/'.$uid;
+    $album_front_dir = $this->App()->getAppRoot().$this->Config('site.front_cover_dir').'/'.$uid;
     createfolders($album_front_dir);
 
     // 获取画集列表
@@ -177,14 +177,14 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
         if($size[0] >= 200 && $size[1] >= 200 && $size_bytes < (2048*1024)) {
           // get avatar_file_name
           $avatar_file_name = $this->Config('site.avatar').'/orignal.'.$user_id;
-          createfolders(_IROOT.$this->Config('site.avatar'));
+          createfolders($this->App()->getAppRoot().$this->Config('site.avatar'));
           // get file
           if (move_uploaded_file(
             $_FILES['user_file']['tmp_name'],
-            _IROOT.$avatar_file_name)) 
+            $this->App()->getAppRoot().$avatar_file_name)) 
           {
             
-            $t->push('filename', _IPATH.$avatar_file_name);
+            $t->push('filename', $avatar_file_name);
           } else {
             $result = "Possible file upload attack!";
           }
@@ -490,7 +490,7 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
       switch($open_type) {
       case 'sinaweibo':
         {
-    include_once(_IROOT.'/phpweibosdk/saetv2.ex.class.php' );
+    include_once(_QROOT.'/tp/phpweibosdk/saetv2.ex.class.php' );
           $client = new SaeTClientV2( 
             $this->Config('openapi.sinaweibo.WB_AKEY') , 
             $this->Config('openapi.sinaweibo.WB_SKEY') ,
@@ -802,21 +802,21 @@ class CLASS_MODULE_USER extends CLASS_MODULE {
     $user_id = $this->App()->get_user_info('uid');
     $config_avatar = $this->Config('site.avatar');
     $avatar_file_name = $config_avatar.'/'.$data['img'];
-
+    $avatar_dir = $this->App()->getAppRoot();
     // load orignal image, according to main rect  create the full image;
-    if(!file_exists(_IROOT.$avatar_file_name)) {
-      $this->errmsg('invalid avatar image. hack action!'._IROOT.$avatar_file_name);
+    if(!file_exists($avatar_dir.$avatar_file_name)) {
+      $this->errmsg('invalid avatar image. hack action!'. $avatar_file_name);
       return;
     }
 
     $avatar_image = new QImage();
-    if(!$avatar_image->load(_IROOT.$avatar_file_name)) {
+    if(!$avatar_image->load($avatar_dir.$avatar_file_name)) {
       $this->errmsg('invalid image file.');
       return;
     }
 
-    $avatar_92_filename = _IROOT.$config_avatar.'/user92.'.$user_id.'.jpg';
-    $avatar_48_filename = _IROOT.$config_avatar.'/user48.'.$user_id.'.jpg';
+    $avatar_92_filename = $avatar_dir.$config_avatar.'/user92.'.$user_id.'.jpg';
+    $avatar_48_filename = $avatar_dir.$config_avatar.'/user48.'.$user_id.'.jpg';
     
     $clip_image = new QImage();
     $clip_image->create($select_rect['width'], $select_rect['height']);

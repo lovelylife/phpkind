@@ -10,35 +10,35 @@
 
   window.undefined = window.undefined;
 
-    // check the name is used
-    if(window.Q) {
-        alert('conflict name for Q');
-        return;
-    }
+  // check the name is used
+  if(window.Q) {
+    alert('conflict name for Q');
+    return;
+  }
     
-    //! Q
-    window.Q = Q = this;
-  //! QLib base dir
+  // Q
+  window.Q = Q = this;
+  // QLib base dir
   var _libdir = null;
-    // dom elements cache
-    var _domcache = {};    
-    //! OnPageLoad Message Queue
-    var _OnPageLoad = [];
-  //! QueryString
+  // dom elements cache
+  var _domcache = {};    
+  // OnPageLoad Message Queue
+  var _OnPageLoad = [];
+  // QueryString
   var _querystring = {};
-  //! Browser
+  // Browser
   var _Browser = {};
 
-  //! LoadCompleted
+  // LoadCompleted
   var _LoadCompleted = false;
   var _delayDOMReady = [];
 
-  //! class creator
-    this.KLASS = function() {
+  // class creator
+  this.KLASS = function() {
         return function() {
         this._initialize.apply(this, arguments);  
-      };
     };
+  };
   
   this.ELEMENT_NODE = 1;
   this.ELEMENT_TEXTNODE = 3;
@@ -54,7 +54,7 @@
     stdoutput: null    // 输出
   };
 
-    //! get Element from dom cache if exists
+    // get Element from dom cache if exists
     this.$ = function(id, bOverride) {
         if(typeof(id) != 'string') { return id; }
         var element = null;
@@ -134,69 +134,69 @@
     return { t: t, l: l, w: w, h: h };
   };
 
-    //! Javascript Loader
-    function loadJsLib() {
-        var scripts = document.getElementsByTagName("script");  
-        // 判断指定的文件是否已经包含，如果已包含则触发onsuccess事件并返回  
-        var libscript = null;
-        for (i = 0; i < scripts.length; i++) {
-            if(scripts[i].src) {
-                var pos = -1;
-                if((pos=scripts[i].src.indexOf('/Q.js')) >= 0) {
-                    _libdir = scripts[i].src.substring(0, pos);
-                    libscript = scripts[i];
-                }
-            }
+  // Javascript Loader
+  function loadJsLib() {
+    var scripts = document.getElementsByTagName("script");  
+    // 判断指定的文件是否已经包含，如果已包含则触发onsuccess事件并返回  
+    var libscript = null;
+    for (i = 0; i < scripts.length; i++) {
+      if(scripts[i].src) {
+        var pos = -1;
+        if((pos=scripts[i].src.indexOf('/Q.js')) >= 0) {
+           _libdir = scripts[i].src.substring(0, pos);
+           libscript = scripts[i];
         }
+      }
+    }
 
-        //! 解析script import
-        var sImports = libscript.innerHTML;
-        // var re = /\s*import\s+(.+);/ig;
+    // 解析script import
+    var sImports = libscript.innerHTML;
+    // var re = /\s*import\s+(.+);/ig;
     //var arr = sImports.match(re);
     var re = /\n/ig;
-        var arr = sImports.split(re);
+    var arr = sImports.split(re);
 
-    //! 同步加载
+    // 同步加载
     loadItem(document.getElementsByTagName("head")[0], arr);        
 
     // 顺序加载js文件
-        function loadItem(header, ar) {
+    function loadItem(header, ar) {
       ar = ar||[];
       if(ar.length<=0) { 
         _LoadCompleted = true;
         Q.DelayLoad();
         return;
       }
-            //! 加载lib
-            var url = ar.shift();
-      //! 解析格式，并自动加载库文件
-            var re2 = /^\s*import\s+(.+);/i;
-            if(re2.test(url)) {
+      // 加载lib
+      var url = ar.shift();
+      // 解析格式，并自动加载库文件
+      var re2 = /^\s*import\s+(.+);/i;
+      if(re2.test(url)) {
         url = RegExp.$1 + '';
-                url = url.replace(/\./g, '/')+'.js';
-                // 创建script结点,并将其属性设为外联JavaScript文件  
-                var s = document.createElement("script");  
-                s.type = "text/javascript";
-                s.src = _libdir+'/'+url;
+        url = url.replace(/\./g, '/')+'.js';
+        // 创建script结点,并将其属性设为外联JavaScript文件  
+        var s = document.createElement("script");  
+        s.type = "text/javascript";
+        s.src = _libdir+'/'+url;
 
-                // 对于IE浏览器，使用readystatechange事件判断是否载入成功  
-                // 对于其他浏览器，使用onload事件判断载入是否成功  
+        // 对于IE浏览器，使用readystatechange事件判断是否载入成功  
+        // 对于其他浏览器，使用onload事件判断载入是否成功  
         s.done = false;
-                s.onload = s.onreadystatechange = (function() {
-          if ( !this.done 
-             && (!this.readyState 
+        s.onload = s.onreadystatechange = (function() {
+          if( !this.done 
+           && (!this.readyState 
               || this.readyState == "loaded" 
               || this.readyState == "complete") 
-          ) {
+          )
+          {
             this.done = true;
             loadItem(header, ar);
-
             // Handle memory leak in IE
             this.onload = this.onreadystatechange = null;
             header.removeChild( this );
           }
         });
-                s.onerror = (function() { 
+        s.onerror = (function() { 
           // Handle memory leak in IE
           this.onload = this.onreadystatechange = null;
           header.removeChild(this); 
@@ -205,11 +205,11 @@
         
         // 获取head结点，并将<script>插入到其中  
         header.appendChild(s);
-            } else {
+      } else {
         loadItem(header, ar);
       }
-        }
-    };
+    }
+  };
   
   // 解析地址页面的查询字段
   function doParseUrlQuery() {
@@ -222,11 +222,11 @@
       _querystring[t[0]] = t[1];
     }
   };
-  //! document.createElement
+  // document.createElement
   this.createElement = document.createElement;
-  //! QLib Dir
+  // QLib Dir
   this.libDir = function() { return _libdir; };
-  //! get querystring
+  // get querystring
   this.GET = function(key) { return _querystring[key]; };
   this.querystring = function(arrExcepts) {
     if(arrExcepts) {
@@ -243,7 +243,7 @@
       return str.substring(1, str.length);    
     }    
   };
-  //! OnLoad
+  // OnLoad
     this.DOMReady = function(evt) {
     if(!_LoadCompleted) {
       Q.registerDelayDOMReady(Q.delayDOMReady);
@@ -256,8 +256,10 @@
     while(_OnPageLoad.length > 0) { _OnPageLoad.shift()(); }
   };
 
-  //! push event when document loaded
-    this.Ready = function(f) { _OnPageLoad.push(f); };
+  // push event when document loaded
+  this.Ready = function(f) {
+    _OnPageLoad.push(f); 
+  };
 
   // current Q.js所在路径
   Q.__DIR__ = function() {
@@ -289,7 +291,7 @@
   }
 
   function Initialize() {
-    //! get Browser
+    // get Browser
     _Browser.agt = navigator.userAgent.toLowerCase();
     _Browser.isW3C = document.getElementById ? true:false;
     _Browser.isIE = ((_Browser.agt.indexOf("msie") != -1) && (_Browser.agt.indexOf("opera") == -1) && (_Browser.agt.indexOf("omniweb") == -1));

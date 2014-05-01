@@ -40,9 +40,8 @@ var CONST = {
   STYLE_POPUP :    0x00000400,
 
   STYLE_CHILD :    0x00000800,
-  STYLE_MULTIWINDOW :  0x00001000,
-  STYLE_ICON :    0x00002000,
-  STYLE_WITHBOTTOM :  0x00004000,
+  STYLE_ICON  :    0x00001000,
+  STYLE_WITHBOTTOM :  0x00002000,
   MIN_HEIGHT:      60,
   MIN_WIDTH:      140,
   
@@ -90,11 +89,12 @@ function __RECT(top, left, bottom, right) {
 var __GLOBALS = {};
 __GLOBALS.MIN_HEIGHT = 32;
 __GLOBALS.MIN_WIDTH  = 100;
+__GLOBALS.Z_INDEX    = 10000;
 
 // global windows  
 __GLOBALS.desktop = document.body;
 __GLOBALS.desktop.wnds = new __LIST();
-__GLOBALS.actvieWnd = null;
+__GLOBALS.desktop.actvieWnd = null;
 __GLOBALS.desktop.maskWnd = document.createElement('DIV');
 __GLOBALS.desktop.maskWnd.style.cssText = 'display: none;'
 //  __GLOBALS.desktop.appendChild(__GLOBALS.maskWnd);
@@ -216,8 +216,17 @@ function $GetActiveWindow(wndNode){
     return null;
 }
 
+function $SetActiveWindow(wndNode, activeWnd){
+  if( $IsWindow(wndNode) && $IsWindow(activeWnd) )
+    wndNode.activeWnd = activeWnd;
+}
+
 function $GetWindowZIndex(wndNode){
-  return parseInt(wndNode.style.zIndex, 10);
+  if(wndNode && wndNode.style && wndNode.style.zIndex) {
+    return parseInt(wndNode.style.zIndex, 10);
+  } else {
+    return __GLOBALS.Z_INDEX;
+  }
 }
 
 var  $ActivateWindowEvent = function(wndNode){
@@ -238,53 +247,63 @@ function $ActivateWindow(wndNode) {
 // 此时当有弹出窗口时，系统无激活窗口，当弹出窗口关闭时，系统则将默认的激活窗口的深度设置为zIndex
 // 所有，会出现在最下层
   if( !$IsWindow(wndNode)) { return; }
+
+  // 保存当前激活窗口
+  var active_wnd = $GetActiveWindow(__GLOBALS.desktop);
+  var p = wndNode;
+  var is_child_of_active_window = false;
+  while(p && p != __GLOBALS.desktop) {
+    if(p == active_wnd) {
+      is_child_of_active_window = true;
+      break;
+    }
+    p = $GetParentWindow(p);
+  }
+
+  var parent = $GetParentWindow(wndNode);
+  if(is_child_of_active_window) {
+    var active_sibling = $GetActiveWindow(parent);
+    if(wndNode == active_sibling) {
+      return;
+    } else {
+      // deactive sibling
+      // active self
+      $SetWindowActive(active_sibling, false);
+      $SetWindowActive(wndNode, true);
+      
+      // z
+      var z_active_wnd = $GetWindowZIndex(active_sibling);
+      $SetWindowZIndex(wndNode, z_active_wnd + 1);
+      $SetActiveWindow(parent, wndNode);
+    }
+  } else {
+    var top_window = wndNode;
+    var t = wndNode;
+    do {
+      if(t == __GLOBALS.desktop) {
+        break;
+      }
+      top_window = t;
+      t = $GetParentWindow(t);
+    } while(t)
+    
+    if(top_window) {
+      __GLOBALS.desktop.activeWnd = top_window;
+    }
+    $SetWindowActive(active_wnd, false);
+    $SetWindowActive(wndNode, true);
+      
+    // z
+    var z_active_wnd = $GetWindowZIndex(active_wnd);
+    $SetWindowZIndex(top_window, z_active_wnd + 1);
+  }
+  
+  /*  
   if( $GetModalType(wndNode) == CONST['MODE'] ){
     var tp = $GetParentWindow(wndNode);
     $ActivateWindow(tp);
     $MaskWindow(tp, true);
-  }
-  var ws = $GetWindowStyle(wndNode);
-  var zIndex = 10000;  // 默认的窗口深度
-
-  // 保存当前激活窗口
-  var ActiveWnd = $GetActiveWindow(__GLOBALS.desktop);
-  // 获得当前父窗口内的激活窗口
-  if( !$IsNull(ActiveWnd) ){ // 如果已经存在激活窗口的话，要将激活窗口的样式改成非激活状态
-    if( (ActiveWnd == wndNode) ){ // 当前窗口为激活窗口时，直接返回
-      return;
-    } else if($IsStyle(ws, CONST['STYLE_CHILD'])) {
-      if($GetActiveWindow(ActiveWnd) == wndNode){
-        return;
-      }
-    }
-    $SetWindowActive(ActiveWnd, false);
-    if( !$IsNull($GetTopWindow()))
-      zIndex = $GetWindowZIndex($GetTopWindow())+1;
-  }
-  var hwndactive = null;  // 待激活窗口
-  if( $IsStyle(ws, CONST['STYLE_CHILD']) ) {
-    // 如果是子窗口的话，应该将焦点移到父窗口， 而将父窗口的激活窗口设置为该子窗口
-    //alert('child')
-    hwndactive = $GetParentWindow(wndNode);
-    $SetWindowZIndex(hwndactive, zIndex);
-    zIndex = zIndex + 1;
-    atvwnd = $GetActiveWindow(hwndactive);
-    var z = 0;
-    if( !$IsNull(atvwnd) ) {
-      z = $GetWindowZIndex(atvwnd) + 1;
-    }
-    $SetWindowZIndex(wndNode, z);
-    hwndactive.activeWnd = wndNode;
-  } else {
-    hwndactive = wndNode;
-  }
-  $SetWindowZIndex(hwndactive, zIndex);
-  $SetWindowActive(hwndactive, true);
-  // 如果是模式对话框的话，则激活窗口保存在__GLOBALS['vtable'].activeWnd上
-  if( $GetModalType(hwndactive) == CONST['mode'] )
-    __GLOBALS.activeWnd = $GetParentWindow(hwndactive);
-  else
-    __GLOBALS.activeWnd = hwndactive;
+  }*/
 }
 
 /*----------------------------------------------------
@@ -298,18 +317,22 @@ function $SetWindowActive(wndNode, IsActive){
   if(!$IsWindow(wndNode) || (wndNode == __GLOBALS.desktop)) {  return; }
   var style;
   style = (IsActive) ? 'clsActiveTitle' : 'clsNoActiveTitle';
-  var ws = $GetWindowStyle(wndNode);
-  var titleHandle = $GetTitle(wndNode);
-  if( $IsStyle(ws, CONST['STYLE_MULTIWINDOW']) ) { // 多窗口
-    titleHandle.className = style;
-    var ActiveWnd = $GetActiveWindow(wndNode);
-    if( $IsNull(ActiveWnd) )
-      return;
-    titleHandle = $GetTitle(ActiveWnd);
-    titleHandle.className = style;
-  } else {
-    titleHandle.className = style;
-  }    
+  
+  var p = $GetParentWindow(wndNode);
+  while(p && p != __GLOBALS.desktop) {
+    $GetTitle(p).className = style;
+    p = $GetParentWindow(p);
+  }
+
+  var active_child = wndNode;
+  while(active_child) {
+    $GetTitle(active_child).className = style;
+    active_child = $GetActiveWindow(active_child);
+  }
+}
+
+function HaveChildWindow(wndNode) {
+  return ($IsWindow(wndNode) && (wndNode.wnds.length > 0));
 }
 
 function $MaxizeWindow(wndNode){
@@ -446,13 +469,6 @@ function $SetWindowZIndex(wndNode, zIndex) {
     return;
   }
   wndNode.style.zIndex = zIndex;
-}
-
-function $SetActiveWindow(wndNode){
-  if( !$IsWindow(wndNode) )
-    return;
-  var parent = $GetParentWindow(wndNode);
-  parent.activeWnd = wndNode;
 }
 
 function $ChangeCtrlButton(wndNode, type, dsttype){
@@ -802,7 +818,7 @@ function $CreateWindowEx(wndName, wndTitle, ws, left, top, width, height, pParen
       hwnd.min = $CreateCtrlButton(CONST['SIZE_MIN'], 
         function(wnd){ $MinimizeWindow(wnd);}, hwnd );
     }
-        if( $IsStyle(ws, CONST['STYLE_MAX']) ) {
+    if( $IsStyle(ws, CONST['STYLE_MAX']) ) {
       hwnd.max = $CreateCtrlButton(CONST['SIZE_MAX'], function(wnd){
           if(wnd.statusType  != CONST['SIZE_MAX']){  
             $MaxizeWindow(wnd); 
@@ -811,7 +827,7 @@ function $CreateWindowEx(wndName, wndTitle, ws, left, top, width, height, pParen
           }
         }, hwnd );
     }
-        if( $IsStyle(ws, CONST['STYLE_CLOSE'])) {
+    if( $IsStyle(ws, CONST['STYLE_CLOSE'])) {
       hwnd.close = $CreateCtrlButton(CONST['SIZE_CLOSE'], 
         function(wnd) {  $DestroyWindow(wnd); }, hwnd );
     }
@@ -820,14 +836,15 @@ function $CreateWindowEx(wndName, wndTitle, ws, left, top, width, height, pParen
   hwnd.hClientArea.className = 'clsClientArea';
   hwnd.appendChild(hwnd.hClientArea);
     
-    if( $IsStyle(ws, CONST['STYLE_WITHBOTTOM']) ) {
-        hwnd.hBottomBar = document.createElement('DIV');
-        hwnd.appendChild(hwnd.hBottomBar);
+  if( $IsStyle(ws, CONST['STYLE_WITHBOTTOM']) ) {
+    hwnd.hBottomBar = document.createElement('DIV');
+    hwnd.appendChild(hwnd.hBottomBar);
     hwnd.hBottomBar.className = 'clsBottomBar';
-    }
+  }
     
     
   hwnd.style.display = 'none';
+  hwnd.style.zIndex = __GLOBALS.Z_INDEX;
   return hwnd;
 }
 
@@ -1479,5 +1496,4 @@ setZIndex : function(zIndex) {
 
 };
 
-new __DRAGWND();
-
+(new __DRAGWND())

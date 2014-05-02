@@ -473,13 +473,19 @@ function $SetWindowZIndex(wndNode, zIndex) {
 
 function $ChangeCtrlButton(wndNode, type, dsttype){
   var btn;
+	var t = {};
+  t[CONST.SIZE_MIN] = 'min';
+  t[CONST.SIZE_MAX] = 'max';
+  t[CONST.SIZE_NORMAL] = 'normal';
+  t[CONST.SIZE_CLOSE] = 'close';
+
   if( !$IsWindow(wndNode) )
     return;
   if( type == CONST.SIZE_MIN )
     btn = $GetMinCtrlButton(wndNode);
   else if( type == CONST.SIZE_MAX )
     btn = $GetMaxCtrlButton(wndNode);
-  btn.innerHTML = dsttype;
+  btn.className = t[dsttype];
 }
 
 
@@ -799,7 +805,6 @@ function $CreateWindowEx(wndName, wndTitle, ws, left, top, width, height, pParen
     
     if( $IsStyle(ws, CONST['STYLE_ICON'])) {
         hwnd.hIcon = document.createElement('IMG');
-        //hwnd.hIcon.src = 'images/panelwork.gif';
         hwnd.hIcon.className = 'clsIcon';
         hwnd.hTitle.appendChild(hwnd.hIcon);
     }
@@ -815,11 +820,11 @@ function $CreateWindowEx(wndName, wndTitle, ws, left, top, width, height, pParen
     hwnd.hTitleContent.innerText = hwnd.szTitle;
     
     if( $IsStyle(ws, CONST['STYLE_MIN']) ) {
-      hwnd.min = $CreateCtrlButton(CONST['SIZE_MIN'], 
+      hwnd.min = $CreateCtrlButton('min', 
         function(wnd){ $MinimizeWindow(wnd);}, hwnd );
     }
     if( $IsStyle(ws, CONST['STYLE_MAX']) ) {
-      hwnd.max = $CreateCtrlButton(CONST['SIZE_MAX'], function(wnd){
+      hwnd.max = $CreateCtrlButton('max', function(wnd){
           if(wnd.statusType  != CONST['SIZE_MAX']){  
             $MaxizeWindow(wnd); 
           } else { 
@@ -828,7 +833,7 @@ function $CreateWindowEx(wndName, wndTitle, ws, left, top, width, height, pParen
         }, hwnd );
     }
     if( $IsStyle(ws, CONST['STYLE_CLOSE'])) {
-      hwnd.close = $CreateCtrlButton(CONST['SIZE_CLOSE'], 
+      hwnd.close = $CreateCtrlButton('close', 
         function(wnd) {  $DestroyWindow(wnd); }, hwnd );
     }
   }    
@@ -849,15 +854,16 @@ function $CreateWindowEx(wndName, wndTitle, ws, left, top, width, height, pParen
 }
 
 function $CreateCtrlButton(type, lpfuncEvent, hwnd){
-  var btn = document.createElement('span');  
+  var btn = document.createElement('button');  
   // hwnd.type = 'button';
   hwnd.hTitleCtrlBar.appendChild(btn);
-  btn.innerHTML = type;
-  btn.className = 'clsCtrlButtonOut';
+  btn.innerHTML = '&nbsp;';
+  btn.className = type;
   btn.bindwnd = hwnd;
-  btn.onmouseover = function() { this.className='clsCtrlButtonOver';};
-  btn.onmouseout = function() { this.className='clsCtrlButtonOut';};
-  btn.onmouseup = function() { lpfuncEvent(this.bindwnd); };
+	btn.hideFocus = true;
+  //btn.onmouseover = function() { this.className='clsCtrlButtonOver';};
+  //btn.onmouseout = function() { this.className='clsCtrlButtonOut';};
+  btn.onclick = function() { lpfuncEvent(this.bindwnd); };
   return btn;
 }
 

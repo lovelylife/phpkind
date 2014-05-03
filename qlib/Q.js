@@ -54,20 +54,20 @@
     stdoutput: null    // 输出
   };
 
-    // get Element from dom cache if exists
-    this.$ = function(id, bOverride) {
-        if(typeof(id) != 'string') { return id; }
-        var element = null;
-        if(!_domcache[id] || bOverride) {
-            element = document.getElementById(id);
-            if(element) {
-                _domcache[id] = element;
-            }
-        } else {
-            element = _domcache[id];
-        }
-        return element;
-    };
+  // get Element from dom cache if exists
+  this.$ = function(id, bOverride) {
+    if(typeof(id) != 'string') { return id; }
+    var element = null;
+    if(!_domcache[id] || bOverride) {
+      element = document.getElementById(id);
+      if(element) {
+        _domcache[id] = element;
+      }
+    } else {
+      element = _domcache[id];
+    }
+    return element;
+  };
 
   this.registerDelayDOMReady = function(f) {
     if(!_LoadCompleted) {
@@ -81,17 +81,17 @@
     }
   };
     
-    // 兼容ff的attachEvent接口
-    this.addEvent = function(obj, evtName, fnHandler, useCapture) {
-      obj = Q.$(obj);
-      if(obj.addEventListener) {
-        obj.addEventListener(evtName, fnHandler, !!useCapture);
-      } else if(obj.attachEvent) {
-        obj.attachEvent('on'+evtName, fnHandler);
-      } else {
+  // 兼容ff的attachEvent接口
+  this.addEvent = function(obj, evtName, fnHandler, useCapture) {
+    obj = Q.$(obj);
+    if(obj.addEventListener) {
+      obj.addEventListener(evtName, fnHandler, !!useCapture);
+    } else if(obj.attachEvent) {
+      obj.attachEvent('on'+evtName, fnHandler);
+    } else {
       oTarget["on" + evtName] = fnHandler;
     }
-    };
+  };
 
   this.removeEvent = function(obj, evtName, fnHandler) {
     obj = Q.$(obj); 

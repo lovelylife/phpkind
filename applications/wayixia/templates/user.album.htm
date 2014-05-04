@@ -3,9 +3,7 @@
 <head>
 <title> 挖一下，让更多人分享~ Powered By wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<!-- 使用QLib控件是必须包含样式表 -->
-<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
+{#template resinclude}
 <style>
 .pic {
 position: absolute;
@@ -122,7 +120,7 @@ function delete_pictures(pics) {
   }
   
   Q.Ajax({
-    command: '{$app:app}&mod=imageeditor&action=delete-image&inajax=true',
+    command: '{$app:app}?mod=imageeditor&action=delete-image&inajax=true',
     data : {album_id: g_current_album_id, pictures: data},
     oncomplete : 
       function(xmlhttp) {
@@ -346,7 +344,7 @@ Q.Ready(function(){
       <div class="plzhld" data-fill="tab_content">
         <div class="action-bar"> 
           <p>
-          <a href="{$app:app}&mod=user&action=home">我的画集 </a> >> 
+          <a href="{$app:app}?mod=user&action=home">我的画集 </a> >> 
           <b style="color:red;">{$fields:album_name}</b> </p>
           <div style="position:absolute; right:0; bottom:0; width:300px; height: 48px; line-height: 50px;text-align:right;margin-right: 15px;">
             <button id="button_bat_mode" class="uploadBtn small">批量处理图片</button>
@@ -394,7 +392,7 @@ Q.Ready(function(){
   <a href="http://[[server]]/[[file_name]]" class="lightwindow img x" rel="/\\:;*?<>'”|®™©&#[Sushi]" title="图片查看" caption="[[title]]" author="yourself">
     <img src="http://[[server]]/thumb/[[file_name]]" width=[[width]] height=[[height]] alt="">
   </a>
-  <p class="description">&nbsp;<!--[[title]]{$app:app}&mod=imageeditor&action=edit&id=[[id]]--></p>
+  <p class="description">&nbsp;<!--[[title]]{$app:app}?mod=imageeditor&action=edit&id=[[id]]--></p>
   <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
   <div 
     onmouseover="album_action_show('[[id]]',true)" 
@@ -405,7 +403,7 @@ Q.Ready(function(){
       <a href="#" target="_self">[[create_date]]</a>
     </p>
     <div id="action_bar_[[id]]" style="position:absolute; right:0; bottom:0; width:100px; height: 35px; line-height: 35px;text-align:center;visibility:hidden;">
-      <a href="{$app:app}&mod=imageeditor&action=edit&id=[[id]]" class="album-icons album-icons-edit">&nbsp;</a>
+      <a href="{$app:app}?mod=imageeditor&action=edit&id=[[id]]" class="album-icons album-icons-edit">&nbsp;</a>
       <!--a href="#" class="album-icons album-icons-delete">&nbsp;</a>
       <a href="#" class="album-icons album-icons-check">&nbsp;</a-->
     </div>

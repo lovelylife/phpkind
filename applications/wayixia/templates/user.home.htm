@@ -41,36 +41,40 @@ Q.Ready(function() {
   }
 
   Q.$('create-new-album').onclick=function() {
-      var content = '<div id="create-album-panel" style=" line-height: 30px;padding:10px;">名称: <br/><input type="text" id="album-name" style="height: 20px;"> <br/></div>';
-      g_test_window = new Q.MsgBox({
+    if(g_test_window) {
+      g_test_window.close();    
+    }
+
+    g_test_window = new Q.MsgBox({
       title : '创建画集',
-      content: content,
+      content: Q.$('create-album-panel'),
+      width: 350,
+      height: 200,
       onok : function() {
         var album_name = Q.$('album-name').value;
-      if(!album_name) {
-        alert('输入不能为空!');
-        return false;
-      }
-
-      Q.Ajax({
-        command: '{$app:app}&mod=album&action=create-new&inajax=true',
-        data : {album_name:album_name},
-        oncomplete : function(xmlhttp) {
-          try
-          {
-          var resp = eval('('+xmlhttp.responseText+')');
-          if(resp.header == 0) {
-            location.reload();
-            g_test_window.close();
-          } else {
-            alert(resp.data);
-          }
-          } catch (e) {
-          alert(xmlhttp.responseText);
-          }        
+        if(!album_name) {
+          alert('输入不能为空!');
+          return false;
         }
-      });
-      return false;
+
+        Q.Ajax({
+          command: '{$app:app}?mod=album&action=create-new&inajax=true',
+          data : {album_name:album_name},
+          oncomplete : function(xmlhttp) {
+            try {
+            var resp = eval('('+xmlhttp.responseText+')');
+            if(resp.header == 0) {
+              location.reload();
+              g_test_window.close();
+            } else {
+              alert(resp.data);
+            }
+            } catch (e) {
+              alert(xmlhttp.responseText);
+            }        
+          }
+        });
+        return false;
       }
     });
   }
@@ -105,7 +109,7 @@ Q.Ready(function(){
 //  "mouseout": function(e) { alert('out');},
   });
 
-  g_waterfall.append(g_store.pop(10));
+  g_waterfall.append(g_store.pop(30));
 
 });
 
@@ -113,7 +117,12 @@ Q.Ready(function(){
 </script>
 
 {#template user.menubar}
-
+<!-- template create album -->
+<div id="create-album-panel" style=" line-height: 30px;padding:10px; display:none">
+  名称: <br/>
+  <input type="text" id="album-name" style="height: 20px;"> <br/>
+</div>
+<!-- template create album end -->
 <div id="wrapper" class="skin01" style="margin-top: 40px;"> 
 <div class="bground"> 
   <div id="content">  
@@ -159,7 +168,7 @@ Q.Ready(function(){
 </div>
 
 <textarea id="wf-template" style="display:none;">
-  <a href="{$app:app}&mod=album&id=[[album_id]]" target="_self" class="img x" style="display:block;position:relative;overflow:hidden; height:120px;">
+  <a href="{$app:app}?mod=album&id=[[album_id]]" target="_self" class="img x" style="display:block;position:relative;overflow:hidden; height:120px;">
     <img
     src="[[file_name]]" 
     onerror="check_error(this);" 

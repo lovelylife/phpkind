@@ -3,22 +3,7 @@
 <head>
 <title> 编辑图片 - wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<!-- 使用QLib控件是必须包含样式表 -->
-<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
-
-<script src="{$app:qlib}/Q.js">
-<!--
-import utils.stl;
-import utils.json2;
-import utils.ajax;
-import utils.xml;
-import ui.wndx-1-0-2;
-import ui.select;
--->
-</script>
-<script src="{$themes:path/}/waterfall.js"></script>
-
+{#template resinclude}
 <body>
 <script type="text/javascript">
 <!--
@@ -153,7 +138,7 @@ function check_width() {
     <div class="plzhld" data-fill="tab_content">
       <div class="action-bar"> 
         <p>
-         <a href="{$app:app}&mod=user&action=home">我的画集 </a> 
+         <a href="{$app:app}?mod=user&action=home">我的画集 </a> 
         </p>
       </div>
       <br>

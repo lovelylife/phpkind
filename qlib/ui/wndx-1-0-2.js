@@ -70,14 +70,6 @@ __GLOBALS.MIN_HEIGHT = 32;
 __GLOBALS.MIN_WIDTH  = 100;
 __GLOBALS.Z_INDEX    = 10000;
 
-// global windows  
-__GLOBALS.desktop = document.body;
-__GLOBALS.desktop.wnds = new __LIST();
-__GLOBALS.desktop.actvieWnd = null;
-__GLOBALS.desktop.maskWnd = document.createElement('DIV');
-__GLOBALS.desktop.maskWnd.style.cssText = 'display: none;'
-//  __GLOBALS.desktop.appendChild(__GLOBALS.maskWnd);
-
 /*-----------------------------------------------------------------
   common APIs
 -------------------------------------------------------------------*/
@@ -868,8 +860,8 @@ Q.Dialog.prototype = {
     var self = this;
     var left = 0, top = 0;
     var parent = config.parent;
-    var width  = config.width || 500;
-    var height = config.height || 300;
+    var width  = config.width || 300;
+    var height = config.height || 100;
     var title  = config.title || 'QWindowTitle';
     var wstyle = config.wstyle || "STYLE_TITLE|STYLE_CLOSE|STYLE_FIXED|STYLE_WITHBOTTOM"; 
      
@@ -944,13 +936,13 @@ Q.Dialog.prototype = {
   },
 };
 
-function $IndirectCreateDialog(dlg, res, ws) {
-  $GetClient($GetWindow(dlg)).innerHTML = res;
-  $GetWindow(dlg).onresize = function() {
-  //if(hclient) {
-  //    hclient.style.width = $GetClient(this).offsetWidth - 2;
-  //}  
-  } 
+function $IndirectCreateDialog(dlg, HTMLContent, ws) {
+  if(HTMLContent.nodeType == Q.ELEMENT_NODE) {
+    $GetClient($GetWindow(dlg)).appendChild(HTMLContent);
+    HTMLContent.style.display = '';
+  } else {
+    $GetClient($GetWindow(dlg)).innerHTML = HTMLContent;
+  }
 }
 
 function $GetModalType(wndNode){
@@ -1113,7 +1105,6 @@ function $MessageBox(config) {
 
   var hwnd = $GetWindow(msgdlg);
   $SetTitleText(hwnd, config.title);
-  config.content = '<pre style="margin:0;padding:0;"><p style="font-size:14px; color:#666; margin:8px 16px;">' + config.content + '</p></pre>'
   $IndirectCreateDialog(msgdlg, config.content, config.wstyle | CONST.STYLE_WITHBOTTOM);
   if(!config.wstyle) {
     config.wstyle = MSGBOX_YES;
@@ -1297,5 +1288,14 @@ set_zindex : function(zIndex) {
 },
 
 };
-
+// global windows  
+//Q.Ready(function() {
+__GLOBALS.desktop = document.body;
+__GLOBALS.desktop.wnds = new __LIST();
+__GLOBALS.desktop.actvieWnd = null;
+__GLOBALS.desktop.maskWnd = document.createElement('DIV');
+__GLOBALS.desktop.maskWnd.style.cssText = 'display: none;';
 (new __DRAGWND())
+//  __GLOBALS.desktop.appendChild(__GLOBALS.maskWnd);
+//});
+

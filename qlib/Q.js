@@ -76,6 +76,7 @@
   };
 
   this.DelayLoad = function() {
+		alert('load js completed');
     if(_LoadCompleted) {
       while(_delayDOMReady.length > 0) { _delayDOMReady.shift()(); }
     }
@@ -243,22 +244,29 @@
       return str.substring(1, str.length);    
     }    
   };
-  // OnLoad
-    this.DOMReady = function(evt) {
+  
+	// OnLoad
+  this.DOMReady = function(evt) {
+			alert('window load');
     if(!_LoadCompleted) {
       Q.registerDelayDOMReady(Q.delayDOMReady);
     } else {
       Q.delayDOMReady();
     }        
-    };
-  // 当所有脚本都加载后开始执行Ready回调
+  };
+  
+	// 当所有脚本都加载后开始执行Ready回调
   this.delayDOMReady = function() {
     while(_OnPageLoad.length > 0) { _OnPageLoad.shift()(); }
   };
 
   // push event when document loaded
-  this.Ready = function(f) {
-    _OnPageLoad.push(f); 
+  this.Ready = function(f, push_front) {
+    var back = !push_front;
+		if(back)
+		  _OnPageLoad.push(f); 
+		else 
+		  _OnPageLoad.unshift(f); 
   };
 
   // current Q.js所在路径

@@ -1289,13 +1289,14 @@ set_zindex : function(zIndex) {
 
 };
 // global windows  
-//Q.Ready(function() {
-__GLOBALS.desktop = document.body;
-__GLOBALS.desktop.wnds = new __LIST();
-__GLOBALS.desktop.actvieWnd = null;
-__GLOBALS.desktop.maskWnd = document.createElement('DIV');
-__GLOBALS.desktop.maskWnd.style.cssText = 'display: none;';
-(new __DRAGWND())
-//  __GLOBALS.desktop.appendChild(__GLOBALS.maskWnd);
-//});
+
+Q.Ready(function() {
+	__GLOBALS.desktop = document.body;
+  __GLOBALS.desktop.wnds = new __LIST();
+  __GLOBALS.desktop.actvieWnd = null;
+  __GLOBALS.desktop.maskWnd = document.createElement('DIV');
+  __GLOBALS.desktop.maskWnd.style.cssText = 'display: none;';
+  __GLOBALS.desktop.appendChild(__GLOBALS.desktop.maskWnd);
+  (new __DRAGWND());
+}, true);
 

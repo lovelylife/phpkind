@@ -90,7 +90,7 @@ class CLASS_DTL {
   }
 
   function query_data() {
-    $theApp = &$this->getApp();
+    $theApp = $this->getApp();
     $records = array();
     if($this->is_datatype_sql()) {
       $db = $theApp->db();
@@ -107,7 +107,7 @@ class CLASS_DTL {
   }
   
   // 解析标签内的属性，传入的tag不能包含子标签，否则解析可能不正确
-  function parse_attrs($tag) {
+  static function parse_attrs($tag) {
     $attrs = array();
     preg_match_all(REGEX_PARSE_ATTRS, $tag, $matches);
     $names = $matches[1];

@@ -1256,7 +1256,7 @@ _initialize : function(config) {
   if(config.wstyle) 
     ws = $ToWindowStyle(config.wstyle);
 
-  _this.hwnd = $CreateWindow('dialog', title, ws, left, top, width, height, parent);  
+  _this.hwnd = $CreateWindow('QWindow', title, ws, left, top, width, height, parent);  
   $RegisterWindow(_this.hwnd);
   $MakeResizable(_this.hwnd);
 },
@@ -1291,7 +1291,7 @@ set_zindex : function(zIndex) {
 // global windows  
 
 Q.Ready(function() {
-	__GLOBALS.desktop = document.body;
+  __GLOBALS.desktop = document.body;
   __GLOBALS.desktop.wnds = new __LIST();
   __GLOBALS.desktop.actvieWnd = null;
   __GLOBALS.desktop.maskWnd = document.createElement('DIV');

@@ -76,7 +76,6 @@
   };
 
   this.DelayLoad = function() {
-		alert('load js completed');
     if(_LoadCompleted) {
       while(_delayDOMReady.length > 0) { _delayDOMReady.shift()(); }
     }
@@ -247,7 +246,6 @@
   
 	// OnLoad
   this.DOMReady = function(evt) {
-			alert('window load');
     if(!_LoadCompleted) {
       Q.registerDelayDOMReady(Q.delayDOMReady);
     } else {

@@ -7,9 +7,7 @@
 
 // 初始化 Javascript Loader
 (function() {
-
   window.undefined = window.undefined;
-
   // check the name is used
   if(window.Q) {
     alert('conflict name for Q');
@@ -40,6 +38,55 @@
     };
   };
   
+  // 基于prototype的继承实现
+  Q.CLASS = function() {};
+  Q.CLASS.prototype.extend = function() {};
+  Q.CLASS.prototype.create = function() {};
+  Q.CLASS.extend = function (props) { return this.prototype.extend.call(this, props); }
+  Q.CLASS.prototype.create = function(props) {
+    // create 实际上是对new的封装
+    // create 返回的实例实际上就是new构造出的实例
+    // this 即指向调用当前create的构造函数
+    var instance = new this();
+    
+    
+    // 绑定该实例的属性
+    for(var name in props) {
+      instance[name] = props[name];
+    }
+    
+    return instance;
+  }
+
+  Q.CLASS.prototype.extend = function(props) {
+    // 派生出来的新的子类
+    var sub_class = function() {};
+    // 继承父类的属性和方法
+    // 当然前提是父类的属性都放在prototype中
+    // 而非上面create方法的“实例属性”中
+    sub_class.prototype = Object.create(this.prototype);
+    // 并且添加自己的方法和属性
+    for (var name in props) {
+      sub_class.prototype[name] = props[name];
+    }
+    sub_class.prototype.constructor = sub_class;
+    // 介于需要以.extend的方式和.create的方式调用
+    sub_class.extend = sub_class.prototype.extend;
+    sub_class.create = sub_class.prototype.create;
+
+    return sub_class;
+  }
+  /*
+  var q = CLASS.extend({
+    c : function() {
+      alert(1);
+    }
+  });
+
+  alert(q);
+  var a = q.create();
+  a.c();
+  */ 
   this.ELEMENT_NODE = 1;
   this.ELEMENT_TEXTNODE = 3;
 

@@ -1,11 +1,11 @@
 /*--------------------------------------------------------------------------------
- $ 文档：WndX.js
+ $ 文档：wndx.js
  $ 功能：封装的窗口api和相关定义
  $ 日期：2007-10-09 15:47
  $ 作者：LovelyLife
  $ 邮件：Life.qm@gmail.com
  $ 版权: 请勿擅自修改版权和作者
- $ powered by Javascript经典专区[http://onlyaa.com] All rights reservered.
+ $ powered by Javascript经典专区[http://jshtml.com] All rights reservered.
 
  1. 解决窗口拖动时，鼠标位置
  2. 改进模式对话框遮罩问题
@@ -56,7 +56,6 @@ var CONST = {
   NORMAL :            '0',
   MODE:              '1',
   MODELESS:           '2',
-  IDOK :              '1',
   IDCANCEL :          '0'
 };
 
@@ -70,6 +69,17 @@ __GLOBALS.MIN_HEIGHT = 32;
 __GLOBALS.MIN_WIDTH  = 100;
 __GLOBALS.Z_INDEX    = 10000;
 
+// global windows  
+Q.Ready(function() {
+  __GLOBALS.desktop = document.body;
+  __GLOBALS.desktop.wnds = new __LIST();
+  __GLOBALS.desktop.actvieWnd = null;
+  __GLOBALS.desktop.maskWnd = document.createElement('DIV');
+  __GLOBALS.desktop.maskWnd.style.cssText = 'display: none;';
+  __GLOBALS.desktop.appendChild(__GLOBALS.desktop.maskWnd);
+  (new __DRAGWND());
+}, true);
+
 /*-----------------------------------------------------------------
   common APIs
 -------------------------------------------------------------------*/
@@ -78,6 +88,16 @@ function $IsNull(statement) {
   return  (statement == null);  
 }
 
+function $IsStyle(cs, style) { return ((cs & style) == style); }
+function $IsWithStyle(style, wstyle) { return ((style & wstyle) == style); }
+function $ToWindowStyle(s) {
+  var style = 0;  
+  var wstyle = s.split('|');
+  for(var i=0; i < wstyle.length; i++)
+    style = style | CONST[wstyle[i]];  
+
+  return style;
+}
 
 /*-----------------------------------------------------------------
   windows APIs
@@ -110,7 +130,6 @@ function $UnRegisterWindow(wndNode) {
 function $IsWindow(wndNode){
   if($IsNull(wndNode)) 
     return false;
-
   var parent = $GetParentWindow(wndNode);
   if( $IsNull(parent) ){
     return false;
@@ -134,17 +153,6 @@ function $ShowWindow(wndNode, ws){
   }
 }
 
-function $IsStyle(cs, style) { return ((cs & style) == style); }
-function $IsWithStyle(style, wstyle) { return ((style & wstyle) == style); }
-function $ToWindowStyle(s) {
-  var style = 0;  
-  var wstyle = s.split('|');
-  for(var i=0; i < wstyle.length; i++)
-    style = style | CONST[wstyle[i]];  
-
-  return style;
-}
-
 // do modifying
 function $IsMaxWindow(wndNode) {
   return ($IsStyle($GetWindowStyle(wndNode), CONST.STYLE_MAX) && (CONST.SIZE_MAX == $GetWindowStatus(wndNode)));
@@ -153,13 +161,12 @@ function $IsMaxWindow(wndNode) {
 function $DestroyWindow(wndNode){
   var parent = $GetParentWindow(wndNode);
   if( $IsNull(parent)) {
-    alert('system error, close window exception[the window have not been registered]');
     return;
   }
   $RemoveWindow(wndNode);
   $UnRegisterWindow(wndNode);
   wndNode = 0;
-  var wnd = $GetTopWindow(parent);
+  var wnd = $GetTopZIndexWindow(parent);
   if( $IsWindow(wnd) ){
     $ActivateWindow(wnd);
   }
@@ -173,21 +180,6 @@ function $RemoveWindow(wndNode){
   wndNode.parentNode.removeChild(wndNode);
 }
 
-function $GetActiveWindow(wndNode) { return wndNode.activeWnd; }
-
-function $SetActiveWindow(wndNode, activeWnd){
-  if( $IsWindow(wndNode) && $IsWindow(activeWnd) )
-    wndNode.activeWnd = activeWnd;
-}
-
-function $GetWindowZIndex(wndNode){
-  if(wndNode && wndNode.style && wndNode.style.zIndex) {
-    return parseInt(wndNode.style.zIndex, 10);
-  } else {
-    return __GLOBALS.Z_INDEX;
-  }
-}
-
 var  $ActivateWindowEvent = function(wndNode){
   return function(){
     $ActivateWindow(wndNode);
@@ -196,11 +188,39 @@ var  $ActivateWindowEvent = function(wndNode){
 
 /*----------------------------------------------------
  窗口激活模式 $ActiveWindow
+
+RootWindow (__GLOBALS.desktop)  
+ |               
+ +--activewnd---> Window 1 
+ |        +---------------- child window 1
+ |        +---activewnd---> child window 2
+ |        +---------------- child window 3
+ |
+ +-------------- Window 2
+ +-------------- Window 3
+
+ 桌面窗口           __GLOBALS.desktop (document.body) 
+ 桌面窗口的子窗口   TopWindow (QWindow)
+ 窗口激活流程如下
+ 
+ [wndNode] 
+    |
+ [$IsWindow]   
+    | No
+    +---------> [return]
+    | Yes
+ [$GetTopWindow(wndNode) == __GLOBALS.desktop.activewnd]
+    | No
+    |                          [SetWindowActive(__GLOBALS.desktop.activewnd, false)]
+    +------------------------- [__GLOBALS.desktop.activewnd = $GetTopWindow(wndNode)]
+    |                          [SetWindowActive(__GLOBALS.desktop.activewnd, true)]
+    |
+    |
+    | Yes
+ [$SetWindowActive(wndNode, true)]
+
 ------------------------------------------------------*/
 function $ActivateWindow(wndNode) {
-// 激活存在的问题， 弹出窗口没有注册到系统列表当中
-// 此时当有弹出窗口时，系统无激活窗口，当弹出窗口关闭时，系统则将默认的激活窗口的深度设置为zIndex
-// 所有，会出现在最下层
   if( !$IsWindow(wndNode)) { return; }
 
   // 保存当前激活窗口
@@ -221,30 +241,18 @@ function $ActivateWindow(wndNode) {
     if(wndNode == active_sibling) {
       return;
     } else {
-      // deactive sibling
-      // active self
+      // deactive sibling, active self
       $SetWindowActive(active_sibling, false);
       $SetWindowActive(wndNode, true);
       
       // z
       var z_active_wnd = $GetWindowZIndex(active_sibling);
       $SetWindowZIndex(wndNode, z_active_wnd + 1);
-      $SetActiveWindow(parent, wndNode);
+      parent.activewnd = wndNode;
     }
   } else {
-    var top_window = wndNode;
-    var t = wndNode;
-    do {
-      if(t == __GLOBALS.desktop) {
-        break;
-      }
-      top_window = t;
-      t = $GetParentWindow(t);
-    } while(t)
-    
-    if(top_window) {
-      __GLOBALS.desktop.activeWnd = top_window;
-    }
+    var top_window = $GetTopWindow(wndNode);
+    __GLOBALS.desktop.activeWnd = top_window;
     $SetWindowActive(active_wnd, false);
     $SetWindowActive(wndNode, true);
       
@@ -261,20 +269,13 @@ function $ActivateWindow(wndNode) {
   }*/
 }
 
-/*----------------------------------------------------
- 窗口失去焦点 $DeactiveWindow
- input: wndNode - the specified window
- no return;
- function:
-   set the specified window deactive;
-------------------------------------------------------*/
 function $SetWindowActive(wndNode, IsActive){
-  if(!$IsWindow(wndNode) || (wndNode == __GLOBALS.desktop)) {  return; }
+  if(!$IsWindow(wndNode) || (wndNode == $GetDesktopWindow())) {  return; }
   var style;
   style = (IsActive) ? 'clsActiveTitle' : 'clsNoActiveTitle';
   
   var p = $GetParentWindow(wndNode);
-  while(p && p != __GLOBALS.desktop) {
+  while(p && p != $GetDesktopWindow()) {
     $GetTitle(p).className = style;
     p = $GetParentWindow(p);
   }
@@ -284,10 +285,6 @@ function $SetWindowActive(wndNode, IsActive){
     $GetTitle(active_child).className = style;
     active_child = $GetActiveWindow(active_child);
   }
-}
-
-function HaveChildWindow(wndNode) {
-  return ($IsWindow(wndNode) && (wndNode.wnds.length > 0));
 }
 
 function $MaxizeWindow(wndNode){
@@ -405,18 +402,22 @@ function $SetWindowZIndex(wndNode, zIndex) {
   wndNode.style.zIndex = zIndex;
 }
 
-function $ChangeCtrlButton(wndNode, type, dsttype){
-  var btn;
-  if( type == CONST.SIZE_MIN )
-    btn = $GetMinCtrlButton(wndNode);
-  else if( type == CONST.SIZE_MAX )
-    btn = $GetMaxCtrlButton(wndNode);
-  btn.className = dsttype;
-}
-
 /*-----------------------------------------------------------------
   windows APIs Get Methods
 -------------------------------------------------------------------*/
+
+function $IsDesktopWindow(wndNode) { return (__GLOBALS.desktop == wndNode); }
+function $GetDesktopWindow() { return __GLOBALS.desktop; }
+function $GetMaskWindow(wndNode) { return wndNode.maskWnd; }
+function $GetActiveWindow(wndNode) { return wndNode.activeWnd; }
+function $GetWindowZIndex(wndNode){
+  if(wndNode && wndNode.style && wndNode.style.zIndex) {
+    return parseInt(wndNode.style.zIndex, 10);
+  } else {
+    return __GLOBALS.Z_INDEX;
+  }
+}
+
 function $GetModalWindow(wndNode){
   if( $IsNull(wndNode.modalWnd) )
     return wndNode;
@@ -436,7 +437,7 @@ function $GetWindowStatus(wndNode){ return wndNode.statusType ; }
 function $GetWindowStyle(wndNode){ return wndNode.wstyle; }
 function $GetClient(wndNode) { return wndNode.hClientArea; }
 
-function $GetTopWindow(){
+function $GetTopZIndexWindow(){
   var topWnd;
   var node = null;
   var parentWnd;
@@ -456,6 +457,18 @@ function $GetTopWindow(){
   }
   return topWnd;
 }
+
+function $GetTopWindow(wndNode) {
+  var top_window = wndNode;
+  var p = $GetParentWindow(wndNode);
+  while(p && p != $GetDesktopWindow()) {
+      top_window = p;
+      p = $GetParentWindow(p);
+  }
+
+  return top_window;
+}
+
 
 // 获得最先显示的深度
 function $GetModalZIndex(wndNode) {
@@ -489,7 +502,6 @@ function $MoveTo(wndNode, x, y){
 
 function $ResizeTo(wndNode, width, height){
   if(typeof(wndNode.onresize) == 'function') {
-    //alert('onresize()');
     wndNode.onresize();
   }
    
@@ -539,9 +551,6 @@ function $CenterWindow(wndNode) {
   $MoveTo(wndNode, left, top);
 }
 
-/*----------------------------------------------------------------------
- $ load resource from configure XML file
-------------------------------------------------------------------------*/
 function $CreateWindowEx(wndName, wndTitle, ws, left, top, width, height, pParent){
   var hwnd = document.createElement('DIV');
   hwnd.IsSubWnd  = false;
@@ -675,18 +684,14 @@ function $CreateCtrlButton(type, lpfuncEvent, hwnd){
   return btn;
 }
 
-function $GetMaskWindow(wndNode){
-  return wndNode.maskWnd;
+function $ChangeCtrlButton(wndNode, type, dsttype){
+  var btn;
+  if( type == CONST.SIZE_MIN )
+    btn = $GetMinCtrlButton(wndNode);
+  else if( type == CONST.SIZE_MAX )
+    btn = $GetMaxCtrlButton(wndNode);
+  btn.className = dsttype;
 }
-
-function $IsDesktopWindow(wndNode) {
-  return (__GLOBALS.desktop == wndNode)
-}
-
-function $GetDesktopWindow() {
-  return __GLOBALS.desktop;
-}
-
 
 /*-----------------------------------------------------------------
  $MaskWindow
@@ -837,133 +842,17 @@ function $MakeResizable(obj) {
       }else if(obj.style.cursor) {
         obj.style.cursor='';
       }
-      //Q.printf('current cursor: '+ obj.style.cursor);
     } else {
-      //Q.printf('clear cursor style');
       obj.style.cursor = '';
     }
   }
 }
 
 /*-----------------------------------------------------------------
- $ class Q.Dialog
+ $ window dragging
  $ dialog base class
  $ date: 2007-11-20
 -------------------------------------------------------------------*/
-Q.Dialog = Q.KLASS();
-Q.Dialog.prototype = {
-  hwnd : null,
-  _initialize : function(config) {
-    config = config || {};
-   
-    // initialize parameters 
-    var self = this;
-    var left = 0, top = 0;
-    var parent = config.parent;
-    var width  = config.width || 300;
-    var height = config.height || 100;
-    var title  = config.title || 'QWindowTitle';
-    var wstyle = config.wstyle || "STYLE_TITLE|STYLE_CLOSE|STYLE_FIXED|STYLE_WITHBOTTOM"; 
-     
-    if( !$IsWindow(parent) || ($IsDesktopWindow(parent)) ){
-      parent = $GetDesktopWindow();
-      left = (document.body.clientWidth - width ) / 2;;
-      top =  (document.body.clientHeight - height ) / 2;;
-    } else {
-      left = parent.nLeft;
-      top =  parent.nTop;
-    }
- 
-    // window style
-    var wstyle = $ToWindowStyle(wstyle); 
-    this.hwnd = $CreateWindow('dialog', title, wstyle, left, top, width, height, parent);  
-    $RegisterWindow(this.hwnd);
-    $ResizeTo(this.hwnd, width, height);
-    
-    $IndirectCreateDialog(this, config.content, wstyle);
-  },
-  
-  _initialDialog : function(){},  // virtual function to be overrided
-  
-  addBottomButton : function(text, className, lpfunc) {
-    var _this = this;
-    var hwnd = $GetWindow(_this);
-    var ws = $GetWindowStyle(hwnd);
-    
-    if((!$IsStyle(ws, CONST.STYLE_WITHBOTTOM)) || $IsNull($GetBottomBar(hwnd))) {
-      return false;
-    }
-    var btn = document.createElement('button');
-    $GetBottomBar(hwnd).appendChild(btn);
-    btn.innerText = text;
-    btn.onclick = lpfunc;
-    btn.className = className;
-  },
-
-  destroy : function() {
-    var wnd = null;
-    hwnd = $IsWindow(this) ? this : $GetWindow(this);
-    var parent = $GetParentWindow(hwnd);
-    $MaskWindow(parent, false);
-    $ActivateWindow(parent);
-    $DestroyWindow(hwnd);
-  },
-  
-  doModal : function() {
-    // this.hwnd.setAttribute('modeType', CONST['MODE']);
-    var parent = $GetParentWindow(this.hwnd);
-    $MaskWindow(parent, true);
-    parent.modalWnd = this.hwnd;
-    var _this = this;
-    this.hwnd.close.onmouseup = function() {
-        $EndDialog(_this, CONST.IDCANCEL); 
-    };
-    $ShowWindow(this.hwnd, CONST.SW_SHOW);
-    $ResizeTo(this.hwnd, this.hwnd.nWidth, this.hwnd.nHeight);
-  },
-  
-  create : function(){
-    this.hwnd.modeType = CONST.MODELESS;
-    var parent = $GetParentWindow(this.hwnd);
-    parent.wnds.push(this.hwnd);
-    $ShowWindow(this.hwnd, CONST.SW_SHOW);
-    $FitWindow(_this.hwnd);
-  },
-    
-  showWindow : function(bShow) {
-    var show=bShow?CONST.SW_SHOW:CONST.SW_HIDE;
-    $ShowWindow(this.hwnd, show);
-  },
-};
-
-function $IndirectCreateDialog(dlg, HTMLContent, ws) {
-  if(HTMLContent.nodeType == Q.ELEMENT_NODE) {
-    $GetClient($GetWindow(dlg)).appendChild(HTMLContent);
-    HTMLContent.style.display = '';
-  } else {
-    $GetClient($GetWindow(dlg)).innerHTML = HTMLContent;
-  }
-}
-
-function $GetModalType(wndNode){
-  return wndNode.modeType;
-}
-
-function $GetWindow(dlg){
-  if(!dlg) { return null; }
-  if(dlg.hwnd) { return dlg.hwnd; }
-  return null;
-}
-
-function $EndDialog(dlg) {
-  dlg.destroy();
-  if( arguments.length > 1 )  
-    return arguments[1];
-  else 
-    return CONST.IDCANCEL;
-}
-
-// window dragging
 var __DRAGWND = Q.KLASS();
 __DRAGWND.prototype = {
   hCaptureWnd : null,
@@ -1086,163 +975,15 @@ __DRAGWND.prototype = {
 };
 
 /*-----------------------------------------------------------------
-  $MessageBox
+ $ class Q.Window
+ $ dialog base class
+ $ date: 2007-11-20
 -------------------------------------------------------------------*/
-var MSGBOX_LEFT    = 0x0001;
-var MSGBOX_CENTER  = 0x0002;
-var MSGBOX_RIGHT   = 0x0004;
-var MSGBOX_YES     = 0x0008;  // 是
-var MSGBOX_NO      = 0x0010;    // 否
-var MSGBOX_CANCEL  = 0x0020;  // 取消
-var MSGBOX_YESNO   = MSGBOX_YES | MSGBOX_NO;  // 是/否
-var MSGBOX_YESNOCANCEL  = MSGBOX_YES | MSGBOX_NO | MSGBOX_CANCEL;  // 是/否/取消
-
-function $MessageBox(config) {
-  var msgdlg = new Q.Dialog(config);
-  msgdlg.onok = config.onok || function() {};
-  msgdlg.onno = config.onno || function() {};
-  msgdlg.oncancel = config.oncancel || function() {};
-
-  var hwnd = $GetWindow(msgdlg);
-  $SetTitleText(hwnd, config.title);
-  $IndirectCreateDialog(msgdlg, config.content, config.wstyle | CONST.STYLE_WITHBOTTOM);
-  if(!config.wstyle) {
-    config.wstyle = MSGBOX_YES;
-  }
-    
-  if( $IsWithStyle(MSGBOX_YES, config.wstyle) ) {
-    msgdlg.addBottomButton('  是  ', 'sysbtn',
-      function(){
-        var return_ok = false;
-          if(msgdlg.onok){ return_ok = msgdlg.onok(); }
-        if(return_ok) {
-          $EndDialog(msgdlg);
-        }          
-      }
-    )
-  }
-    
-  if( $IsWithStyle(MSGBOX_NO, config.wstyle) ) {
-    msgdlg.addBottomButton('  否  ', 'sysbtn',
-      function(){
-        if(msgdlg.onno){ msgdlg.onno(); }
-        $EndDialog(msgdlg);
-      }
-    )
-  }
-
-  if( $IsWithStyle(MSGBOX_CANCEL, config.wstyle) ) {
-    msgdlg.addBottomButton(' 取消 ', 'syscancelbtn',
-        function(){
-          if(msgdlg.oncancel){ msgdlg.oncancel(); }
-          $EndDialog(msgdlg);
-        }
-      )
-    }
-
-    this.close = function() {
-    $EndDialog(msgdlg);
-  }
-
-  this.show = function() {
-    msgdlg.doModal();
-    $FitWindow($GetWindow(msgdlg));
-    $CenterWindow(msgdlg.hwnd);
-  }
-
-  msgdlg.doModal();
-  $FitWindow($GetWindow(msgdlg));
-  $CenterWindow(msgdlg.hwnd);
-}
-
-Q.MsgBox = $MessageBox;
-
-Q.FileDialog = function(json) {
-  json = json || {};
-  var _this = this;
-  if(!json.App) {
-    return;
-  }
-
-  if( $IsWindow($GetWindow(Q._fDLG)) ) {
-    $GetWindow(Q._fDLG).style.display = '';
-    return;
-  } else {
-    Q._fDLG = new Q.Dialog('OpenFile', json.ParentWnd);
-    var hwnd = $GetWindow(Q._fDLG);
-    $SetTitleText(hwnd, '打开文件 Powered By QLib');
-    $GetClient(hwnd).innerHTML = '<iframe frameborder="no" src="'+Q.libDir()+'/php/iframe.htm?cfg='+json.App+'&e="'+json.Extensions+' width="100%" height="100%" scrolling="no"></iframe>'; //_this.tplInstance.load('OpenFile');
-    Q._fDLG.doModal();
-    $FitWindow(hwnd);
-    $CenterWindow(hwnd);
-
-    if(json.Type == 'saveas') {
-      // 文字
-      var text = document.createElement('span');
-      text.innerHTML = '文件名称: ';
-      $GetBottomBar(hwnd).appendChild(text);
-      var input = document.createElement('input');
-      $GetBottomBar(hwnd).appendChild(input);
-
-      var sel = document.createElement('select');
-      $GetBottomBar(hwnd).appendChild(sel);
-
-      Q._fDLG.fNameCtrl = input;
-      Q._fDLG.fExtension = sel;
-      
-      var types = (json.Extension || '').split(/\s*\|\s*/g);
-      for(var i=0; i < types.length; i++) {
-         sel.options.add(new Option(types[i],types[i])); // "text","value"
-      }
-    }
-
-    Q._fDLG.addBottomButton(json.Type == 'saveas'?' 保 存 ':' 确 定 ', 'sysbtn',  function() {
-      // Q._fDLG.UpdateData(true);
-      var bCancel = false;
-      //var iframe = document.frames ? $GetClient(hwnd).firstChild.document.window : $GetClient(hwnd).firstChild.contentWindow;
-      var iframe = $GetClient(hwnd).firstChild.contentWindow;
-      var fName = '';
-      if(json.Type == 'saveas') {
-        // 保存文件对话框
-        var sDir = iframe.GetCurrentDir();
-        var sName = Q._fDLG.fNameCtrl.value;
-        var sExtension = Q._fDLG.fExtension.value;
-        if(sDir == '/') { sDir = ''; }
-        fName = sDir + '/' + sName + sExtension;
-        if((sName == '') || (sExtension == '')) {
-          alert('文件名称输入不能为空!');
-          bCancel = true;
-        }
-      } else {
-        // 默认选择对话框
-        fName = iframe.GetSelectedFileName();
-      }
-
-      if((!bCancel) && json.OnOK) {
-        bCancel = !json.OnOK(fName);
-      }       
-
-      (!bCancel) && $EndDialog(Q._fDLG);
-    });
-
-    if(json.Type != 'saveas') {
-      Q._fDLG.addBottomButton(' 取 消 ', 'syscancelbtn', function() {
-        var bCancel = false;
-        if(json.OnCancel) {
-          bCancel = !json.OnCancel();
-        }
-
-        (!bCancel) && $EndDialog(Q._fDLG);
-      });
-    }
-  }
-}
-
 // 创建窗口，并返回一个窗口操作类
-Q.Window = Q.KLASS();
-Q.Window.prototype = {
+Q.Window = Q.CLASS.extend({
+
 hwnd : null,
-_initialize : function(config) {
+initialize : function(config) {
   config = config || {};
   var _this = this;
   var title = config.title || '无标题';
@@ -1287,16 +1028,131 @@ set_zindex : function(zIndex) {
   $SetWindowZIndex(this.hwnd, zIndex);
 },
 
-};
-// global windows  
+});
 
-Q.Ready(function() {
-  __GLOBALS.desktop = document.body;
-  __GLOBALS.desktop.wnds = new __LIST();
-  __GLOBALS.desktop.actvieWnd = null;
-  __GLOBALS.desktop.maskWnd = document.createElement('DIV');
-  __GLOBALS.desktop.maskWnd.style.cssText = 'display: none;';
-  __GLOBALS.desktop.appendChild(__GLOBALS.desktop.maskWnd);
-  (new __DRAGWND());
-}, true);
+/*-----------------------------------------------------------------
+ $ class Q.Dialog
+ $ dialog base class
+ $ date: 2007-11-20
+-------------------------------------------------------------------*/
+Q.Dialog = Q.KLASS();
+Q.Dialog.prototype = {
+  qwnd : null,
+  _initialize : function(config) {
+    config = config || {};
+    // initialize parameters 
+    var this_ = this;
+    // window style
+    this_.qwnd = new Q.Window(config)
+  },
+  
+  addBottomButton : function(text, className, lpfunc) {
+    var _this = this;
+    var hwnd = $GetWindow(_this);
+    var ws = $GetWindowStyle(hwnd);
+    
+    if((!$IsStyle(ws, CONST.STYLE_WITHBOTTOM)) || $IsNull($GetBottomBar(hwnd))) {
+      return false;
+    }
+    var btn = document.createElement('button');
+    $GetBottomBar(hwnd).appendChild(btn);
+    btn.innerText = text;
+    btn.onclick = lpfunc;
+    btn.className = className;
+  },
+
+  destroy : function() {
+    var wnd = null;
+    hwnd = $IsWindow(this) ? this : $GetWindow(this);
+    var parent = $GetParentWindow(hwnd);
+    $MaskWindow(parent, false);
+    $ActivateWindow(parent);
+    $DestroyWindow(hwnd);
+  },
+  
+  doModal : function() {
+    // this.hwnd.setAttribute('modeType', CONST['MODE']);
+    var parent = $GetParentWindow(this.hwnd);
+    $MaskWindow(parent, true);
+    parent.modalWnd = this.hwnd;
+    var _this = this;
+    this.hwnd.close.onmouseup = function() {
+        $EndDialog(_this, CONST.IDCANCEL); 
+    };
+    $ShowWindow(this.hwnd, CONST.SW_SHOW);
+    $ResizeTo(this.hwnd, this.hwnd.nWidth, this.hwnd.nHeight);
+  },
+  
+  create : function(){
+    this.hwnd.modeType = CONST.MODELESS;
+    var parent = $GetParentWindow(this.hwnd);
+    parent.wnds.push(this.hwnd);
+    $ShowWindow(this.hwnd, CONST.SW_SHOW);
+    $FitWindow(_this.hwnd);
+  },
+};
+
+/*-----------------------------------------------------------------
+  class Q.MessageBox
+-------------------------------------------------------------------*/
+var MSGBOX_LEFT    = 0x0001;
+var MSGBOX_CENTER  = 0x0002;
+var MSGBOX_RIGHT   = 0x0004;
+var MSGBOX_YES     = 0x0008;  // 是
+var MSGBOX_NO      = 0x0010;    // 否
+var MSGBOX_CANCEL  = 0x0020;  // 取消
+var MSGBOX_YESNO   = MSGBOX_YES | MSGBOX_NO;  // 是/否
+var MSGBOX_YESNOCANCEL  = MSGBOX_YES | MSGBOX_NO | MSGBOX_CANCEL;  // 是/否/取消
+
+Q.MessageBox = function(config) {
+  config = config || {};
+  var dlg = new Q.Dialog(config);
+  dlg.onok = config.onok || function() {};
+  dlg.onno = config.onno || function() {};
+  dlg.oncancel = config.oncancel || function() {};
+
+  if( $IsWithStyle(MSGBOX_YES, config.wstyle) ) {
+    dlg.addBottomButton('  是  ', 'sysbtn',
+      function(){
+        var return_ok = false;
+          if(dlg.onok){ return_ok = dlg.onok(); }
+        if(return_ok) {
+          $EndDialog(msgdlg);
+        }          
+      }
+    )
+  }
+    
+  if( $IsWithStyle(MSGBOX_NO, config.wstyle) ) {
+    msgdlg.addBottomButton('  否  ', 'sysbtn',
+      function(){
+        if(msgdlg.onno){ msgdlg.onno(); }
+        $EndDialog(msgdlg);
+      }
+    )
+  }
+
+  if( $IsWithStyle(MSGBOX_CANCEL, config.wstyle) ) {
+    msgdlg.addBottomButton(' 取消 ', 'syscancelbtn',
+        function(){
+          if(msgdlg.oncancel){ msgdlg.oncancel(); }
+          $EndDialog(msgdlg);
+        }
+      )
+    }
+
+    this.close = function() {
+    $EndDialog(msgdlg);
+  }
+
+  this.show = function() {
+    msgdlg.doModal();
+    $FitWindow(dlg);
+    $CenterWindow(dlg.hwnd);
+  }
+
+  msgdlg.doModal();
+  $FitWindow($GetWindow(msgdlg));
+  $CenterWindow(msgdlg.hwnd);
+}
 

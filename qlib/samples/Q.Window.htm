@@ -28,20 +28,20 @@
     Q.setdebug(Q.$('debug_window'));
     // 提示对话框
     Q.$('btnOpenMessageBox').onclick = function() {
-      Q.MsgBox({
+      Q.MessageBox({
         title: "提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口",
         content: '提示窗口内容', 
-        onok : function() {alert(1); }
+        onok : function() { return true; }
       });
     }
 
-    g_test_window = new Q.Window({width:480, height:370});
-    g_test_window.show(true);
-    g_test_window.set_content(Q.$('flash'));
-    //$GetClient(wnd).innerHTML = '<br>testtasdfs<br/><br>';
-    $FitWindow(g_test_window.wnd());
-    g_test_window.center();
-
+    Q.$('btnOpenWindow').onclick = function() {
+      g_test_window = Q.Window.create({width:480, height:370});
+      g_test_window.show(true);
+      g_test_window.set_content(Q.$('flash'));
+      $FitWindow(g_test_window.wnd());
+      g_test_window.center();
+    }
   });
   
   -->
@@ -50,6 +50,7 @@
 <body onselectstart="return false;" style=" background: #CCC;height: 100%;overflow:hidden;-moz-user-select:none;-webkit-user-select: none;">
 
 <p>提示对话框</p>
+<button id="btnOpenWindow">Window</button>
 <button id="btnOpenMessageBox">MessageBox</button>
 <embed id="flash" style="display:none;" pluginspage='http://www.macromedia.com/go/getflashplayer' src='http://you.video.sina.com.cn/api/sinawebApi/outplayrefer.php/vid=3685396_1292548084_ah21RiZsBjPK+l1lHz2stqkP7KQNt6nki2O2vlasJQZdQ0/XM5GaZNUC4yDQFokbpWFOQpA6dvcg/s.swf' type='application/x-shockwave-flash' name='sinaplayer' allowFullScreen='true' allowScriptAccess='always' width='480' height='370' wmode='transparent'></embed>
 <br>

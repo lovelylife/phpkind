@@ -2,22 +2,20 @@
 /*--------------------------------------------------------------------------------
  $ basic  type list definition
 ----------------------------------------------------------------------------------*/
-var __NODE = Q.KLASS();	//列表节点结构ṹ
-var __LIST = Q.KLASS();	// 链表
-
-__NODE.prototype = {
+//列表节点结构
+var __NODE = Q.extend({
 	next : null,
 	prev : null,
 	key  : null,
-	_initialize : function(key) { this.key = key; }
-};
+	construct : function(key) { this.key = key; }
+});
 
-__LIST.prototype = {
+var __LIST = Q.extend({
 	head : null,	// 链表的头部
 	tail : null,	// 链表尾部
 	current: null,
 	length : 0,
-	_initialize : function(){
+	construct : function(){
 		this.head = new __NODE(null);
 		this.tail = new __NODE(null);
 		this.head.next = this.tail;
@@ -84,15 +82,14 @@ __LIST.prototype = {
 		}
 		return str;
 	}
-};
+});
 
 
-var STRUCT_HASMAP = Q.KLASS();
-STRUCT_HASMAP.prototype = {
+var STRUCT_HASMAP = Q.extend({
 	base : null,
 	length : 0,
 	dataIndex : 0,
-	_initialize : function() {
+	construct : function() {
 		this.base = new Object();
 	},
 	
@@ -157,4 +154,4 @@ STRUCT_HASMAP.prototype = {
 	has : function(key) {
 		return !(typeof this.base[key] == 'undefined');
 	}
-};
+});

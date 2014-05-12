@@ -15,7 +15,7 @@
   }
     
   // Q
-  window.Q = Q = this;
+  var Q = window.Q = {};
   // QLib base dir
   var _libdir = null;
   // dom elements cache
@@ -31,78 +31,61 @@
   var _LoadCompleted = false;
   var _delayDOMReady = [];
 
-  // class creator
-  this.KLASS = function() {
-        return function() {
-        this._initialize.apply(this, arguments);  
-    };
-  };
-  
   // 基于prototype的继承实现
-  Q.CLASS = function() {};
-  Q.CLASS.prototype.extend = function() {};
-  Q.CLASS.prototype.create = function() {};
-  Q.CLASS.extend = function (props) { return this.prototype.extend.call(this, props); }
-  Q.CLASS.prototype.create = function(props) {
-    // create 实际上是对new的封装
-    // create 返回的实例实际上就是new构造出的实例
-    // this 即指向调用当前create的构造函数
-    var instance = new this();
+  var CLASS = function() {};
+  CLASS.prototype.extend = function(props) {
+    var sup = this.prototype;  
+    var sub = function() {
+      this.construct.apply(this, arguments);
+    };
     
-    
-    // 绑定该实例的属性
+    sub.prototype = Object.create(this.prototype);
     for(var name in props) {
-      instance[name] = props[name];
+      //console.log(name + "\n");
+      sub.prototype[name] = props[name];  
     }
-    
-    return instance;
+    sub.prototype.__super__ = sup;    
+    sub.prototype.constructor = sub;
+    sub.extend = sub.prototype.extend;
+  
+		return sub;
   }
 
-  Q.CLASS.prototype.extend = function(props) {
-    // 派生出来的新的子类
-    var sub_class = function() {};
-    // 继承父类的属性和方法
-    // 当然前提是父类的属性都放在prototype中
-    // 而非上面create方法的“实例属性”中
-    sub_class.prototype = Object.create(this.prototype);
-    // 并且添加自己的方法和属性
-    for (var name in props) {
-      sub_class.prototype[name] = props[name];
-    }
-    sub_class.prototype.constructor = sub_class;
-    // 介于需要以.extend的方式和.create的方式调用
-    sub_class.extend = sub_class.prototype.extend;
-    sub_class.create = sub_class.prototype.create;
-
-    return sub_class;
+	CLASS.extend = function(props) {
+    return this.prototype.extend.call(this, props);
   }
+
+	var Q = window.Q = CLASS;
+
   /*
   var q = CLASS.extend({
-    c : function() {
+    construct : function() {
       alert(1);
-    }
+    },
+		c : function(a) {
+		  alert(a)
+		}
   });
 
-  alert(q);
-  var a = q.create();
-  a.c();
+  var a = new q();
+  a.c(1);
   */ 
-  this.ELEMENT_NODE = 1;
-  this.ELEMENT_TEXTNODE = 3;
+  Q.ELEMENT_NODE = 1;
+  Q.ELEMENT_TEXTNODE = 3;
 
   // default ie mouse button
-  this.LBUTTON  = 1;
-  this.RBUTTON  = 2;
-  this.MBUTTON  = 4;
+  Q.LBUTTON  = 1;
+  Q.RBUTTON  = 2;
+  Q.MBUTTON  = 4;
 
   // debug
-  this._DEBUG    = {
+  Q._DEBUG    = {
     enable: false,    // 开启debug功能
     stdoutput: null    // 输出
   };
 
   // get Element from dom cache if exists
-  this.$ = function(id, bOverride) {
+  Q.$ = function(id, bOverride) {
     if(typeof(id) != 'string') { return id; }
     var element = null;
     if(!_domcache[id] || bOverride) {
@@ -116,20 +99,20 @@
     return element;
   };
 
-  this.registerDelayDOMReady = function(f) {
+  Q.registerDelayDOMReady = function(f) {
     if(!_LoadCompleted) {
       _delayDOMReady.push(f);
     }
   };
 
-  this.DelayLoad = function() {
+  Q.DelayLoad = function() {
     if(_LoadCompleted) {
       while(_delayDOMReady.length > 0) { _delayDOMReady.shift()(); }
     }
   };
     
   // 兼容ff的attachEvent接口
-  this.addEvent = function(obj, evtName, fnHandler, useCapture) {
+  Q.addEvent = function(obj, evtName, fnHandler, useCapture) {
     obj = Q.$(obj);
     if(obj.addEventListener) {
       obj.addEventListener(evtName, fnHandler, !!useCapture);
@@ -140,7 +123,7 @@
     }
   };
 
-  this.removeEvent = function(obj, evtName, fnHandler) {
+  Q.removeEvent = function(obj, evtName, fnHandler) {
     obj = Q.$(obj); 
     if (obj.removeEventListener) {
       obj.removeEventListener(evtName, fnHandler, false);
@@ -152,7 +135,7 @@
   };
 
   // 获取element的绝对位置
-  this.absPosition = function(element) {
+  Q.absPosition = function(element) {
     var w = element.offsetWidth;
     var h = element.offsetHeight;
     var t = element.offsetTop;
@@ -165,7 +148,7 @@
   };
 
   // get scroll info
-  this.scrollInfo = function() {
+  Q.scrollInfo = function() {
     var t, l, w, h;
     if (document.documentElement && (document.documentElement.scrollTop || document.documentElement.scrollLeft) ) { 
       t = document.documentElement.scrollTop;
@@ -270,12 +253,12 @@
     }
   };
   // document.createElement
-  this.createElement = document.createElement;
+  Q.createElement = document.createElement;
   // QLib Dir
-  this.libDir = function() { return _libdir; };
+  Q.libDir = function() { return _libdir; };
   // get querystring
-  this.GET = function(key) { return _querystring[key]; };
-  this.querystring = function(arrExcepts) {
+  Q.GET = function(key) { return _querystring[key]; };
+  Q.querystring = function(arrExcepts) {
     if(arrExcepts) {
       var e = _querystring;
       for(var i=0; i<arrExcepts.length; i++) {
@@ -292,7 +275,7 @@
   };
   
 	// OnLoad
-  this.DOMReady = function(evt) {
+  Q.DOMReady = function(evt) {
     if(!_LoadCompleted) {
       Q.registerDelayDOMReady(Q.delayDOMReady);
     } else {
@@ -301,12 +284,12 @@
   };
   
 	// 当所有脚本都加载后开始执行Ready回调
-  this.delayDOMReady = function() {
+  Q.delayDOMReady = function() {
     while(_OnPageLoad.length > 0) { _OnPageLoad.shift()(); }
   };
 
   // push event when document loaded
-  this.Ready = function(f, push_front) {
+  Q.Ready = function(f, push_front) {
     var back = !push_front;
 		if(back)
 		  _OnPageLoad.push(f); 

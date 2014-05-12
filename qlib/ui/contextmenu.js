@@ -12,8 +12,7 @@ var MENU_ITEM = 0;
 var MENU_ITEM_CHECKBOX = 1;
 var MENU_ITEM_RADIO = 3;
 
-var class_menuitem = Q.KLASS();
-class_menuitem.prototype = {
+var class_menuitem = Q.extend({
 	hwnd : null,
 	parentMenu : null,
 	topMenu : null,
@@ -29,7 +28,7 @@ class_menuitem.prototype = {
 	items : null,
 	binddata : null,
 	isChecked : true,
-	_initialize : function(json) {
+	construct : function(json) {
 		var _this = this;
 		_this.items = [];
 		_this.parentMenu = json.parentMenu;
@@ -228,17 +227,16 @@ class_menuitem.prototype = {
 	},
 	
 	t : function() {}
-}
+});
 
-var class_menu = Q.KLASS();
-class_menu.prototype = {
+var class_menu = Q.extend({
 	hwnd : null,
 	timer : null,
 	isajust : false,
 	activeItem : null,
 	items : null,
 	_fHide : null,
-	_initialize : function() {
+	construct : function() {
 		var _this = this;
 		_this.items = [];
 		_this.initview();
@@ -380,4 +378,4 @@ class_menu.prototype = {
 			_this.items[i].hidePopup();
 		}
 	}
-}
+});

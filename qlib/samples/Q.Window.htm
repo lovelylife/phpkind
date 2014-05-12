@@ -36,7 +36,7 @@
     }
 
     Q.$('btnOpenWindow').onclick = function() {
-      g_test_window = Q.Window.create({width:480, height:370});
+      g_test_window = new Q.Window({width:480, height:370});
       g_test_window.show(true);
       g_test_window.set_content(Q.$('flash'));
       $FitWindow(g_test_window.wnd());

@@ -99,6 +99,17 @@ function $ToWindowStyle(s) {
   return style;
 }
 
+function $AddStyle(wstyle, s) {
+   var ws = wstyle.split('|');
+   var ws_add = s.split('|');
+	 //求并集
+	 var arr = ws.concat(ws_add); 
+}
+
+function $RemoveStyle(wstyle, s) {
+
+}
+
 /*-----------------------------------------------------------------
   windows APIs
 -------------------------------------------------------------------*/
@@ -853,8 +864,7 @@ function $MakeResizable(obj) {
  $ dialog base class
  $ date: 2007-11-20
 -------------------------------------------------------------------*/
-var __DRAGWND = Q.KLASS();
-__DRAGWND.prototype = {
+var __DRAGWND = Q.extend({
   hCaptureWnd : null,
   hDragWnd : null,
   ie  : document.all,
@@ -871,7 +881,7 @@ __DRAGWND.prototype = {
   MouseMove_Handler : null,
   isMoved : false,
 
-  _initialize : function(){
+  construct : function(){
     var _this = this;
 
     // 缓存时间
@@ -972,7 +982,7 @@ __DRAGWND.prototype = {
     }
     _this.isMoved=false;
   }
-};
+});
 
 /*-----------------------------------------------------------------
  $ class Q.Window
@@ -980,10 +990,9 @@ __DRAGWND.prototype = {
  $ date: 2007-11-20
 -------------------------------------------------------------------*/
 // 创建窗口，并返回一个窗口操作类
-Q.Window = Q.CLASS.extend({
-
+Q.Window = Q.extend({
 hwnd : null,
-initialize : function(config) {
+construct : function(config) {
   config = config || {};
   var _this = this;
   var title = config.title || '无标题';
@@ -1011,6 +1020,10 @@ center : function() {
   $CenterWindow(this.hwnd);
 },
 
+adjust : function() {
+  $FitWindow(this.hwnd);				 
+},
+
 wnd : function() {
   return this.hwnd;
 },
@@ -1035,16 +1048,14 @@ set_zindex : function(zIndex) {
  $ dialog base class
  $ date: 2007-11-20
 -------------------------------------------------------------------*/
-Q.Dialog = Q.KLASS();
-Q.Dialog.prototype = {
-  qwnd : null,
-  _initialize : function(config) {
+Q.Dialog = Q.Window.extend({
+  construct : function(config) {
     config = config || {};
     // initialize parameters 
     var this_ = this;
     // window style
-    this_.qwnd = new Q.Window(config)
-  },
+    this_.__super__.construct(config);
+	},
   
   addBottomButton : function(text, className, lpfunc) {
     var _this = this;
@@ -1090,7 +1101,7 @@ Q.Dialog.prototype = {
     $ShowWindow(this.hwnd, CONST.SW_SHOW);
     $FitWindow(_this.hwnd);
   },
-};
+});
 
 /*-----------------------------------------------------------------
   class Q.MessageBox
@@ -1106,7 +1117,10 @@ var MSGBOX_YESNOCANCEL  = MSGBOX_YES | MSGBOX_NO | MSGBOX_CANCEL;  // 是/否/�
 
 Q.MessageBox = function(config) {
   config = config || {};
-  var dlg = new Q.Dialog(config);
+  config.wstyle = config.wstyle | CONST.STYLE_FIXED;
+  config.wstyle = config.wstyle &~ CONST.STYLE_MAX;
+  config.wstyle = config.wstyle &~ CONST.STYLE_MIN;
+	var dlg = new Q.Dialog(config);
   dlg.onok = config.onok || function() {};
   dlg.onno = config.onno || function() {};
   dlg.oncancel = config.oncancel || function() {};
@@ -1124,7 +1138,7 @@ Q.MessageBox = function(config) {
   }
     
   if( $IsWithStyle(MSGBOX_NO, config.wstyle) ) {
-    msgdlg.addBottomButton('  否  ', 'sysbtn',
+    dlg.addBottomButton('  否  ', 'sysbtn',
       function(){
         if(msgdlg.onno){ msgdlg.onno(); }
         $EndDialog(msgdlg);
@@ -1146,13 +1160,11 @@ Q.MessageBox = function(config) {
   }
 
   this.show = function() {
-    msgdlg.doModal();
-    $FitWindow(dlg);
-    $CenterWindow(dlg.hwnd);
+    dlg.doModal();
+    dlg.adjust();
+    dlg.center();
   }
 
-  msgdlg.doModal();
-  $FitWindow($GetWindow(msgdlg));
-  $CenterWindow(msgdlg.hwnd);
+  this.show();
 }
 

@@ -24,23 +24,21 @@ var CONST = {
   STYLE: |0|0|0|0|0|0|0|0|
   ----------------------------------------------*/
 // window style
-  STYLE_DEFAULT :  0x00000001,
   STYLE_TITLE:     0x00000001,
   STYLE_MENU :     0x00000002,
   STYLE_TOOLBAR :  0x00000004,
   STYLE_STATUS:    0x00000008,
-  STYLE_RESIZABLE: 0x00000010,
+  STYLE_FIXED: 0x00000010,
 
 // size status
   STYLE_MAX :      0x00000020,
   STYLE_MIN :      0x00000040,
   STYLE_CLOSE :    0x00000080,
-  STYLE_FIXED :    0x00000100,
-  STYLE_POPUP :    0x00000200,
+  STYLE_POPUP :    0x00000100,
 
-  STYLE_CHILD :    0x00000400,
-  STYLE_ICON  :    0x00000800,
-  STYLE_WITHBOTTOM :  0x00001000,
+  STYLE_CHILD :    0x00000200,
+  STYLE_ICON  :    0x00000400,
+  STYLE_WITHBOTTOM :  0x00000800,
   
 // size text
   SIZE_CLOSE:    'close',
@@ -59,7 +57,7 @@ var CONST = {
   IDCANCEL :          '0'
 };
 
-CONST.STYLE_DEFAULT = $ToWindowStyle('STYLE_TITLE|STYLE_ICON|STYLE_MAX|STYLE_MIN|STYLE_CLOSE|STYLE_RESIZABLE');
+CONST.STYLE_DEFAULT = CONST.STYLE_TITLE|CONST.STYLE_ICON|CONST.STYLE_MAX|CONST.STYLE_MIN|CONST.STYLE_CLOSE;
 
 /*-------------------------------------------------------------------------
   you must defined the function MessageProcedure in the handle as a memeber
@@ -90,25 +88,6 @@ function $IsNull(statement) {
 
 function $IsStyle(cs, style) { return ((cs & style) == style); }
 function $IsWithStyle(style, wstyle) { return ((style & wstyle) == style); }
-function $ToWindowStyle(s) {
-  var style = 0;  
-  var wstyle = s.split('|');
-  for(var i=0; i < wstyle.length; i++)
-    style = style | CONST[wstyle[i]];  
-
-  return style;
-}
-
-function $AddStyle(wstyle, s) {
-   var ws = wstyle.split('|');
-   var ws_add = s.split('|');
-	 //求并集
-	 var arr = ws.concat(ws_add); 
-}
-
-function $RemoveStyle(wstyle, s) {
-
-}
 
 /*-----------------------------------------------------------------
   windows APIs
@@ -612,8 +591,10 @@ function $CreateWindowEx(wndName, wndTitle, ws, left, top, width, height, pParen
   }
 
   // 主窗口
-  if( !$IsStyle(ws, CONST.STYLE_FIXED) )
+  if( !$IsStyle(ws, CONST.STYLE_FIXED) ) {
+    Q.printf('set icon style');
     $MakeResizable(hwnd);
+  }
   $SaveRectForWindow(hwnd);
   hwnd.setAttribute('IsWindow', CONST.REGISTEREDWND);
   Q.addEvent(hwnd, 'mousedown', $ActivateWindowEvent(hwnd));
@@ -792,8 +773,8 @@ function $MakeResizable(obj) {
     var srcElement = evt.srcElement || evt.target;
     //Q.printf(srcElement);
     var status = $GetWindowStatus(obj);
-    if(( status == CONST.SIZE_MAX ) 
-      || ( status == CONST.SIZE_FIXED) 
+    if(( status & CONST.SIZE_MAX ) 
+      || ( $IsStyle($GetWindowStyle(obj), CONST.STYLE_FIXED) ) 
       || (status == CONST.SIZE_MIN))
     {
       //Q.printf('wrong status');
@@ -1004,7 +985,7 @@ construct : function(config) {
   
   var ws = CONST.STYLE_DEFAULT;
   if(config.wstyle) 
-    ws = $ToWindowStyle(config.wstyle);
+    ws = config.wstyle;
 
   _this.hwnd = $CreateWindow('QWindow', title, ws, left, top, width, height, parent);  
   $RegisterWindow(_this.hwnd);
@@ -1024,8 +1005,11 @@ adjust : function() {
   $FitWindow(this.hwnd);				 
 },
 
-wnd : function() {
-  return this.hwnd;
+destroy : function() {
+  var parent = $GetParentWindow(this.hwnd);
+  $MaskWindow(parent, false);
+  $ActivateWindow(parent);
+  $DestroyWindow(this.hwnd);
 },
 
 set_content : function(HTMLContent) {
@@ -1059,28 +1043,18 @@ Q.Dialog = Q.Window.extend({
   
   addBottomButton : function(text, className, lpfunc) {
     var _this = this;
-    var hwnd = $GetWindow(_this);
-    var ws = $GetWindowStyle(hwnd);
+    var ws = $GetWindowStyle(this.hwnd);
     
-    if((!$IsStyle(ws, CONST.STYLE_WITHBOTTOM)) || $IsNull($GetBottomBar(hwnd))) {
+    if((!$IsStyle(ws, CONST.STYLE_WITHBOTTOM)) || $IsNull($GetBottomBar(this.hwnd))) {
       return false;
     }
     var btn = document.createElement('button');
-    $GetBottomBar(hwnd).appendChild(btn);
+    $GetBottomBar(this.hwnd).appendChild(btn);
     btn.innerText = text;
     btn.onclick = lpfunc;
     btn.className = className;
   },
 
-  destroy : function() {
-    var wnd = null;
-    hwnd = $IsWindow(this) ? this : $GetWindow(this);
-    var parent = $GetParentWindow(hwnd);
-    $MaskWindow(parent, false);
-    $ActivateWindow(parent);
-    $DestroyWindow(hwnd);
-  },
-  
   doModal : function() {
     // this.hwnd.setAttribute('modeType', CONST['MODE']);
     var parent = $GetParentWindow(this.hwnd);
@@ -1088,7 +1062,7 @@ Q.Dialog = Q.Window.extend({
     parent.modalWnd = this.hwnd;
     var _this = this;
     this.hwnd.close.onmouseup = function() {
-        $EndDialog(_this, CONST.IDCANCEL); 
+        _this.end_dialog(CONST.IDCANCEL); 
     };
     $ShowWindow(this.hwnd, CONST.SW_SHOW);
     $ResizeTo(this.hwnd, this.hwnd.nWidth, this.hwnd.nHeight);
@@ -1100,6 +1074,15 @@ Q.Dialog = Q.Window.extend({
     parent.wnds.push(this.hwnd);
     $ShowWindow(this.hwnd, CONST.SW_SHOW);
     $FitWindow(_this.hwnd);
+  },
+
+  end_dialog : function(code) {
+    this.destroy();
+    if( arguments.length > 1 )  
+      return arguments[1];
+    else 
+      return CONST.IDCANCEL;
+                 
   },
 });
 
@@ -1117,46 +1100,52 @@ var MSGBOX_YESNOCANCEL  = MSGBOX_YES | MSGBOX_NO | MSGBOX_CANCEL;  // 是/否/�
 
 Q.MessageBox = function(config) {
   config = config || {};
-  config.wstyle = config.wstyle | CONST.STYLE_FIXED;
-  config.wstyle = config.wstyle &~ CONST.STYLE_MAX;
-  config.wstyle = config.wstyle &~ CONST.STYLE_MIN;
+  config.wstyle = config.wstyle || CONST.STYLE_DEFAULT;
+  config.wstyle |= CONST.STYLE_FIXED;
+  config.wstyle |= CONST.STYLE_CLOSE;
+  config.wstyle |= CONST.STYLE_WITHBOTTOM;
+  config.wstyle &= ~CONST.STYLE_MAX;
+  config.wstyle &= ~CONST.STYLE_MIN;
+  config.width  = config.width  || 360;
+  config.height = config.height || 200;
 	var dlg = new Q.Dialog(config);
+  dlg.set_content(config.content);
   dlg.onok = config.onok || function() {};
   dlg.onno = config.onno || function() {};
   dlg.oncancel = config.oncancel || function() {};
-
-  if( $IsWithStyle(MSGBOX_YES, config.wstyle) ) {
+  config.bstyle = config.bstyle || MSGBOX_YES;
+  if( $IsWithStyle(MSGBOX_YES, config.bstyle) ) {
     dlg.addBottomButton('  是  ', 'sysbtn',
       function(){
-        var return_ok = false;
+        var return_ok = true;
           if(dlg.onok){ return_ok = dlg.onok(); }
         if(return_ok) {
-          $EndDialog(msgdlg);
+          dlg.end_dialog();
         }          
       }
     )
   }
     
-  if( $IsWithStyle(MSGBOX_NO, config.wstyle) ) {
+  if( $IsWithStyle(MSGBOX_NO, config.bstyle) ) {
     dlg.addBottomButton('  否  ', 'sysbtn',
       function(){
-        if(msgdlg.onno){ msgdlg.onno(); }
-        $EndDialog(msgdlg);
+        if(dlg.onno){ dlg.onno(); }
+        dlg.end_dialog();
       }
     )
   }
 
-  if( $IsWithStyle(MSGBOX_CANCEL, config.wstyle) ) {
-    msgdlg.addBottomButton(' 取消 ', 'syscancelbtn',
+  if( $IsWithStyle(MSGBOX_CANCEL, config.bstyle) ) {
+    dlg.addBottomButton(' 取消 ', 'syscancelbtn',
         function(){
-          if(msgdlg.oncancel){ msgdlg.oncancel(); }
-          $EndDialog(msgdlg);
+          if(dlg.oncancel){ dlg.oncancel(); }
+          dlg.end_dialog();
         }
       )
-    }
+  }
 
-    this.close = function() {
-    $EndDialog(msgdlg);
+  this.close = function() {
+    dlg.end_dialog();
   }
 
   this.show = function() {

@@ -15,7 +15,8 @@
   }
     
   // Q
-  var Q = window.Q = {};
+  var Q = {};
+  window.Q = Q;
   // QLib base dir
   var _libdir = null;
   // dom elements cache
@@ -164,96 +165,6 @@
     return { t: t, l: l, w: w, h: h };
   };
 
-  // Javascript Loader
-  function loadJsLib() {
-    var scripts = document.getElementsByTagName("script");  
-    // 判断指定的文件是否已经包含，如果已包含则触发onsuccess事件并返回  
-    var libscript = null;
-    for (i = 0; i < scripts.length; i++) {
-      if(scripts[i].src) {
-        var pos = -1;
-        if((pos=scripts[i].src.indexOf('/Q.js')) >= 0) {
-           _libdir = scripts[i].src.substring(0, pos);
-           libscript = scripts[i];
-        }
-      }
-    }
-
-    // 解析script import
-    var sImports = libscript.innerHTML;
-    // var re = /\s*import\s+(.+);/ig;
-    //var arr = sImports.match(re);
-    var re = /\n/ig;
-    var arr = sImports.split(re);
-
-    // 同步加载
-    loadItem(document.getElementsByTagName("head")[0], arr);        
-
-    // 顺序加载js文件
-    function loadItem(header, ar) {
-      ar = ar||[];
-      if(ar.length<=0) { 
-        _LoadCompleted = true;
-        Q.DelayLoad();
-        return;
-      }
-      // 加载lib
-      var url = ar.shift();
-      // 解析格式，并自动加载库文件
-      var re2 = /^\s*import\s+(.+);/i;
-      if(re2.test(url)) {
-        url = RegExp.$1 + '';
-        url = url.replace(/\./g, '/')+'.js';
-        // 创建script结点,并将其属性设为外联JavaScript文件  
-        var s = document.createElement("script");  
-        s.type = "text/javascript";
-        s.src = _libdir+'/'+url;
-
-        // 对于IE浏览器，使用readystatechange事件判断是否载入成功  
-        // 对于其他浏览器，使用onload事件判断载入是否成功  
-        s.done = false;
-        s.onload = s.onreadystatechange = (function() {
-          if( !this.done 
-           && (!this.readyState 
-              || this.readyState == "loaded" 
-              || this.readyState == "complete") 
-          )
-          {
-            this.done = true;
-            loadItem(header, ar);
-            // Handle memory leak in IE
-            this.onload = this.onreadystatechange = null;
-            header.removeChild( this );
-          }
-        });
-        s.onerror = (function() { 
-          // Handle memory leak in IE
-          this.onload = this.onreadystatechange = null;
-          header.removeChild(this); 
-          loadItem(header, ar);
-        });
-        
-        // 获取head结点，并将<script>插入到其中  
-        header.appendChild(s);
-      } else {
-        loadItem(header, ar);
-      }
-    }
-  };
-  
-  // 解析地址页面的查询字段
-  function doParseUrlQuery() {
-    var querystring = location.search.toString();
-    querystring = querystring.substring(1, querystring.length);
-    var queryMap = querystring.split('&');
-    for(var i=0; i < queryMap.length; i++) {
-      var t = queryMap[i].split('=');
-      if(t.length != 2) { continue; }
-      _querystring[t[0]] = t[1];
-    }
-  };
-  // document.createElement
-  Q.createElement = document.createElement;
   // QLib Dir
   Q.libDir = function() { return _libdir; };
   // get querystring
@@ -326,6 +237,84 @@
     Q._DEBUG.stdoutput = output;
   }
 
+  // Javascript Loader
+  function jsloader() {
+    var scripts = document.getElementsByTagName("script");  
+    // 判断指定的文件是否已经包含，如果已包含则触发onsuccess事件并返回  
+    var libscript = null;
+    for (i = 0; i < scripts.length; i++) {
+      if(scripts[i].src) {
+        var pos = -1;
+        if((pos=scripts[i].src.indexOf('/Q.js')) >= 0) {
+           _libdir = scripts[i].src.substring(0, pos);
+           libscript = scripts[i];
+        }
+      }
+    }
+
+    // 解析script import
+    var sImports = libscript.innerHTML;
+    // var re = /\s*import\s+(.+);/ig;
+    //var arr = sImports.match(re);
+    var re = /\n/ig;
+    var arr = sImports.split(re);
+
+    // 异步顺序加载
+    async_load_js(document.getElementsByTagName("head")[0], arr);        
+  };
+
+  // 顺序加载js文件
+  function async_load_js(header, ar) {
+    ar = ar||[];
+    if(ar.length<=0) { 
+      _LoadCompleted = true;
+      Q.DelayLoad();
+      return;
+    }
+    
+    // 加载lib
+    var url = ar.shift();
+    // 解析格式，并自动加载库文件
+    var re2 = /^\s*import\s+(.+);/i;
+    if(re2.test(url)) {
+      url = RegExp.$1 + '';
+      url = url.replace(/\./g, '/')+'.js';
+      // 创建script结点,并将其属性设为外联JavaScript文件  
+      var s = document.createElement("script");  
+      s.type = "text/javascript";
+      s.src = _libdir+'/'+url;
+
+      // 对于IE浏览器，使用readystatechange事件判断是否载入成功  
+      // 对于其他浏览器，使用onload事件判断载入是否成功  
+      s.done = false;
+      s.onload = s.onreadystatechange = (function() {
+        if( !this.done 
+           && (!this.readyState 
+           || this.readyState == "loaded" 
+           || this.readyState == "complete"))
+        {
+            this.done = true;
+            async_load_js(header, ar);
+            // Handle memory leak in IE
+            this.onload = this.onreadystatechange = null;
+            header.removeChild( this );
+        }
+      });
+      s.onerror = (function() { 
+          // Handle memory leak in IE
+          this.onload = this.onreadystatechange = null;
+          header.removeChild(this); 
+          async_load_js(header, ar);
+      });
+        
+      // 获取head结点，并将<script>插入到其中  
+      header.appendChild(s);
+    } else {
+      async_load_js(header, ar);
+    }
+  }
+
+
   function Initialize() {
     // get Browser
     _Browser.agt = navigator.userAgent.toLowerCase();
@@ -352,9 +341,28 @@
       // 兼容ff，ie的鼠标按键值
       Q.LBUTTON  = 0;
       Q.MBUTTON  = 1;
+      
+      // 解析地址页面的查询字段
+      var querystring = location.search.toString();
+      querystring = querystring.substring(1, querystring.length);
+      var queryMap = querystring.split('&');
+      for(var i=0; i < queryMap.length; i++) {
+        var t = queryMap[i].split('=');
+        if(t.length != 2) { continue; }
+        _querystring[t[0]] = t[1];
+      }
     }
-    doParseUrlQuery();
-    loadJsLib();
+    // 解析地址页面的查询字段
+    var querystring = location.search.toString();
+    querystring = querystring.substring(1, querystring.length);
+    var queryMap = querystring.split('&');
+    for(var i=0; i < queryMap.length; i++) {
+      var t = queryMap[i].split('=');
+      if(t.length != 2) { continue; }
+      _querystring[t[0]] = t[1];
+    }
+
+    jsloader();
     Q.addEvent(window, 'load', Q.DOMReady);  
   }
 

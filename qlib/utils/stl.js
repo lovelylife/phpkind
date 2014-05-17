@@ -16,47 +16,48 @@ var __LIST = Q.extend({
 	current: null,
 	length : 0,
 	construct : function(){
-		this.head = new __NODE(null);
-		this.tail = new __NODE(null);
-		this.head.next = this.tail;
-		this.tail.prev = this.head;
-		this.current = this.head;
+		this.head = null;
+		this.tail = null;
+		this.current = null;
 	},
 	
-	begin : function(){	return this.head.next; },	// not head	use as STL
-	end : function(){	return this.tail;	},
-	len : function(){	return this.length;	},
-	item : function() {	return this.current.key; },
+	begin :    function() {	return this.head; },	// not head	use as STL
+	end :      function() {	return null	},
+	len :      function() {	return this.length;	},
+	item :     function() {	return this.current.key; },
 	moveNext : function() {	this.current = this.current.next;	},
 	movePrev : function(){	this.current = this.current.prev;	},
 	
 	push : function(key){
 		var node = new __NODE(key);
-		this.tail.prev.next = node;
-		node.prev = this.tail.prev;
-		node.next = this.tail;
-		this.tail.prev = node;
+
+    if(!this.head) {
+      this.head = this.tail = node;
+    } else {
+      this.tail.next = node;
+      node.prev = this.tail;
+      this.tail = node;
+    }
+
 		this.length++;
 	},
 	
-	insert : function(key) {
-		var node = new __NODE(key);
-		this.tail.prev.next = node;
-		node.prev = this.tail.prev;
-		node.next = this.tail;
-		this.tail.prev = node;
-		this.length++;
-	},
-	
-	remove : function(key){
+  remove : function(key){
 		var node = this.find(key);
 		if( node == null ){	return false;	}
 		this.removeNode(node);
 	},
 	
 	removeNode : function(node) {
-		node.prev.next = node.next;
-		node.next.prev = node.prev;
+    if(node == this.head) {
+      this.head = node.next;
+    } 
+
+    if(node == this.tail) {
+      this.tail = node.prev;
+    }
+    
+    delete node;
 		this.length--;
 	},
 	

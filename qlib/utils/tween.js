@@ -150,8 +150,7 @@ var Tween = {
 	}
 }
 
-Q.Animate = Q.KLASS();
-Q.Animate.prototype = {
+Q.Animate = Q.extend( {
 func : null,
 bind : null,
 timer: null,
@@ -201,4 +200,4 @@ play : function(){
 	_run();
 }
 
-}
+});

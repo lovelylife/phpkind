@@ -28,15 +28,23 @@
   var g_test_window;
   var g_test_dialog;
   Q.Ready(function() {
+
+    var set = {};
+    set[1] = Q.$('btnOpenMessageBox');
+    set[2] = Q.$('btnOpenWindow');
+    
+    var arr = new Q.LIST();
+    arr.append(Q.$('btnOpenMessageBox'));
+    arr.append(Q.$('btnOpenWindow'));
+    console.log(set);
+    console.log(arr);
     Q.debug(true);
     Q.setdebug(Q.$('debug_window'));
     // 提示对话框
     Q.$('btnOpenMessageBox').onclick = function() {
-      
       g_test_dialog = new Q.Dialog({
         title: "提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口提示窗口",
         content: Q.$('test-domodal'),
-        mask_desktop: false, 
         onok : function() { return true; }
       });
 
@@ -56,7 +64,6 @@
         parent: g_test_dialog,
         title: "test",
         content: 'test-domodal',
-        mask_desktop: false, 
         onok : function() { return true; }
       });
    

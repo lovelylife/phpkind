@@ -26,7 +26,7 @@
   // QueryString
   var _querystring = {};
   // Browser
-  var _Browser = {};
+  Q.Browser = {};
 
   // LoadCompleted
   var _LoadCompleted = false;
@@ -314,16 +314,17 @@
     }
   }
 
+  // get Browser
+  Q.agent   = function() { return navigator.userAgent.toLowerCase(); }
+  Q.isW3C   = function() { return document.getElementById ? true:false; }
+  Q.isIE    = function() { var a = Q.agent(); return ((a.indexOf("msie") != -1) && (a.indexOf("opera") == -1) && (a.indexOf("omniweb") == -1)); }
+  Q.isOpera = function() { return Q.agent().indexOf("opera") != -1; }
+  Q.isNS6   = function() { return Q.isW3C() && (navigator.appName=="Netscape"); }
 
   function Initialize() {
     // get Browser
-    _Browser.agt = navigator.userAgent.toLowerCase();
-    _Browser.isW3C = document.getElementById ? true:false;
-    _Browser.isIE = ((_Browser.agt.indexOf("msie") != -1) && (_Browser.agt.indexOf("opera") == -1) && (_Browser.agt.indexOf("omniweb") == -1));
-    _Browser.isOpera = _Browser.agt.indexOf("opera") != -1;
-    _Browser.isNS6 = _Browser.isW3C && (navigator.appName=="Netscape");
     //为Firefox下的DOM对象增加innerText属性
-    if(_Browser.isNS6) { //firefox innerText define
+    if(Q.isNS6()) { //firefox innerText define
       HTMLElement.prototype.__defineGetter__( "innerText",
         function(){  return this.textContent;  }
       );

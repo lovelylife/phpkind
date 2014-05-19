@@ -46,11 +46,15 @@ erase : function(key){
   var node = this.find(key);
   if( node ) { 
     if(node != this.head) {
-      node.prev.next = node.next;
-      node.next.prev = node.prev;
+      if(node.prev)
+        node.prev.next = node.next;
+      if(node.next)
+        node.next.prev = node.prev;
     } else {
       this.head = node.next;
-      node.next.prev = null;
+      if(node.next) {
+        node.next.prev = null;
+      }
     }
 
     delete node;

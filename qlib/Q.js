@@ -100,6 +100,12 @@
     return element;
   };
 
+  Q.bind_handler = function(object, func) {
+    return function() {
+      return func.apply(object, arguments);
+    };
+  };
+
   Q.registerDelayDOMReady = function(f) {
     if(!_LoadCompleted) {
       _delayDOMReady.push(f);

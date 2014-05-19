@@ -91,6 +91,13 @@ function $IsNull(statement) {
 function $IsStyle(cs, style) { return ((cs & style) == style); }
 function $IsWithStyle(style, wstyle) { return ((style & wstyle) == style); }
 
+function $BindWindowMessage(wndNode, messageid, parameters) {
+  return function() {
+    wndNode.wnd_proc(wndNode, messageid, parameters);
+  }
+} 
+
+
 /*-----------------------------------------------------------------
   windows APIs
 -------------------------------------------------------------------*/
@@ -559,10 +566,19 @@ function $DefaultWindowProc(hwnd, msg, data) {
   case MESSAGE.CREATE:
     break;  
   case MESSAGE.MIN:
+    Q.printf('DefaultWindowProc MESSAGE.MIN');
     break;
   case MESSAGE.MAX:
+    Q.printf('DefaultWindowProc MESSAGE.MAX');
+    if(hwnd.status_type != CONST.SIZE_MAX) { 
+      $MaxizeWindow(hwnd); 
+    } else { 
+      $RestoreWindow(hwnd); 
+    }
     break;
-  case MESSAGE.MIN:
+  case MESSAGE.CLOSE:
+    Q.printf('DefaultWindowProc MESSAGE.CLOSE');
+    $DestroyWindow(hwnd);
     break;  
   }
 } 
@@ -749,6 +765,10 @@ function $CreateTitlebar(hwnd)
   hTitle.hMax = $CreateCtrlButton('max');
   hTitle.hClose = $CreateCtrlButton('close');
 
+  hTitle.hMin.onclick = $BindWindowMessage(hwnd, MESSAGE.MIN);
+  hTitle.hMax.onclick = $BindWindowMessage(hwnd, MESSAGE.MAX);
+  hTitle.hClose.onclick = $BindWindowMessage(hwnd, MESSAGE.CLOSE);
+  
   hTitle.hTitleCtrlBar.appendChild(hTitle.hMin);
   hTitle.hTitleCtrlBar.appendChild(hTitle.hMax);
   hTitle.hTitleCtrlBar.appendChild(hTitle.hClose);

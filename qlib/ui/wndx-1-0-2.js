@@ -73,8 +73,8 @@ Q.Ready(function() {
   __GLOBALS.desktop.active_wnd = null;
   __GLOBALS.desktop.wnd_mask = document.createElement('DIV');
   __GLOBALS.desktop.wnd_mask.className = 'clsMaskWindow alpha_5';
-  __GLOBALS.desktop.wnd_mask.style.display = 'none';
   __GLOBALS.desktop.appendChild(__GLOBALS.desktop.wnd_mask);
+  __GLOBALS.desktop.wnd_mask.style.display = 'none';
   (new __DRAGWND());
 }, true);
 
@@ -122,6 +122,10 @@ function $UnRegisterWindow(wndNode) {
     return;
   }
   parent.wnds.erase(wndNode);
+}
+
+function $CreateMaskWindow() {
+
 }
 
 function $IsWindow(wndNode){
@@ -432,8 +436,8 @@ function $GetTopZIndexWindow(){
    } else {
      top_wnd = wnd;
    }
- 
-  }) 
+   return true; 
+  }); 
   
   return top_wnd;
 }

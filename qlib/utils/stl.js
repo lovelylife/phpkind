@@ -23,7 +23,7 @@ item :     function() {  return this.current.key; },
 each : function(callback) {
   if(typeof callback == 'function') {
     for(var node = this.begin(); node != this.end(); node = node.next) {
-      if(!callback(key)) break;
+      if(!callback(node.key)) break;
     }
   }
 },

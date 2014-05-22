@@ -625,7 +625,18 @@ function $DefaultWindowProc(hwnd, msg, data) {
     $ActivateWindow(hwnd);
     break;  
   }
-} 
+}
+
+function $SetWindowProc(wndNode, new_window_proc) {
+  if(typeof new_window_proc == 'function') {
+    var old_wnd_proc = wndNode.wnd_proc;
+    wndNode.wnd_proc = new_window_proc;
+    return old_wnd_proc;
+  }
+
+  return null;
+
+}
 
 function $CreateWindow(parent_wnd, title, ws, left, top, width, height){
   var hwnd = document.createElement('DIV');
@@ -1050,10 +1061,6 @@ var __DRAGWND = Q.extend({
  $ dialog base class
  $ date: 2014-05-16
 -------------------------------------------------------------------*/
-function $GetQWindow(wndNode) {
-  return wndNode.qwindow_object;
-}
-
 // 创建窗口，并返回一个窗口操作类
 Q.Window = Q.extend({
 hwnd : null,
@@ -1075,16 +1082,6 @@ construct : function(config) {
   this.set_content(config.content);
 },
 
-window_proc : function(msg, data) {
-  switch(msg) {
-  case MESSAGE.CREATE:
-    break;
-  case MESSAGE.CLOSE:
-    break;
-  }
-  return $DefaultWindowProc(this.hwnd, msg, data);
-},
-
 show : function(isVisible) {
   var show=isVisible?CONST.SW_SHOW:CONST.SW_HIDE;
   $ShowWindow(this.hwnd, show);
@@ -1096,16 +1093,6 @@ center : function() {
 
 adjust : function() {
   $FitWindow(this.hwnd);				 
-},
-
-destroy : function() {
-  if(!this.hwnd) 
-    return;
-  var parent_wnd = $GetParentWindow(this.hwnd);
-  $MaskWindow(parent_wnd, false);
-  $ActivateWindow(parent_wnd);
-  $DestroyWindow(this.hwnd);
-  this.hwnd = null;
 },
 
 wnd : function() {
@@ -1126,6 +1113,9 @@ set_zindex : function(zIndex) {
   $SetWindowZIndex(this.hwnd, zIndex);
 },
 
+set_window_proc : function(new_window_proc) {
+  return $SetWindowProc(this.hwnd, new_window_proc);
+},
 });
 
 /*-----------------------------------------------------------------
@@ -1134,6 +1124,7 @@ set_zindex : function(zIndex) {
  $ date: 2007-11-20
 -------------------------------------------------------------------*/
 Q.Dialog = Q.Window.extend({
+old_window_proc : null,
 construct : function(config) {
   config = config || {};
   config.wstyle = config.wstyle || CONST.STYLE_DEFAULT;
@@ -1145,8 +1136,20 @@ construct : function(config) {
   config.wstyle &= ~CONST.STYLE_ICON;
 
   this.__super__.construct(config);
+  this.old_window_proc = this.set_window_proc( (function(qwindow) {
+    return function(hwnd, msgid, json) { return qwindow.window_proc(msgid, json);}
+  })(this)); 
 },
-  
+
+window_proc : function(msgid, json) {
+  switch(msgid) {
+  case MESSAGE.CLOSE:
+    break;
+  }
+
+  return this.old_window_proc(this.hwnd, msgid, json);
+},
+
 add_bottom_button : function(text, className, lpfunc) {
   var _this = this;
   var ws = $GetWindowStyle(this.hwnd);
@@ -1178,7 +1181,8 @@ domodal : function() {
 },
  
 end_dialog : function(code) {
-  this.destroy();
+  $BindWindowMessage(this.hwnd, MESSAGE.CLOSE)();
+  //this.destroy();
   if( arguments.length > 1 )  
     return arguments[1];
   else 
@@ -1209,26 +1213,22 @@ Q.MessageBox = function(config) {
   dlg.oncancel = config.oncancel || function() {};
   config.bstyle = config.bstyle || MSGBOX_YES;
   if( $IsWithStyle(MSGBOX_YES, config.bstyle) ) {
-    dlg.add_bottom_button('  是  ', 'sysbtn',
-      function(){
+    dlg.add_bottom_button('  是  ', 'sysbtn', Q.bind_handler(dlg, function() {
         var return_ok = true;
-        if(dlg.onok)  { 
-          return_ok = dlg.onok(); 
+        if(this.onok)  { 
+          return_ok = this.onok(); 
         }
         if(return_ok) {
-          dlg.end_dialog();
+          this.end_dialog();
         }          
-      }
-    )
+      }))
   }
     
   if( $IsWithStyle(MSGBOX_NO, config.bstyle) ) {
-    dlg.add_bottom_button('  否  ', 'sysbtn',
-      function(){
+    dlg.add_bottom_button('  否  ', 'sysbtn', Q.bind_handler(dlg, function(){
         if(dlg.onno){ dlg.onno(); }
         dlg.end_dialog();
-      }
-    )
+      }))
   }
 
   if( $IsWithStyle(MSGBOX_CANCEL, config.bstyle) ) {

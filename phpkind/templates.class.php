@@ -87,7 +87,7 @@ class CLASS_TEMPLATES {
     $this->tpl_cache_file_ = $this->tpl_cache_dir_.'/'.str_replace('/', '-', $view).'.php';
     $this->tpl_tags_file_ = $this->tpl_cache_file_.".tags.php";
     $need_complie = !file_exists($this->tpl_cache_file_);
-  
+
     // 生成缓存文件
     if($need_complie || isdebug()) {
       // 加载模板
@@ -96,10 +96,11 @@ class CLASS_TEMPLATES {
         // 编译模板内容
         $template_html = $this->compile($template_html, $phplabel);
       }
+      
       // 序列化Tags, 保存早模板对应的.tags.php文件
       $cfg_file = new CLASS_CONFIG_FILE($this->tpl_tags_file_);
-      $config = &$cfg_file->config();
-
+      $config = $cfg_file->config();
+      
       foreach($this->tags as $name => $ui_object) {
         $config[$name] = $ui_object->serialize();
       }
@@ -111,6 +112,8 @@ class CLASS_TEMPLATES {
       fwrite($f, $template_html, strlen($template_html));
       fclose($f);
     }
+
+
 
     // 初始化标签
     //@require
@@ -200,7 +203,7 @@ class CLASS_TEMPLATES {
     require($php_file);
   }
 
-  private function load_template($view) {
+  function load_template($view) {
     $this->tpl_file_ = $this->tpl_dir_.'/'.$view.'.htm';
     //$cache_file = $this->tpl_cache_dir_.'/'.$view.'.php';
     // 输出html流
@@ -214,13 +217,15 @@ class CLASS_TEMPLATES {
   // $replace为true时，生成模板中的标签被替换成php的标
   // 签"< ?=prefix_name? >", 默认使用phplabel
   function compile($content, $phplabel=true) {
+    //echo $content;
     // 解析字典dic等导入标签
-    $content = preg_replace(
-      '/\s*\{#(dict)\s+([^\}]+?)\s*\/?\}\s*/ie', 
-      '$this->import("\\1", "\\2")', 
+    $content = preg_replace_callback(
+      '/\s*\{#(dict)\s+([^\}]+?)\s*\/?\}\s*/is', 
+      array($this, 'import2'), 
       $content
     );
 
+    //echo $content;
     // 解析html:标签 <html:lablename attrs='value'>tpl</html:label>
     $content = preg_replace_callback(
       '/<(html):(\w+).+?<\/\1:\2>/s',  //use:'/<(html|cms):(\w+).+?<\/\1:\2>/is',
@@ -230,8 +235,8 @@ class CLASS_TEMPLATES {
     //$content = $this->complie_php_vars($content);
     $content = preg_replace_callback(
       '/\{\$+(globals|themes|fields|v|cfg|get|post|app):(\w+)((\.\w+)*)(\s+\w+="[^"]*")*\s*\/?\}/is', 
-        array($this, $phplabel?'compile_vars':'compile_values'),
-        $content
+      array($this, $phplabel?'compile_vars':'compile_values'),
+      $content
     );
 
     return $content;
@@ -349,8 +354,8 @@ class CLASS_TEMPLATES {
   }    
 
     // 导入模板
-  function readtemplate($tplname) {        
-    $tplDir = &$this->tpl_dir_;                              
+  function readtemplate($tplname) {
+    $tplDir = $this->tpl_dir_;                              
     // 解析模板文件名, 暂时不支持模板传参数 {t:参数名称}
     $params = parse_url($tplname);
     $tplname = $params['path'];                      
@@ -366,17 +371,20 @@ class CLASS_TEMPLATES {
         
     // 获取文件内容
     $tpldata = file_get_contents($tplFile);
-
     // 预编译处理 - 解析资源路径变量和全局变量（固定不变的）
     // 暂不解析
     // 解析{#template name="tplname"/} 子模板
-    $tpldata = preg_replace(
-       '/\{#template\s+([^\}]+?)\s*\/?\}/ie',
-       '$this->readtemplate("\\1")', 
+    $tpldata = preg_replace_callback(
+       '/\{#template\s+([^\}]+?)\s*\/?\}/is',
+       array($this, 'readtemplate2'), 
        $tpldata
     );
         
     return $tpldata;
+  }
+
+  function readtemplate2($matches) {
+    return $this->readtemplate($matches[1]);
   }
       
   public function setDir($newdir) {
@@ -386,7 +394,14 @@ class CLASS_TEMPLATES {
   public function setCDir($newdir) {
     $this->tpl_cache_dir_ = $newdir;
   }
-  
+ 
+  // 处理模板指令
+  function import2($matches) {
+    // 必须返回空
+    return $this->import($matches[1], $matches[2]);
+  }
+
+ 
   // 处理模板指令
   function import($func, $attrstr) {
     $attrs = CLASS_DTL::parse_attrs(' '.$attrstr);
@@ -558,7 +573,7 @@ class CLASS_TEMPLATES {
 
     // 先从APP的UI目录查找，如果没有再到框架目录查找
     $includefile = $this->theApp->getAppRoot()."/ui/html.{$tagName}.class.php";
-        
+    
     $bfoundfile = file_exists($includefile);
     if(!$bfoundfile) {
       $includefile = _QROOT."/ui/html.{$tagName}.class.php";

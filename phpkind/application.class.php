@@ -102,7 +102,7 @@ class CLASS_APPLICATION {
       trigger_error('module ['.$this->module_.'] not exists.', E_USER_ERROR);
     
     // 访问控制
-    if(!$this->access_control($this->module_, $this->action_)) {
+    if(!$this->access_control($this->module_, $this->action_, $handlered)) {
       trigger_error("have no authority", E_USER_ERROR);
     }
     // 模块文件
@@ -122,7 +122,7 @@ class CLASS_APPLICATION {
     }  
   }
 
-  function access_control($module, $action) {
+  function access_control($module, $action, &$handlered) {
     return true;
   }
 

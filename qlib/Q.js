@@ -33,6 +33,7 @@
   var _delayDOMReady = [];
 
   // 基于prototype的继承实现
+	// 警告：调用父类的（被重载的）同名函数调用需要借助this.__super__.method.call(this, arguments);
   var CLASS = function() {};
   CLASS.prototype.extend = function(props) {
     var sup = this.prototype;  
@@ -42,10 +43,9 @@
     
     sub.prototype = Object.create(this.prototype);
     for(var name in props) {
-      //console.log(name + "\n");
       sub.prototype[name] = props[name];  
     }
-    sub.prototype.__super__ = sup;    
+    sub.prototype.__super__ = sup;  
     sub.prototype.constructor = sub;
     sub.extend = sub.prototype.extend;
   
@@ -58,19 +58,6 @@
 
 	var Q = window.Q = CLASS;
 
-  /*
-  var q = CLASS.extend({
-    construct : function() {
-      alert(1);
-    },
-		c : function(a) {
-		  alert(a)
-		}
-  });
-
-  var a = new q();
-  a.c(1);
-  */ 
   Q.ELEMENT_NODE = 1;
   Q.ELEMENT_TEXTNODE = 3;
 
@@ -83,6 +70,18 @@
   Q._DEBUG    = {
     enable: false,    // 开启debug功能
     stdoutput: null    // 输出
+  };
+
+  // enable/disable debug
+  Q.debug = function(enable) { Q._DEBUG.enable = enable; };
+  Q.setdebug = function(output) { Q._DEBUG.stdoutput = output; }
+
+  // print debug info to 'stdoutput' element
+  Q.printf = function(message) {
+    if(Q._DEBUG.enable) {
+      Q._DEBUG.stdoutput.innerHTML += '<br/>'+message;
+      Q._DEBUG.stdoutput.scrollTop = Q._DEBUG.stdoutput.scrollHeight;
+    }
   };
 
   // get Element from dom cache if exists
@@ -221,28 +220,6 @@
     return js;
   };
 
-  // print debug info to 'stdoutput' element
-  Q.printf = function(message) {
-    if(Q._DEBUG.enable) {
-      Q._DEBUG.stdoutput.innerHTML += '<br/>'+message;
-      Q._DEBUG.stdoutput.scrollTop = Q._DEBUG.stdoutput.scrollHeight;
-    }
-  };
-
-  // enable/disable debug
-  Q.debug = function(enable) {
-    Q._DEBUG.enable = enable;
-  };
-
-  Q.setdebug = function(output) {
-    if(Q._DEBUG.stdoutput) {
-      if(Q._DEBUG.stdoutput.nodeName == Q.ELEMENT_NODE) {
-        
-      }
-    }
-    Q._DEBUG.stdoutput = output;
-  }
-
   // Javascript Loader
   function jsloader() {
     var scripts = document.getElementsByTagName("script");  
@@ -260,8 +237,6 @@
 
     // 解析script import
     var sImports = libscript.innerHTML;
-    // var re = /\s*import\s+(.+);/ig;
-    //var arr = sImports.match(re);
     var re = /\n/ig;
     var arr = sImports.split(re);
 
@@ -294,23 +269,20 @@
       // 对于其他浏览器，使用onload事件判断载入是否成功  
       s.done = false;
       s.onload = s.onreadystatechange = (function() {
-        if( !this.done 
-           && (!this.readyState 
-           || this.readyState == "loaded" 
-           || this.readyState == "complete"))
+        if( !this.done && (!this.readyState || this.readyState == "loaded" || this.readyState == "complete"))
         {
-            this.done = true;
-            async_load_js(header, ar);
-            // Handle memory leak in IE
-            this.onload = this.onreadystatechange = null;
-            header.removeChild( this );
+          this.done = true;
+          async_load_js(header, ar);
+          // Handle memory leak in IE
+          this.onload = this.onreadystatechange = null;
+          header.removeChild( this );
         }
       });
       s.onerror = (function() { 
-          // Handle memory leak in IE
-          this.onload = this.onreadystatechange = null;
-          header.removeChild(this); 
-          async_load_js(header, ar);
+        // Handle memory leak in IE
+        this.onload = this.onreadystatechange = null;
+        header.removeChild(this); 
+        async_load_js(header, ar);
       });
         
       // 获取head结点，并将<script>插入到其中  
@@ -331,20 +303,9 @@
     // get Browser
     //为Firefox下的DOM对象增加innerText属性
     if(Q.isNS6()) { //firefox innerText define
-      HTMLElement.prototype.__defineGetter__( "innerText",
-        function(){  return this.textContent;  }
-      );
-      HTMLElement.prototype.__defineSetter__( "innerText",
-        function(sText){ this.textContent=sText; }
-      );
-
-      HTMLElement.prototype.__defineGetter__("currentStyle", 
-        function () {
-          //getComputedStyle 目标对象，属性。
-          //return this.ownerDocument.defaultView.getComputedStyle(this, ":first-line");
-          return this.ownerDocument.defaultView.getComputedStyle(this, null);
-        }
-      );
+      HTMLElement.prototype.__defineGetter__("innerText",    function() { return this.textContent; });
+      HTMLElement.prototype.__defineSetter__("innerText",    function(sText) { this.textContent=sText; });
+      HTMLElement.prototype.__defineGetter__("currentStyle", function () { return this.ownerDocument.defaultView.getComputedStyle(this, null); });
       // 兼容ff，ie的鼠标按键值
       Q.LBUTTON  = 0;
       Q.MBUTTON  = 1;
@@ -358,15 +319,6 @@
         if(t.length != 2) { continue; }
         _querystring[t[0]] = t[1];
       }
-    }
-    // 解析地址页面的查询字段
-    var querystring = location.search.toString();
-    querystring = querystring.substring(1, querystring.length);
-    var queryMap = querystring.split('&');
-    for(var i=0; i < queryMap.length; i++) {
-      var t = queryMap[i].split('=');
-      if(t.length != 2) { continue; }
-      _querystring[t[0]] = t[1];
     }
 
     jsloader();

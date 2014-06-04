@@ -641,10 +641,33 @@ function $CreateWindowTitlebar(hwnd)  {
 
 
 function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, app){
-  var hwnd = document.createElement('DIV');
+  // check window style
+	var wstyle = ws || CONST.STYLE_DEFAULT;
+	var container = null;
+
+  if( !$IsWindow(parent_wnd) ) 
+    parent_wnd = $GetDesktopWindow();
+ 
+  if($IsDesktopWindow(parent_wnd)) {
+	  if($IsStyle(wstyle, CONST.STYLE_CHILD)) {
+      // ps: 桌面装口不能创建STYLE_CHILD样式的窗口
+			return null;
+		} else {
+		  container = $GetDesktopWindow();
+		}
+	} else {
+	  if($IsStyle(wstyle, CONST.STYLE_CHILD)) {
+	    container = $GetClient(parent_wnd)
+		}	else {
+		  container = $GetDesktopWindow();
+		}
+	}
+	// 创建窗口
+	var hwnd = document.createElement('DIV');
   // user data
   hwnd.setAttribute('__QWindow__', true);  // 设置QWindow标记，用于$IsWindow方法
   hwnd.wstyle       = ws || CONST.STYLE_DEFAULT;  // 窗口样式
+	hwnd.parent_wnd = parent_wnd;
   hwnd.wnds         = new Q.LIST();   // 窗口
   hwnd.drag_objects = new Q.LIST();
   hwnd.active_child   = null;  // 当前活动的子窗口句柄
@@ -677,25 +700,14 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   hwnd.style.left   = pos_left + 'px';
   hwnd.style.width  = width + 'px'; 
   hwnd.style.height = height + 'px';
-
-  var container = null;
-
-  if( !$IsWindow(parent_wnd) ) {
-    container  = $GetDesktopWindow();
-    parent_wnd = $GetDesktopWindow();
-  }
-
-  if( !$IsDesktopWindow(parent_wnd) && $IsStyle(hwnd.wstyle, CONST.STYLE_CHILD) ) { 
-    container = $GetClient(parent_wnd);
-  }
- 
-  // render 
-  container.appendChild(hwnd);
-  // set parent
-  hwnd.parent_wnd = parent_wnd;
-  // register to wnds
-  $GetWnds(parent_wnd).append(hwnd);
   
+	// register to wnds
+	if( (!$IsDesktopWindow(hwnd.parent_wnd)) && $IsStyle(hwnd.wstyle, CONST.STYLE_CHILD) ) { 
+    $GetWnds(parent_wnd).append(hwnd);
+  } else {
+	  $GetWnds($GetDesktopWindow()).append(hwnd);
+	}
+ 
   // 主窗口
   //if( !$IsStyle(ws, CONST.STYLE_FIXED) ) {
   //  $MakeResizable(hwnd);
@@ -728,6 +740,9 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   $SetWindowStyle(hwnd, ws);
   $BindWindowMessage(hwnd, MESSAGE.CREATE)();
   
+	// render 
+  container.appendChild(hwnd);
+
   return hwnd;
 }
 

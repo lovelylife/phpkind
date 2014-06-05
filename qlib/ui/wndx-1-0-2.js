@@ -188,17 +188,17 @@ function $ActivateWindow(wndNode) {
 
   // 保存当前激活窗口
   var active_child = $GetActiveChild($GetDesktopWindow());
-   
   var p = wndNode;
+  
   var is_child_of_active_window = false;
-  while(p && p != __GLOBALS.desktop) {
+  while(p && p != $GetDesktopContainer()) {
     if(p == active_child) {
       is_child_of_active_window = true;
       break;
     }
-    p = $GetParentWindow(p);
+    p = $GetParentContainer(p);
   }
-
+  
   // 为当前窗口的激活窗口
   var parent = $GetParentWindow(wndNode);
   if(is_child_of_active_window) {
@@ -351,9 +351,11 @@ function $SetActiveChild(wndNode, child) { wndNode.active_child = child; }
   windows APIs Get Methods
 -------------------------------------------------------------------*/
 
+function $GetDesktopContainer()    { return __GLOBALS.desktop;   }
 function $GetDesktopWindow()       { return __GLOBALS.desktop;   }
 function $GetMaskWindow(wndNode)   { return wndNode.wnd_mask;    }
 function $GetActiveChild(wndNode)  { return wndNode.active_child;}
+function $GetParentContainer(wndNode) { return wndNode.parent_container;  }
 function $GetParentWindow(wndNode) { return wndNode.parent_wnd;  }
 function $GetWnds(wndNode)         { return wndNode.wnds;        }
 function $GetMinCtrlButton(wndNode){ return wndNode.hTitle.hMin; }
@@ -644,7 +646,7 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   // check window style
 	var wstyle = ws || CONST.STYLE_DEFAULT;
 	var container = null;
-
+  var container_wnds = null;
   if( !$IsWindow(parent_wnd) ) 
     parent_wnd = $GetDesktopWindow();
  
@@ -654,12 +656,15 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
 			return null;
 		} else {
 		  container = $GetDesktopWindow();
+		  container_wnds = $GetWnds($GetDesktopWindow());
 		}
 	} else {
 	  if($IsStyle(wstyle, CONST.STYLE_CHILD)) {
 	    container = $GetClient(parent_wnd)
+		  container_wnds = $GetWnds(parent_wnd);
 		}	else {
 		  container = $GetDesktopWindow();
+		  container_wnds = $GetWnds($GetDesktopWindow());
 		}
 	}
 	// 创建窗口
@@ -667,7 +672,8 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   // user data
   hwnd.setAttribute('__QWindow__', true);  // 设置QWindow标记，用于$IsWindow方法
   hwnd.wstyle       = ws || CONST.STYLE_DEFAULT;  // 窗口样式
-	hwnd.parent_wnd = parent_wnd;
+	hwnd.parent_wnd   = parent_wnd;
+  hwnd.parent_container = container;
   hwnd.wnds         = new Q.LIST();   // 窗口
   hwnd.drag_objects = new Q.LIST();
   hwnd.active_child   = null;  // 当前活动的子窗口句柄
@@ -702,11 +708,7 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   hwnd.style.height = height + 'px';
   
 	// register to wnds
-	if( (!$IsDesktopWindow(hwnd.parent_wnd)) && $IsStyle(hwnd.wstyle, CONST.STYLE_CHILD) ) { 
-    $GetWnds(parent_wnd).append(hwnd);
-  } else {
-	  $GetWnds($GetDesktopWindow()).append(hwnd);
-	}
+	container_wnds.append(hwnd);
  
   // 主窗口
   //if( !$IsStyle(ws, CONST.STYLE_FIXED) ) {
@@ -747,6 +749,23 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
 }
 
 function $DestroyWindow(wndNode){
+  // child wnd in desktop wnds
+  var top_wnds = $GetWnds($GetDesktopWindow());
+  top_wnds.each(function(wnd) {
+    if($GetParentWindow(wnd) == wndNode) {
+      $BindWindowMessage(wnd, MESSAGE.CLOSE)();
+      top_wnds.erase(wnd);
+    }
+    return true; 
+  });
+ 
+  // child wnd in wnds 
+  var child_wnds = $GetWnds(wndNode);
+  child_wnds.each(function(wnd) {
+    $BindWindowMessage(wnd, MESSAGE.CLOSE)();
+    return true;
+  });
+
   var parent_wnd = $GetParentWindow(wndNode);
   wndNode.parentNode.removeChild(wndNode);
   wndNode = 0;

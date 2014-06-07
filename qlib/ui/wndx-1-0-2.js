@@ -71,11 +71,8 @@ Q.Ready(function() {
   __GLOBALS.desktop = document.body;
   __GLOBALS.desktop.wnds   = new Q.LIST();  // popups windows
   __GLOBALS.desktop.active_child = null;
-  __GLOBALS.desktop.wnd_mask = document.createElement('DIV');
-  __GLOBALS.desktop.wnd_mask.className = 'clsMaskWindow alpha_5';
-  __GLOBALS.desktop.appendChild(__GLOBALS.desktop.wnd_mask);
-  __GLOBALS.desktop.wnd_mask.style.display = 'none';
   __GLOBALS.explorer = new Q.UIApplication();
+  $CreateMaskLayer(__GLOBALS.desktop);
   (new __DRAGWND());
 
 }, true);
@@ -133,7 +130,32 @@ function $BindWindowMessage(wndNode, messageid, parameters) {
 function $IsDesktopWindow(wndNode) { return (__GLOBALS.desktop == wndNode); }
 function $IsWindow(wndNode)        { return (!$IsNull(wndNode)) && (wndNode.nodeType == Q.ELEMENT_NODE) && wndNode.getAttribute('__QWindow__');}
 function $IsMaxWindow(wndNode)     { return ($IsStyle($GetWindowStyle(wndNode), CONST.STYLE_MAX) && (CONST.SIZE_MAX == $GetWindowStatus(wndNode))); }
-function $CreateMaskWindow()       {}
+
+function $CreateMaskLayer(wndNode) {
+  wndNode.layer_mask = document.createElement('DIV');
+  wndNode.layer_mask.className = 'clsMaskWindow alpha_1';
+  wndNode.appendChild(wndNode.layer_mask);
+  wndNode.layer_mask.style.display = 'none';
+  wndNode.layer_mask.onmousedown = Q.bind_handler(wndNode, function(evt) { 
+    evt = evt || window.event;
+    var t = this;
+    while(t && t.modal_next) {
+      $ActivateWindow(t);
+      t = t.modal_next;
+    }
+    $ActivateWindow(t);
+    $GetClient(t).innerText = 'mask pop'
+    // 取消事件冒泡，防止ActivateWindow被调用到
+    evt.cancelBubble = true;
+    return false; 
+  });
+  wndNode.layer_mask.onselectstart = function() { return false; }
+}
+
+function $MaskWindow(wndNode, bmask) {
+  bmask = !!bmask;
+  $GetMask(wndNode).style.display=bmask?'' : 'none';
+}
 
 function $ShowWindow(wndNode, ws)  {
   if( ws == CONST.SW_SHOW ){
@@ -142,7 +164,7 @@ function $ShowWindow(wndNode, ws)  {
       $ActivateWindow(wndNode);
   } else if( ws == CONST.SW_HIDE ) {
     wndNode.style.display = 'none';
-    //$MaskWindow(wndNode, false);
+    $MaskWindow(wndNode, false);
   }
 }
 
@@ -174,7 +196,7 @@ RootWindow (__GLOBALS.desktop)
  [active_child = $GetActiveChild($GetDesktopWindow())]
  [is child of active_child]
     | 
-    |        N                 [SetWindowActive(active_child, false)]
+    |         N                 [SetWindowActive(active_child, false)]
     +------------------------- [SetActiveChild($GetDesktopWindow(), wndNode)]
     |                          [SetWindowActive(wndNode, true)]
     |
@@ -201,7 +223,6 @@ function $ActivateWindow(wndNode) {
     p = $GetContainerWindow(p);
   }
   
-  // 为当前窗口的激活窗口
   var parent_container = $GetContainerWindow(wndNode);
   if(is_child_of_active_window) {
     var active_sibling = $GetActiveChild(parent_container);
@@ -348,7 +369,7 @@ function $SetActiveChild(wndNode, child) { wndNode.active_child = child; }
 
 function $GetDesktopContainer()    { return __GLOBALS.desktop;   }
 function $GetDesktopWindow()       { return __GLOBALS.desktop;   }
-function $GetMaskWindow(wndNode)   { return wndNode.wnd_mask;    }
+function $GetMask(wndNode)         { return wndNode.layer_mask;  }
 function $GetActiveChild(wndNode)  { return wndNode.active_child;}
 function $GetContainerWindow(wndNode) { return wndNode.container_wnd;  }
 function $GetParentWindow(wndNode) { return wndNode.parent_wnd;  }
@@ -553,7 +574,16 @@ function $DefaultWindowProc(hwnd, msg, data) {
     break;  
   
   case MESSAGE.ACTIVATE:
-    $ActivateWindow(hwnd);
+    {
+      var t = hwnd;
+      while(t && t.modal_prev) 
+        t = t.modal_prev;
+      while(t && t.modal_next) { 
+        $ActivateWindow(t); 
+        t = t.modal_next; 
+      }  
+      $ActivateWindow(t);
+    }
     break;  
   }
 }
@@ -628,7 +658,6 @@ function $CreateWindowTitlebar(hwnd)  {
 
 
 function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, app){
-  // check window style
 	var wstyle = ws || CONST.STYLE_DEFAULT;
 	var container = null;
 	var container_wnd = null;
@@ -643,17 +672,14 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
 		} else {
 		  container = $GetDesktopWindow();
 		  container_wnd = $GetDesktopWindow();
-		  container_wnds = $GetWnds($GetDesktopWindow());
 		}
 	} else {
 	  if($IsStyle(wstyle, CONST.STYLE_CHILD)) {
 	    container = $GetClient(parent_wnd)
 	    container_wnd = parent_wnd;
-		  container_wnds = $GetWnds(parent_wnd);
 		}	else {
 		  container = $GetDesktopWindow();
 		  container_wnd = $GetDesktopWindow();
-		  container_wnds = $GetWnds($GetDesktopWindow());
 		}
 	}
 	// 创建窗口
@@ -663,9 +689,11 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   hwnd.wstyle       = ws || CONST.STYLE_DEFAULT;  // 窗口样式
 	hwnd.parent_wnd   = parent_wnd;
   hwnd.container_wnd = container_wnd;
+  hwnd.modal_next   = null;
+  hwnd.model_prev   = null;  
   hwnd.wnds         = new Q.LIST();   // 窗口
   hwnd.drag_objects = new Q.LIST();
-  hwnd.active_child   = null;  // 当前活动的子窗口句柄
+  hwnd.active_child = null; 
   hwnd.title_text   = title || 'untitled';
   hwnd.status_type  = CONST.SIZE_NORMAL;
   hwnd.wnd_proc     = $DefaultWindowProc;
@@ -697,7 +725,7 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   hwnd.style.height = height + 'px';
   
 	// register to wnds
-	container_wnds.append(hwnd);
+	$GetWnds(container_wnd).append(hwnd);
  
   // 主窗口
   //if( !$IsStyle(ws, CONST.STYLE_FIXED) ) {
@@ -721,13 +749,8 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   hwnd.appendChild(hwnd.hBottomBar);
 
   // mask window
-  hwnd.wnd_mask = document.createElement('DIV');  //用来屏蔽鼠标
-  hwnd.wnd_mask.className = 'clsMaskWindow alpha_5';
-  hwnd.wnd_mask.onclick = function() { }
-  hwnd.wnd_mask.onselectstart = function() { return false; }
-  hwnd.appendChild(hwnd.wnd_mask);
-  hwnd.wnd_mask.style.display = 'none';
-
+  $CreateMaskLayer(hwnd);
+  
   $SetWindowStyle(hwnd, ws);
   $BindWindowMessage(hwnd, MESSAGE.CREATE)();
   
@@ -766,7 +789,9 @@ function $DestroyWindow(wndNode) {
 
   // 激活相邻窗口 
   var wnd = $GetTopZIndexWindow(parent_container);
-  if( $IsWindow(wnd) ) {
+  if($IsNull(wnd)) {
+    $SetActiveChild(parent_container, null);
+  } else if( $IsWindow(wnd) ) {
     $ActivateWindow(wnd);
   } else {
     $ActivateWindow(parent_container);
@@ -1096,6 +1121,10 @@ construct : function(config) {
 window_proc : function(msgid, json) {
   switch(msgid) {
   case MESSAGE.CLOSE:
+    $MaskWindow(this.hwnd.modal_prev, false);
+    this.hwnd.modal_prev.modal_next = null;
+    this.hwnd.modal_prev = null;
+
     break;
   }
 
@@ -1116,17 +1145,18 @@ add_bottom_button : function(text, className, lpfunc) {
   btn.className = className;
 },
 
-domodal : function() {
-  var parent_wnd = $GetParentWindow(this.hwnd);
-  //if(parent != $GetDesktopWindow()) {
-//    console.log('domodal window');
-//    $MaskWindow(parent_wnd, true);
-//    parent_wnd.modalWnd = this.hwnd;
-  //}
-  var _this = this;
-  //this.hwnd.close.onclick = function() {
-  //   _this.end_dialog(CONST.IDCANCEL); 
-  //};
+domodal : function(wndNode) {
+  Q.printf('domodal window');
+  if($IsNull(wndNode)) {
+    wndNode = $GetActiveChild($GetDesktopWindow());
+    if($IsNull(wndNode)) {
+      wndNode = $GetDesktopWindow();
+    }
+  }
+  $MaskWindow(wndNode, true);
+  wndNode.modal_next = this.hwnd;
+  this.hwnd.modal_prev = wndNode;
+  
   this.show(true);
   $ResizeTo(this.hwnd, this.hwnd.nWidth, this.hwnd.nHeight);
   this.center();
@@ -1178,15 +1208,15 @@ Q.MessageBox = function(config) {
     
   if( $IsWithStyle(MSGBOX_NO, config.bstyle) ) {
     dlg.add_bottom_button('  否  ', 'sysbtn', Q.bind_handler(dlg, function(){
-        if(dlg.onno){ dlg.onno(); }
-        dlg.end_dialog();
+        if(this.onno){ this.onno(); }
+        this.end_dialog();
       }))
   }
 
   if( $IsWithStyle(MSGBOX_CANCEL, config.bstyle) ) {
     dlg.add_bottom_button(' 取消 ', 'syscancelbtn', Q.bind_handler(dlg,  function(){
-        if(dlg.oncancel){ dlg.oncancel(); }
-        dlg.end_dialog();
+        if(this.oncancel){ this.oncancel(); }
+        this.end_dialog();
       }))
   }
 

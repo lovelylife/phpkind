@@ -57,9 +57,6 @@ var CONST = {
 
 CONST.STYLE_DEFAULT = CONST.STYLE_TITLE|CONST.STYLE_ICON|CONST.STYLE_MAX|CONST.STYLE_MIN|CONST.STYLE_CLOSE;
 
-/*-------------------------------------------------------------------------
-  you must defined the function MessageProcedure in the handle as a memeber
----------------------------------------------------------------------------*/
 var __GLOBALS = {};
 __GLOBALS.MIN_HEIGHT = 32;
 __GLOBALS.MIN_WIDTH  = 100;
@@ -163,29 +160,34 @@ RootWindow (__GLOBALS.desktop)
  +-------------- Window 3
 
  桌面窗口           __GLOBALS.desktop (document.body) 
- 桌面窗口的子窗口   TopWindow (QWindow)
+ 桌面窗口的Popup样式的窗口   PopupWindow (QWindow)
  窗口激活流程如下
  
  [wndNode] 
     |
  [$IsWindow]   
-    | No
-    +---------> [return]
-    | Yes
- [$GetTopWindow(wndNode) == __GLOBALS.desktop.active_child]
-    | No
-    |                          [SetWindowActive(__GLOBALS.desktop.active_child, false)]
-    +------------------------- [__GLOBALS.desktop.active_child = $GetTopWindow(wndNode)]
-    |                          [SetWindowActive(__GLOBALS.desktop.active_child, true)]
+    |         N
+    +----------------> [return]
+    |
+    | Y
+    | 
+ [active_child = $GetActiveChild($GetDesktopWindow())]
+ [is child of active_child]
+    | 
+    |        N                 [SetWindowActive(active_child, false)]
+    +------------------------- [SetActiveChild($GetDesktopWindow(), wndNode)]
+    |                          [SetWindowActive(wndNode, true)]
     |
     |
     | Yes
+ [$SetWindowActive(Sibling, false)]
  [$SetWindowActive(wndNode, true)]
 
 ------------------------------------------------------*/
 function $ActivateWindow(wndNode) {
-  if( !$IsWindow(wndNode)) { return; }
-
+  if(!$IsWindow(wndNode))
+    return;
+  Q.printf("active window " + $GetTitleText(wndNode));
   // 保存当前激活窗口
   var active_child = $GetActiveChild($GetDesktopWindow());
   var p = wndNode;
@@ -196,48 +198,41 @@ function $ActivateWindow(wndNode) {
       is_child_of_active_window = true;
       break;
     }
-    p = $GetParentContainer(p);
+    p = $GetContainerWindow(p);
   }
   
   // 为当前窗口的激活窗口
-  var parent = $GetParentWindow(wndNode);
+  var parent_container = $GetContainerWindow(wndNode);
   if(is_child_of_active_window) {
-    var active_sibling = $GetActiveChild(parent);
+    var active_sibling = $GetActiveChild(parent_container);
     if(wndNode == active_sibling) {
+      $SetWindowActive(wndNode, true);
       return;
     } else {
       // deactive sibling, active self
+      $SetActiveChild(parent_container, wndNode);
       $SetWindowActive(active_sibling, false);
       $SetWindowActive(wndNode, true);
       
-      // z
+      // zIndex
       var z_active_child = $GetWindowZIndex(active_sibling);
       $SetWindowZIndex(wndNode, z_active_child + 1);
-      parent.active_child = wndNode;
     }
   } else {
-    var top_window = $GetTopWindow(wndNode);
-    __GLOBALS.desktop.active_child = top_window;
-    $SetWindowActive(active_child, false);
+    $SetActiveChild($GetDesktopWindow(), wndNode);
     $SetWindowActive(wndNode, true);
+    $SetWindowActive(active_child, false);
       
-    // z
+    // zIndex
     var z_active_child = $GetWindowZIndex(active_child);
-    $SetWindowZIndex(top_window, z_active_child + 1);
+    $SetWindowZIndex(wndNode, z_active_child + 1);
   }
 }
 
 function $SetWindowActive(wndNode, IsActive){
-  if(!$IsWindow(wndNode) || (wndNode == $GetDesktopWindow())) {  return; }
   var style;
   style = (IsActive) ? 'clsActiveTitle' : 'clsNoActiveTitle';
   
-  var p = $GetParentWindow(wndNode);
-  while(p && p != $GetDesktopWindow()) {
-    $GetTitle(p).className = style;
-    p = $GetParentWindow(p);
-  }
-
   var active_child = wndNode;
   while(active_child) {
     $GetTitle(active_child).className = style;
@@ -248,14 +243,14 @@ function $SetWindowActive(wndNode, IsActive){
 function $MaxizeWindow(wndNode){
   var ws = $GetWindowStyle(wndNode);
   if( $GetWindowStatus(wndNode) == CONST.SIZE_MAX ) { return; };
-  var parent = $GetParentWindow(wndNode);
+  var parent_container = $GetContainerWindow(wndNode);
   var width, height;
-    if( parent == document.body ) {
+  if( parent_container == document.body ) {
     width = Math.max(document.body.clientWidth, document.body.scrollWidth);
     height = Math.max(document.body.clientHeight, document.body.scrollHeight);
-  } else if( $IsWindow(parent) ) {
-    width  = Math.max($GetClient(parent).clientWidth, $GetClient(parent).scrollWidth);
-    height = Math.max($GetClient(parent).clientHeight, $GetClient(parent).scrollHeight);
+  } else if( $IsWindow(parent_container) ) {
+    width  = Math.max($GetClient(parent_container).clientWidth, $GetClient(parent_container).scrollWidth);
+    height = Math.max($GetClient(parent_container).clientHeight, $GetClient(parent_container).scrollHeight);
   } else {  return;  }
   $ChangeCtrlButton(wndNode, CONST.SIZE_MAX, CONST.SIZE_NORMAL);
   $SetWindowPosition(wndNode, 0, 0, width, height);
@@ -355,11 +350,12 @@ function $GetDesktopContainer()    { return __GLOBALS.desktop;   }
 function $GetDesktopWindow()       { return __GLOBALS.desktop;   }
 function $GetMaskWindow(wndNode)   { return wndNode.wnd_mask;    }
 function $GetActiveChild(wndNode)  { return wndNode.active_child;}
-function $GetParentContainer(wndNode) { return wndNode.parent_container;  }
+function $GetContainerWindow(wndNode) { return wndNode.container_wnd;  }
 function $GetParentWindow(wndNode) { return wndNode.parent_wnd;  }
 function $GetWnds(wndNode)         { return wndNode.wnds;        }
 function $GetMinCtrlButton(wndNode){ return wndNode.hTitle.hMin; }
 function $GetMaxCtrlButton(wndNode){ return wndNode.hTitle.hMax; }
+function $GetTitleText(wndNode)    { return wndNode.title_text;  }
 function $GetTitleContent(wndNode) { return wndNode.hTitleContent; }
 function $GetTitle(wndNode)        { return wndNode.hTitle;      }
 function $GetBottomBar(wndNode)    { return wndNode.hBottomBar;  }
@@ -405,17 +401,6 @@ function $GetTopZIndexWindow(){
   }); 
   
   return top_wnd;
-}
-
-function $GetTopWindow(wndNode) {
-  var top_window = wndNode;
-  var p = $GetParentWindow(wndNode);
-  while(p && p != $GetDesktopWindow()) {
-      top_window = p;
-      p = $GetParentWindow(p);
-  }
-
-  return top_window;
 }
 
 function $GetRect(wndNode) {
@@ -646,6 +631,7 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   // check window style
 	var wstyle = ws || CONST.STYLE_DEFAULT;
 	var container = null;
+	var container_wnd = null;
   var container_wnds = null;
   if( !$IsWindow(parent_wnd) ) 
     parent_wnd = $GetDesktopWindow();
@@ -656,14 +642,17 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
 			return null;
 		} else {
 		  container = $GetDesktopWindow();
+		  container_wnd = $GetDesktopWindow();
 		  container_wnds = $GetWnds($GetDesktopWindow());
 		}
 	} else {
 	  if($IsStyle(wstyle, CONST.STYLE_CHILD)) {
 	    container = $GetClient(parent_wnd)
+	    container_wnd = parent_wnd;
 		  container_wnds = $GetWnds(parent_wnd);
 		}	else {
 		  container = $GetDesktopWindow();
+		  container_wnd = $GetDesktopWindow();
 		  container_wnds = $GetWnds($GetDesktopWindow());
 		}
 	}
@@ -673,7 +662,7 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   hwnd.setAttribute('__QWindow__', true);  // 设置QWindow标记，用于$IsWindow方法
   hwnd.wstyle       = ws || CONST.STYLE_DEFAULT;  // 窗口样式
 	hwnd.parent_wnd   = parent_wnd;
-  hwnd.parent_container = container;
+  hwnd.container_wnd = container_wnd;
   hwnd.wnds         = new Q.LIST();   // 窗口
   hwnd.drag_objects = new Q.LIST();
   hwnd.active_child   = null;  // 当前活动的子窗口句柄
@@ -748,33 +737,39 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   return hwnd;
 }
 
-function $DestroyWindow(wndNode){
-  // child wnd in desktop wnds
-  var top_wnds = $GetWnds($GetDesktopWindow());
-  top_wnds.each(function(wnd) {
-    if($GetParentWindow(wnd) == wndNode) {
-      $BindWindowMessage(wnd, MESSAGE.CLOSE)();
-      top_wnds.erase(wnd);
-    }
-    return true; 
-  });
- 
-  // child wnd in wnds 
+function $DestroyWindow(wndNode) {
+  // 清除子窗口
   var child_wnds = $GetWnds(wndNode);
   child_wnds.each(function(wnd) {
     $BindWindowMessage(wnd, MESSAGE.CLOSE)();
     return true;
   });
 
-  var parent_wnd = $GetParentWindow(wndNode);
+  // 清除弹出的子窗口
+  var parent_container = $GetContainerWindow(wndNode);
+  var parent_wnds = $GetWnds(parent_container);
+  parent_wnds.each(function(wnd) { 
+    if($GetParentWindow(wnd) == wndNode) 
+      $BindWindowMessage(wnd, MESSAGE.CLOSE)();
+    return true;
+  });
+
+  // 从父容器中清除自己
+  //Q.printf("Number Of Wnds is " + parent_wnds.len()); 
+  parent_wnds.erase(wndNode); 
+  //Q.printf("erase after 2 Number Of Wnds is " + parent_wnds.len()); 
+
+  // 删除渲染节点delete dom   
+  wndNode.setAttribute('__QWindow', null);
   wndNode.parentNode.removeChild(wndNode);
   wndNode = 0;
 
-  var wnd = $GetTopZIndexWindow(parent_wnd);
+  // 激活相邻窗口 
+  var wnd = $GetTopZIndexWindow(parent_container);
   if( $IsWindow(wnd) ) {
     $ActivateWindow(wnd);
   } else {
-    $ActivateWindow(parent_wnd);
+    $ActivateWindow(parent_container);
   }
 }
 

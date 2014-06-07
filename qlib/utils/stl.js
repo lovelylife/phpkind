@@ -6,8 +6,8 @@
 Q.NODE = Q.extend({
   next : null,
   prev : null,
-  key  : null,
-  construct : function(key) { this.key = key; }
+  data  : null,
+  construct : function(data) { this.data = data; }
 });
 
 Q.LIST = Q.extend({
@@ -18,18 +18,18 @@ construct : function() {},
 begin :    function() {  return this.head; },  // not head  use as STL
 end :      function() {  return null;  },
 len :      function() {  return this.length;  },
-item :     function() {  return this.current.key; },
+item :     function() {  return this.current.data; },
 
 each : function(callback) {
   if(typeof callback == 'function') {
     for(var node = this.begin(); node != this.end(); node = node.next) {
-      if(!callback(node.key)) break;
+      if(!callback(node.data)) break;
     }
   }
 },
 
-append : function(key){
-  var node = new Q.NODE(key);
+append : function(data){
+  var node = new Q.NODE(data);
   if(!this.head) {
     this.head = node;
   } else {
@@ -42,8 +42,8 @@ append : function(key){
   this.length++;
 },
   
-erase : function(key){
-  var node = this.find(key);
+erase : function(data){
+  var node = this.find(data);
   if( node ) { 
     if(node != this.head) {
       if(node.prev)
@@ -68,9 +68,9 @@ clear : function(){
   }
 },
   
-find : function(key){
+find : function(data){
   for(var node = this.begin(); node != this.end(); node = node.next){
-    if( node.key == key )  return node;
+    if( node.data == data )  return node;
   }
   return null;
 },
@@ -79,7 +79,7 @@ toString : function(){
   var i = 0;
   var str = "";
   for(var node = this.begin(); node != this.end(); node = node.next){
-    str += "Node["+i+"]: " + node.key + "\n";
+    str += "Node["+i+"]: " + node.data + "\n";
     i++;
   }
   return str;

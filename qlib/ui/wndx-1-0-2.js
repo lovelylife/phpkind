@@ -6,21 +6,13 @@
  $ 邮件：Life.qm@gmail.com
  $ 版权: 请勿擅自修改版权和作者
  $ powered by Javascript经典专区[http://jshtml.com] All rights reservered.
-
- 1. 解决窗口拖动时，鼠标位置
- 2. 改进模式对话框遮罩问题
- 3. 去除XML方式加载资源
 ----------------------------------------------------------------------------------*/
 
 // global const variables definition
 var CONST = {
-/*-------------WINDOWS DEFINE -----------------------------*/
   SW_SHOW:           0x0001,
   SW_HIDE:           0x0000,
 
-/*----------------------------------------------
-  STYLE: |0|0|0|0|0|0|0|0|
-  ----------------------------------------------*/
 // window style
   STYLE_TITLE:     0x00000001,
   STYLE_MENU :     0x00000002,
@@ -66,7 +58,7 @@ __GLOBALS.appid      = -1;
 __GLOBALS.apps       = {};
 
 
-// global windows  
+// global windows intitalize  
 Q.Ready(function() {
   __GLOBALS.desktop = document.body;
   __GLOBALS.desktop.wnds   = new Q.LIST();  // popups windows
@@ -103,9 +95,8 @@ construct : function(params) {
   this.wnds_map = new Q.LIST();
 },
 
-add_window : function(wndNode)   { this.wnds_map.append(wndNode); },
+add_window   : function(wndNode) { this.wnds_map.append(wndNode); },
 erase_window : function(wndNode) { this.wnds_map.erase(wndNode); },
-
 });
 
 //  Q.Application end
@@ -117,11 +108,6 @@ erase_window : function(wndNode) { this.wnds_map.erase(wndNode); },
 function $IsNull(statement) { return  (statement == null); }
 function $IsStyle(cs, style) { return ((cs & style) == style); }
 function $IsWithStyle(style, wstyle) { return ((style & wstyle) == style); }
-function $BindWindowMessage(wndNode, messageid, parameters) {
-  return function() {
-    wndNode.wnd_proc(wndNode, messageid, parameters);
-  }
-} 
 
 
 /*-----------------------------------------------------------------
@@ -130,7 +116,13 @@ function $BindWindowMessage(wndNode, messageid, parameters) {
 function $IsDesktopWindow(wndNode) { return (__GLOBALS.desktop == wndNode); }
 function $IsWindow(wndNode)        { return (!$IsNull(wndNode)) && (wndNode.nodeType == Q.ELEMENT_NODE) && wndNode.getAttribute('__QWindow__');}
 function $IsMaxWindow(wndNode)     { return ($IsStyle($GetWindowStyle(wndNode), CONST.STYLE_MAX) && (CONST.SIZE_MAX == $GetWindowStatus(wndNode))); }
+function $BindWindowMessage(wndNode, messageid, parameters) {
+  return function() {
+    wndNode.wnd_proc(wndNode, messageid, parameters);
+  }
+} 
 
+function $MaskWindow(wndNode, bmask) { $GetMask(wndNode).style.display=(!!bmask)?'':'none'; }
 function $CreateMaskLayer(wndNode) {
   wndNode.layer_mask = document.createElement('DIV');
   wndNode.layer_mask.className = 'clsMaskWindow alpha_1';
@@ -138,13 +130,7 @@ function $CreateMaskLayer(wndNode) {
   wndNode.layer_mask.style.display = 'none';
   wndNode.layer_mask.onmousedown = Q.bind_handler(wndNode, function(evt) { 
     evt = evt || window.event;
-    var t = this;
-    while(t && t.modal_next) {
-      $ActivateWindow(t);
-      t = t.modal_next;
-    }
-    $ActivateWindow(t);
-    $GetClient(t).innerText = 'mask pop'
+    $BindWindowMessage(this, MESSAGE.ACTIVATE)();
     // 取消事件冒泡，防止ActivateWindow被调用到
     evt.cancelBubble = true;
     return false; 
@@ -152,16 +138,10 @@ function $CreateMaskLayer(wndNode) {
   wndNode.layer_mask.onselectstart = function() { return false; }
 }
 
-function $MaskWindow(wndNode, bmask) {
-  bmask = !!bmask;
-  $GetMask(wndNode).style.display=bmask?'' : 'none';
-}
-
 function $ShowWindow(wndNode, ws)  {
   if( ws == CONST.SW_SHOW ){
     wndNode.style.display = '';
-    if( $IsWindow(wndNode) )
-      $ActivateWindow(wndNode);
+    $ActivateWindow(wndNode);
   } else if( ws == CONST.SW_HIDE ) {
     wndNode.style.display = 'none';
     $MaskWindow(wndNode, false);
@@ -213,7 +193,6 @@ function $ActivateWindow(wndNode) {
   // 保存当前激活窗口
   var active_child = $GetActiveChild($GetDesktopWindow());
   var p = wndNode;
-  
   var is_child_of_active_window = false;
   while(p && p != $GetDesktopContainer()) {
     if(p == active_child) {
@@ -352,16 +331,9 @@ function $SaveRectForWindow(wndNode) {
     }
 }
 
-function $SetTitleWidth(wndNode, width){ $GetTitleContent(wndNode).style.width = width + 'px'; }
-function $SetTitleHeight(wndNode, height){ $GetTitleContent(wndNode).style.height= height+ 'px'; }
+function $SetActiveChild(wndNode, child)   { wndNode.active_child = child;  }
 function $SetWindowStatus(wndNode, status) { wndNode.status_type  = status; }
-function $SetWindowZIndex(wndNode, zIndex) {
-  if( isNaN(parseInt(zIndex)) ){
-    return;
-  }
-  wndNode.style.zIndex = zIndex;
-}
-function $SetActiveChild(wndNode, child) { wndNode.active_child = child; }
+function $SetWindowZIndex(wndNode, zIndex) { if( isNaN(parseInt(zIndex)) ) { return; } wndNode.style.zIndex = zIndex; }
 
 /*-----------------------------------------------------------------
   windows APIs Get Methods
@@ -383,13 +355,6 @@ function $GetBottomBar(wndNode)    { return wndNode.hBottomBar;  }
 function $GetWindowStatus(wndNode) { return wndNode.status_type; }
 function $GetWindowStyle(wndNode)  { return wndNode.wstyle;      }
 function $GetClient(wndNode)       { return wndNode.hClientArea; }
-function $GetCurrentActiveWindow() {
-  var wndNode = $GetDesktopWindow();
-  while(wndNode && $GetActiveChild(wndNode)) {
-    wndNode = $GetActiveChild(wndNode);
-  }
-  return wndNode;
-}
 
 function $GetWindowZIndex(wndNode){
   if(wndNode && wndNode.style && wndNode.style.zIndex) {
@@ -398,6 +363,7 @@ function $GetWindowZIndex(wndNode){
     return __GLOBALS.Z_INDEX;
   }
 }
+
 function $GetTopZIndexWindow(){
   var parent_wnd;
   if( arguments.length > 0 && $IsWindow(arguments[0]) ) {
@@ -424,22 +390,6 @@ function $GetTopZIndexWindow(){
   return top_wnd;
 }
 
-function $GetRect(wndNode) {
-  var top, left, bottom, right;
-  if(wndNode == __GLOBALS.desktop) {
-    top   = 0;
-    left   = 0;
-    bottom  = document.body.scrollHeight + top;
-    right  = document.body.scrollWidth + left;
-  } else {
-    top    = parseInt(wndNode.style.top, 10);
-    left  = parseInt(wndNode.style.left, 10);
-    bottom  = parseInt(wndNode.style.top, 10) + wndNode.style.offsetHeight;
-    right  = parseInt(wndNode.style.left, 10) + wndNode.style.offWidth;
-  }
-  return {top:top, left:left, bottom:bottom, right:right};
-}
-
 function $MoveTo(wndNode, x, y){
   wndNode.nTop = y;
   wndNode.nLeft = x;
@@ -459,20 +409,20 @@ function $ResizeTo(wndNode, width, height){
   wndNode.nHeight = height;
   wndNode.style.width = width + 'px';
   wndNode.style.height = height + 'px';
-  var client = $GetClient(wndNode);  // 重画客户区
-  // var title  = $GetTitle(wndNode);
-  var ws = $GetWindowStyle(wndNode);
-  var lastHeight = height;
-  
-  if( $IsStyle(ws, CONST.STYLE_TITLE)) {
-    lastHeight = lastHeight - $GetTitle(wndNode).offsetHeight;
-  }
 
-  if( $IsStyle(ws, CONST.STYLE_WITHBOTTOM)) {
-    lastHeight = lastHeight - ($GetBottomBar(wndNode).offsetHeight);
-  }
-  client.style.height = Math.max(lastHeight - 0, __GLOBALS.MIN_HEIGHT)+'px';
-  client.style.width = Math.max(width - 0, __GLOBALS.MIN_WIDTH) + 'px';
+  //var client = $GetClient(wndNode);  // 重画客户区
+  //var ws = $GetWindowStyle(wndNode);
+  //var lastHeight = height;
+  
+  //if( $IsStyle(ws, CONST.STYLE_TITLE)) {
+  //  lastHeight = lastHeight - $GetTitle(wndNode).offsetHeight;
+  //}
+
+  //if( $IsStyle(ws, CONST.STYLE_WITHBOTTOM)) {
+  //  lastHeight = lastHeight - ($GetBottomBar(wndNode).offsetHeight);
+  //}
+  //client.style.height = Math.max(lastHeight - 0, __GLOBALS.MIN_HEIGHT)+'px';
+  //client.style.width = Math.max(width - 0, __GLOBALS.MIN_WIDTH) + 'px';
 }
 
 function $GetWindowClientHeight() {
@@ -575,13 +525,19 @@ function $DefaultWindowProc(hwnd, msg, data) {
   
   case MESSAGE.ACTIVATE:
     {
+      Q.printf('DefaultWindowProc MESSAGE.ACTIVATE');
+      var top_wnd = $GetTopZIndexWindow($GetDesktopWindow());
+      var top_zindex = $GetWindowZIndex(top_wnd);
       var t = hwnd;
       while(t && t.modal_prev) 
         t = t.modal_prev;
       while(t && t.modal_next) { 
-        $ActivateWindow(t); 
+        //Q.printf('set zindex modal ' + $GetTitleText(t));
+        $SetWindowZIndex(t, ++top_zindex); 
         t = t.modal_next; 
-      }  
+      }
+
+      $SetWindowZIndex(t, ++top_zindex); 
       $ActivateWindow(t);
     }
     break;  
@@ -596,7 +552,6 @@ function $SetWindowProc(wndNode, new_window_proc) {
   }
 
   return null;
-
 }
 
 function $CreateCtrlButton(type) {
@@ -619,11 +574,8 @@ function $ChangeCtrlButton(wndNode, type, dsttype){
 function $CreateWindowTitlebar(hwnd)  {
   var hTitle = document.createElement('DIV');
   hTitle.className = 'clsActiveTitle';
-  hTitle.onselectstart = function(){return false;};
-  hTitle.ondblclick = function() {
-    Q.printf('WINDOW title dblclick');
-    $BindWindowMessage(hwnd, MESSAGE.MAX)();
-  }
+  hTitle.onselectstart = function() { return false; };
+  hTitle.ondblclick    = function() { Q.printf('WINDOW title dblclick'); $BindWindowMessage(hwnd, MESSAGE.MAX)(); }
 
   hTitle.hIcon = document.createElement('IMG');
   hTitle.hIcon.className = 'clsIcon';
@@ -659,9 +611,8 @@ function $CreateWindowTitlebar(hwnd)  {
 
 function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, app){
 	var wstyle = ws || CONST.STYLE_DEFAULT;
-	var container = null;
-	var container_wnd = null;
-  var container_wnds = null;
+	var container      = null;
+	var container_wnd  = null;
   if( !$IsWindow(parent_wnd) ) 
     parent_wnd = $GetDesktopWindow();
  
@@ -729,7 +680,7 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
  
   // 主窗口
   //if( !$IsStyle(ws, CONST.STYLE_FIXED) ) {
-  //  $MakeResizable(hwnd);
+    $MakeResizable(hwnd);
   //}
   
   $SaveRectForWindow(hwnd);
@@ -778,10 +729,7 @@ function $DestroyWindow(wndNode) {
   });
 
   // 从父容器中清除自己
-  //Q.printf("Number Of Wnds is " + parent_wnds.len()); 
   parent_wnds.erase(wndNode); 
-  //Q.printf("erase after 2 Number Of Wnds is " + parent_wnds.len()); 
-
   // 删除渲染节点delete dom   
   wndNode.setAttribute('__QWindow', null);
   wndNode.parentNode.removeChild(wndNode);
@@ -799,8 +747,7 @@ function $DestroyWindow(wndNode) {
 }
 
 function $MakeResizable(obj) {
-  return;
-  var d=7;
+  var d=11;
   var l,t,r,b,ex,ey,cur;
   // 这里存在内存泄露，不需要的时候Q.removeEvent
   // 由于FireFox的CaptureEvents不支持CaptureEvents指定的Element对象
@@ -812,13 +759,10 @@ function $MakeResizable(obj) {
     evt = evt || window.event;
     var status = $GetWindowStatus(obj);
     //Q.printf('mousedown out' + status);
-    if( (status != CONST.SIZE_MAX) 
-      && (evt.button == Q.LBUTTON)
-      && obj.style.cursor)
+    if( (status != CONST.SIZE_MAX) && (evt.button == Q.LBUTTON) && obj.style.cursor)
     {
       //Q.printf('mousedown in' + status);
       $SetWindowStatus(obj, CONST.SIZE_RESIZING);
-      
       if(obj.setCapture)
         obj.setCapture();
       else if(window.captureEvents)
@@ -829,9 +773,7 @@ function $MakeResizable(obj) {
   function mouseup(evt){
     evt = evt || window.event;
     var status = $GetWindowStatus(obj);
-      if( ( status != CONST.SIZE_MAX ) && 
-      ( status == CONST.SIZE_RESIZING ) && 
-      ( evt.button == Q.LBUTTON ) )
+    if( ( status != CONST.SIZE_MAX ) && ( status == CONST.SIZE_RESIZING ) && ( evt.button == Q.LBUTTON ) )
     {
       //Q.printf('mouseup in '+status);
       obj.draging = false;
@@ -843,19 +785,16 @@ function $MakeResizable(obj) {
     }
   }
 
-  function mousemove(evt){
+  function mousemove(evt) {
     evt = evt || window.event;
     var srcElement = evt.srcElement || evt.target;
-    //Q.printf(srcElement);
     var status = $GetWindowStatus(obj);
-    if(( status & CONST.SIZE_MAX ) 
-      || ( $IsStyle($GetWindowStyle(obj), CONST.STYLE_FIXED) ) 
-      || (status == CONST.SIZE_MIN))
+    if(( status & CONST.SIZE_MAX ) || ( $IsStyle($GetWindowStyle(obj), CONST.STYLE_FIXED) ) || (status == CONST.SIZE_MIN))
     {
       //Q.printf('wrong status');
       return;  
     }
-    if( status == CONST.SIZE_RESIZING ){
+    if( status == CONST.SIZE_RESIZING ) {
       //Q.printf('move sizing.');  
       var dx=evt.screenX-ex;
       var dy=evt.screenY-ey;
@@ -869,9 +808,6 @@ function $MakeResizable(obj) {
       if(r-l > __GLOBALS.MIN_WIDTH){
         s.left=l+'px';
         s.width = (r-l) +'px';
-        if( $IsWindow(obj) ){
-          $SetTitleWidth(obj, r - l - 90)
-        }
       }
 
       if(b-t > __GLOBALS.MIN_HEIGHT){
@@ -884,8 +820,6 @@ function $MakeResizable(obj) {
       ey+=dy;
     } else if( srcElement == obj ) {
       //Q.printf('caculate cursor style');  
-      //var x=evt.offsetX,y=evt.offsetY;
-
       var x = evt.offsetX==undefined?evt.layerX:evt.offsetX;
       var y = evt.offsetY==undefined?evt.layerY:evt.offsetY;
       var c=obj.currentStyle;
@@ -906,7 +840,7 @@ function $MakeResizable(obj) {
         b=t+h;
         ex=evt.screenX;
         ey=evt.screenY;
-      }else if(obj.style.cursor) {
+      } else if(obj.style.cursor) {
         obj.style.cursor='';
       }
     } else {
@@ -1050,31 +984,17 @@ construct : function(config) {
   var width = config.width || 600;
   var height= config.height || 400;
   var parent_wnd= $GetDesktopWindow();
-  if(config.parent instanceof Q.Window) {
+  if(config.parent instanceof Q.Window) 
     parent_wnd = config.parent.wnd() || $GetDesktopWindow();
-  }
 
   config.wstyle = config.wstyle || CONST.STYLE_DEFAULT;
   this.hwnd = $CreateWindow(parent_wnd, title, config.wstyle, left, top, width, height);  
   this.set_content(config.content);
 },
 
-show : function(isVisible) {
-  var show=isVisible?CONST.SW_SHOW:CONST.SW_HIDE;
-  $ShowWindow(this.hwnd, show);
-},
-
-center : function() {
-  $CenterWindow(this.hwnd);
-},
-
-adjust : function() {
-  $FitWindow(this.hwnd);				 
-},
-
-wnd : function() {
-  return this.hwnd;      
-},
+wnd : function() { return this.hwnd; },
+set_window_proc : function(new_window_proc) { return $SetWindowProc(this.hwnd, new_window_proc); },
+set_zindex : function(zIndex) { $SetWindowZIndex(this.hwnd, zIndex); },
 
 set_content : function(HTMLContent) {
   HTMLContent = HTMLContent || "";
@@ -1085,14 +1005,9 @@ set_content : function(HTMLContent) {
     $GetClient(this.hwnd).innerHTML = HTMLContent;
   }
 },
-
-set_zindex : function(zIndex) {
-  $SetWindowZIndex(this.hwnd, zIndex);
-},
-
-set_window_proc : function(new_window_proc) {
-  return $SetWindowProc(this.hwnd, new_window_proc);
-},
+show : function(isVisible) { $ShowWindow(this.hwnd, (!!isVisible)?CONST.SW_SHOW:CONST.SW_HIDE); },
+center : function()        { $CenterWindow(this.hwnd); },
+adjust : function()        { $FitWindow(this.hwnd); },
 });
 
 /*-----------------------------------------------------------------
@@ -1118,13 +1033,13 @@ construct : function(config) {
   })(this)); 
 },
 
+// dialog procedure
 window_proc : function(msgid, json) {
   switch(msgid) {
   case MESSAGE.CLOSE:
     $MaskWindow(this.hwnd.modal_prev, false);
     this.hwnd.modal_prev.modal_next = null;
     this.hwnd.modal_prev = null;
-
     break;
   }
 
@@ -1143,6 +1058,7 @@ add_bottom_button : function(text, className, lpfunc) {
   btn.innerText = text;
   btn.onclick = lpfunc;
   btn.className = className;
+  return true;
 },
 
 domodal : function(wndNode) {
@@ -1164,12 +1080,12 @@ domodal : function(wndNode) {
  
 end_dialog : function(code) {
   $BindWindowMessage(this.hwnd, MESSAGE.CLOSE)();
-  //this.destroy();
   if( arguments.length > 1 )  
     return arguments[1];
   else 
     return CONST.IDCANCEL;
-  },
+},
+
 });
 
 /*-----------------------------------------------------------------

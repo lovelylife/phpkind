@@ -41,7 +41,7 @@
     Q.$('btnOpenWindow').onclick = function() {
       g_test_window = new Q.Window({width:480, height:370});
       g_test_window.show(true);
-      g_test_window.set_content(Q.$('flash').cloneNode());
+      g_test_window.set_content("test flash");
       g_test_window.adjust();
       g_test_window.center();
     }

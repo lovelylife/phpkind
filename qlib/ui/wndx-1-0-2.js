@@ -186,13 +186,20 @@ RootWindow (__GLOBALS.desktop)
  [$SetWindowActive(wndNode, true)]
 
 ------------------------------------------------------*/
-function $ActivateWindow(wndNode) {
+function $ActivateWindow(wndNode, zindex) {
   if(!$IsWindow(wndNode))
     return;
   Q.printf("active window " + $GetTitleText(wndNode));
   // 保存当前激活窗口
   var active_child = $GetActiveChild($GetDesktopWindow());
   var p = wndNode;
+  if(p == active_child) { 
+    if(!isNaN(zindex)) {
+      $SetWindowZIndex(wndNode, zindex);
+    }
+    return;
+  }
+
   var is_child_of_active_window = false;
   while(p && p != $GetDesktopContainer()) {
     if(p == active_child) {
@@ -215,8 +222,11 @@ function $ActivateWindow(wndNode) {
       $SetWindowActive(wndNode, true);
       
       // zIndex
-      var z_active_child = $GetWindowZIndex(active_sibling);
-      $SetWindowZIndex(wndNode, z_active_child + 1);
+      var z_active_child = $GetWindowZIndex(active_sibling)+1;
+      if(!isNaN(zindex)) {
+        z_active_child = zindex;
+      }
+      $SetWindowZIndex(wndNode, z_active_child);
     }
   } else {
     $SetActiveChild($GetDesktopWindow(), wndNode);
@@ -224,8 +234,11 @@ function $ActivateWindow(wndNode) {
     $SetWindowActive(active_child, false);
       
     // zIndex
-    var z_active_child = $GetWindowZIndex(active_child);
-    $SetWindowZIndex(wndNode, z_active_child + 1);
+    var z_active_child = $GetWindowZIndex(active_child) + 1;
+    if(!isNaN(zindex)) {
+      z_active_child = zindex;
+    }
+    $SetWindowZIndex(wndNode, z_active_child);
   }
 }
 
@@ -532,13 +545,11 @@ function $DefaultWindowProc(hwnd, msg, data) {
       while(t && t.modal_prev) 
         t = t.modal_prev;
       while(t && t.modal_next) { 
-        //Q.printf('set zindex modal ' + $GetTitleText(t));
         $SetWindowZIndex(t, ++top_zindex); 
         t = t.modal_next; 
       }
 
-      $SetWindowZIndex(t, ++top_zindex); 
-      $ActivateWindow(t);
+      $ActivateWindow(t, ++top_zindex);
     }
     break;  
   }
@@ -961,7 +972,7 @@ var __DRAGWND = Q.extend({
       _this.hDragWnd.style.display = 'none';
        
       _this.isMoved && $MoveTo(_this.hCaptureWnd, _this.endX-pos.left, _this.endY-pos.top);
-      $ShowWindow(_this.hCaptureWnd, CONST.SW_SHOW);
+      //$ShowWindow(_this.hCaptureWnd, CONST.SW_SHOW);
     }
     _this.isMoved=false;
   }

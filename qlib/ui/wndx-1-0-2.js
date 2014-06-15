@@ -190,6 +190,30 @@ function $ActivateWindow(wndNode, zindex) {
   if(!$IsWindow(wndNode))
     return;
   Q.printf("active window " + $GetTitleText(wndNode));
+  var wstyle = $GetWindowStyle(wndNode);
+  
+  if($IsStyle(wstyle, CONST.STYLE_CHILD)) {
+    // child style window
+    var parent_container = $GetContainerWindow(wndNode);
+    $SetActiveChild(parent_container, wndNode);
+    // set zindex
+    var top_sibling = $GetTopZIndexWindow(parent_container);
+    var z_active_sibling = $GetWindowZIndex(top_sibling)+1;
+    $SetWindowZIndex(wndNode, z_active_sibling);
+    
+  } else {
+    // popup window
+    // set active child
+    var parent_container = $GetContainerWindow(wndNode);
+    $SetActiveChild(parent_container, wndNode);
+    // set zindex
+    var top_sibling = $GetTopZIndexWindow(parent_container);
+    var z_active_sibling = $GetWindowZIndex(top_sibling)+1;
+    $SetWindowZIndex(wndNode, z_active_sibling);
+  }
+  
+
+  return;
   // 保存当前激活窗口
   var active_child = $GetActiveChild($GetDesktopWindow());
   var p = wndNode;
@@ -229,8 +253,10 @@ function $ActivateWindow(wndNode, zindex) {
       $SetWindowZIndex(wndNode, z_active_child);
     }
   } else {
-    $SetActiveChild($GetDesktopWindow(), wndNode);
-    $SetWindowActive(wndNode, true);
+    var top_wnd = $GetTopContainer(wndNode);
+    $SetActiveChild(parent_container, wndNode);
+    $SetActiveChild($GetDesktopWindow(), top_wnd);
+    $SetWindowActive(top_wnd, true);
     $SetWindowActive(active_child, false);
       
     // zIndex
@@ -238,7 +264,24 @@ function $ActivateWindow(wndNode, zindex) {
     if(!isNaN(zindex)) {
       z_active_child = zindex;
     }
-    $SetWindowZIndex(wndNode, z_active_child);
+    $SetWindowZIndex(top_wnd, z_active_child);
+    var z_active_sibling = $GetWindowZIndex(parent_container) + 1;
+    $SetWindowZIndex(wndNode, z_active_sibling);
+    
+
+  }
+}
+
+function $GetTopContainer(wndNode) {
+  var c = $GetContainerWindow(wndNode);
+  if(c == $GetDesktopContainer()) {
+    return wndNode;
+  } else {
+    while($GetContainerWindow(c) != $GetDesktopContainer()) {
+      c = $GetContainerWindow(c);      
+    }
+    
+    return c;
   }
 }
 
@@ -539,17 +582,28 @@ function $DefaultWindowProc(hwnd, msg, data) {
   case MESSAGE.ACTIVATE:
     {
       Q.printf('DefaultWindowProc MESSAGE.ACTIVATE');
+      
+      $ActivateWindow(hwnd);
+      /*
       var top_wnd = $GetTopZIndexWindow($GetDesktopWindow());
       var top_zindex = $GetWindowZIndex(top_wnd);
       var t = hwnd;
+      // 最底部的模式窗口
       while(t && t.modal_prev) 
         t = t.modal_prev;
+      // 统计增加的层数
       while(t && t.modal_next) { 
-        $SetWindowZIndex(t, ++top_zindex); 
-        t = t.modal_next; 
+        t = t.modal_next;
+        ++top_zindex;  
       }
-
+      // 先激活顶层窗口
       $ActivateWindow(t, ++top_zindex);
+      // 一层层设置zindex
+      while(t && t.modal_prev) {
+        t = t.modal_prev;
+        $SetWindowZIndex(t, --top_zindex); 
+      }
+      */
     }
     break;  
   }
@@ -569,7 +623,7 @@ function $CreateCtrlButton(type) {
   var btn = document.createElement('button');  
   btn.innerHTML = '&nbsp;';
   btn.className = type;
-	btn.hideFocus = true;
+  btn.hideFocus = true;
   return btn;
 }
 
@@ -621,35 +675,35 @@ function $CreateWindowTitlebar(hwnd)  {
 
 
 function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, app){
-	var wstyle = ws || CONST.STYLE_DEFAULT;
-	var container      = null;
-	var container_wnd  = null;
+  var wstyle = ws || CONST.STYLE_DEFAULT;
+  var container      = null;
+  var container_wnd  = null;
   if( !$IsWindow(parent_wnd) ) 
     parent_wnd = $GetDesktopWindow();
  
   if($IsDesktopWindow(parent_wnd)) {
-	  if($IsStyle(wstyle, CONST.STYLE_CHILD)) {
+    if($IsStyle(wstyle, CONST.STYLE_CHILD)) {
       // ps: 桌面装口不能创建STYLE_CHILD样式的窗口
-			return null;
-		} else {
-		  container = $GetDesktopWindow();
-		  container_wnd = $GetDesktopWindow();
-		}
-	} else {
-	  if($IsStyle(wstyle, CONST.STYLE_CHILD)) {
-	    container = $GetClient(parent_wnd)
-	    container_wnd = parent_wnd;
-		}	else {
-		  container = $GetDesktopWindow();
-		  container_wnd = $GetDesktopWindow();
-		}
-	}
-	// 创建窗口
-	var hwnd = document.createElement('DIV');
+      return null;
+    } else {
+      container = $GetDesktopWindow();
+      container_wnd = $GetDesktopWindow();
+    }
+  } else {
+    if($IsStyle(wstyle, CONST.STYLE_CHILD)) {
+      container = $GetClient(parent_wnd)
+      container_wnd = parent_wnd;
+    }  else {
+      container = $GetDesktopWindow();
+      container_wnd = $GetDesktopWindow();
+    }
+  }
+  // 创建窗口
+  var hwnd = document.createElement('DIV');
   // user data
   hwnd.setAttribute('__QWindow__', true);  // 设置QWindow标记，用于$IsWindow方法
   hwnd.wstyle       = ws || CONST.STYLE_DEFAULT;  // 窗口样式
-	hwnd.parent_wnd   = parent_wnd;
+  hwnd.parent_wnd   = parent_wnd;
   hwnd.container_wnd = container_wnd;
   hwnd.modal_next   = null;
   hwnd.model_prev   = null;  
@@ -686,8 +740,8 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   hwnd.style.width  = width + 'px'; 
   hwnd.style.height = height + 'px';
   
-	// register to wnds
-	$GetWnds(container_wnd).append(hwnd);
+  // register to wnds
+  $GetWnds(container_wnd).append(hwnd);
  
   // 主窗口
   //if( !$IsStyle(ws, CONST.STYLE_FIXED) ) {
@@ -716,7 +770,7 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   $SetWindowStyle(hwnd, ws);
   $BindWindowMessage(hwnd, MESSAGE.CREATE)();
   
-	// render 
+  // render 
   container.appendChild(hwnd);
 
   return hwnd;
@@ -751,9 +805,9 @@ function $DestroyWindow(wndNode) {
   if($IsNull(wnd)) {
     $SetActiveChild(parent_container, null);
   } else if( $IsWindow(wnd) ) {
-    $ActivateWindow(wnd);
+    $BindWindowMessage(wnd, MESSAGE.ACTIVATE)();
   } else {
-    $ActivateWindow(parent_container);
+    $BindWindowMessage(parent_container, MESSAGE.ACTIVATE)();
   }
 }
 
@@ -839,7 +893,7 @@ function $MakeResizable(obj) {
       var current_style_left = parseInt(c.left, 10);
       var current_style_top  = parseInt(c.top, 10);
 
-      Q.printf('x='+x+';y='+y+';w='+w+';h='+h);
+      //Q.printf('x='+x+';y='+y+';w='+w+';h='+h);
       // 计算鼠标样式
       cur=y<d?'n':h-y<d?'s':'';
       cur+=x<d?'w':w-x<d?'e':'';

@@ -160,116 +160,23 @@ RootWindow (__GLOBALS.desktop)
  |
  +-------------- Window 2
  +-------------- Window 3
-
- 桌面窗口           __GLOBALS.desktop (document.body) 
- 桌面窗口的Popup样式的窗口   PopupWindow (QWindow)
- 窗口激活流程如下
- 
- [wndNode] 
-    |
- [$IsWindow]   
-    |         N
-    +----------------> [return]
-    |
-    | Y
-    | 
- [active_child = $GetActiveChild($GetDesktopWindow())]
- [is child of active_child]
-    | 
-    |         N                 [SetWindowActive(active_child, false)]
-    +------------------------- [SetActiveChild($GetDesktopWindow(), wndNode)]
-    |                          [SetWindowActive(wndNode, true)]
-    |
-    |
-    | Yes
- [$SetWindowActive(Sibling, false)]
- [$SetWindowActive(wndNode, true)]
-
 ------------------------------------------------------*/
 function $ActivateWindow(wndNode, zindex) {
   if(!$IsWindow(wndNode))
     return;
   Q.printf("active window " + $GetTitleText(wndNode));
-  var wstyle = $GetWindowStyle(wndNode);
-  
-  if($IsStyle(wstyle, CONST.STYLE_CHILD)) {
-    // child style window
-    var parent_container = $GetContainerWindow(wndNode);
-    $SetActiveChild(parent_container, wndNode);
-    // set zindex
-    var top_sibling = $GetTopZIndexWindow(parent_container);
-    var z_active_sibling = $GetWindowZIndex(top_sibling)+1;
-    $SetWindowZIndex(wndNode, z_active_sibling);
-    
-  } else {
-    // popup window
-    // set active child
-    var parent_container = $GetContainerWindow(wndNode);
-    $SetActiveChild(parent_container, wndNode);
-    // set zindex
-    var top_sibling = $GetTopZIndexWindow(parent_container);
-    var z_active_sibling = $GetWindowZIndex(top_sibling)+1;
-    $SetWindowZIndex(wndNode, z_active_sibling);
-  }
-  
+  var defined_zindex = 0;
+  if(!isNaN(zindex)) 
+    defined_zindex = zindex;
 
-  return;
-  // 保存当前激活窗口
-  var active_child = $GetActiveChild($GetDesktopWindow());
-  var p = wndNode;
-  if(p == active_child) { 
-    if(!isNaN(zindex)) {
-      $SetWindowZIndex(wndNode, zindex);
-    }
-    return;
-  }
-
-  var is_child_of_active_window = false;
-  while(p && p != $GetDesktopContainer()) {
-    if(p == active_child) {
-      is_child_of_active_window = true;
-      break;
-    }
-    p = $GetContainerWindow(p);
-  }
-  
   var parent_container = $GetContainerWindow(wndNode);
-  if(is_child_of_active_window) {
-    var active_sibling = $GetActiveChild(parent_container);
-    if(wndNode == active_sibling) {
-      $SetWindowActive(wndNode, true);
-      return;
-    } else {
-      // deactive sibling, active self
-      $SetActiveChild(parent_container, wndNode);
-      $SetWindowActive(active_sibling, false);
-      $SetWindowActive(wndNode, true);
-      
-      // zIndex
-      var z_active_child = $GetWindowZIndex(active_sibling)+1;
-      if(!isNaN(zindex)) {
-        z_active_child = zindex;
-      }
-      $SetWindowZIndex(wndNode, z_active_child);
-    }
-  } else {
-    var top_wnd = $GetTopContainer(wndNode);
-    $SetActiveChild(parent_container, wndNode);
-    $SetActiveChild($GetDesktopWindow(), top_wnd);
-    $SetWindowActive(top_wnd, true);
-    $SetWindowActive(active_child, false);
-      
-    // zIndex
-    var z_active_child = $GetWindowZIndex(active_child) + 1;
-    if(!isNaN(zindex)) {
-      z_active_child = zindex;
-    }
-    $SetWindowZIndex(top_wnd, z_active_child);
-    var z_active_sibling = $GetWindowZIndex(parent_container) + 1;
-    $SetWindowZIndex(wndNode, z_active_sibling);
-    
-
-  }
+  $SetActiveChild(parent_container, wndNode);
+    // set zindex
+  var top_sibling = $GetTopZIndexWindow(parent_container);
+  var z_active_sibling = $GetWindowZIndex(top_sibling)+1;
+  $SetWindowZIndex(wndNode, (defined_zindex)?defined_zindex:z_active_sibling);
+  $SetWindowActive(top_sibling, false);
+  $SetWindowActive(wndNode, true);
 }
 
 function $GetTopContainer(wndNode) {
@@ -280,7 +187,6 @@ function $GetTopContainer(wndNode) {
     while($GetContainerWindow(c) != $GetDesktopContainer()) {
       c = $GetContainerWindow(c);      
     }
-    
     return c;
   }
 }
@@ -582,12 +488,19 @@ function $DefaultWindowProc(hwnd, msg, data) {
   case MESSAGE.ACTIVATE:
     {
       Q.printf('DefaultWindowProc MESSAGE.ACTIVATE');
-      
-      $ActivateWindow(hwnd);
-      /*
       var top_wnd = $GetTopZIndexWindow($GetDesktopWindow());
       var top_zindex = $GetWindowZIndex(top_wnd);
       var t = hwnd;
+
+      while(true) {
+        var wstyle = $GetWindowStyle(t);
+        if(!$IsStyle(wstyle, CONST.STYLE_CHILD)) {
+          break;
+        } else {
+          $ActivateWindow(t);
+        }
+        t = $GetContainerWindow(t);
+      }
       // 最底部的模式窗口
       while(t && t.modal_prev) 
         t = t.modal_prev;
@@ -603,7 +516,6 @@ function $DefaultWindowProc(hwnd, msg, data) {
         t = t.modal_prev;
         $SetWindowZIndex(t, --top_zindex); 
       }
-      */
     }
     break;  
   }

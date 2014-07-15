@@ -24,11 +24,9 @@ var CONST = {
   STYLE_MAX :      0x00000020,
   STYLE_MIN :      0x00000040,
   STYLE_CLOSE :    0x00000080,
-  STYLE_POPUP :    0x00000100,
 
-  STYLE_CHILD :    0x00000200,
-  STYLE_ICON  :    0x00000400,
-  STYLE_WITHBOTTOM :  0x00000800,
+  STYLE_ICON  :    0x00000100,
+  STYLE_WITHBOTTOM :  0x00000200,
   
 // size text
   SIZE_CLOSE:    'close',
@@ -41,9 +39,6 @@ var CONST = {
   SIZE_MINING :  6,
 
 // dialog define
-  NORMAL :            '0',
-  MODE:              '1',
-  MODELESS:           '2',
   IDCANCEL :          '0'
 };
 
@@ -179,18 +174,6 @@ function $ActivateWindow(wndNode, zindex) {
   $SetWindowActive(wndNode, true);
 }
 
-function $GetTopContainer(wndNode) {
-  var c = $GetContainerWindow(wndNode);
-  if(c == $GetDesktopContainer()) {
-    return wndNode;
-  } else {
-    while($GetContainerWindow(c) != $GetDesktopContainer()) {
-      c = $GetContainerWindow(c);      
-    }
-    return c;
-  }
-}
-
 function $SetWindowActive(wndNode, IsActive){
   var style;
   style = (IsActive) ? 'clsActiveTitle' : 'clsNoActiveTitle';
@@ -228,24 +211,15 @@ function $RestoreWindow(wndNode){
 }
 
 function $MinimizeWindow(wndNode){
-  if( !$IsWindow(wndNode)) { return; }
   if( $GetWindowStatus(wndNode) == CONST.SIZE_NIN )
     return;
   var ws = $GetWindowStyle(wndNode);
   if( $IsStyle(ws, CONST.STYLE_FIXED)) { return; }
-  wndNode.width = 0;
-  wndNode.style.width = 0;
+  //wndNode.width = 0;
+  //wndNode.style.width = 0;
   var width, height;
-  if( parent == document.body ){
-    width = document.body.clientWidth;
-    height = document.body.clientHeight;
-  } else if( $IsWindow(parent) ) {
-    width  = $GetClient(parent).clientWidth;
-    height = $GetClient(parent).clientHeight;
-  } else { return; }
-    
-  $MoveTo(wndNode, 0, height - $GetTitle(wndNode).offsetHeight);
-  $ResizeTo(wndNode, __GLOBALS.MIN_WIDTH, $GetTitle(wndNode).offsetHeight);
+  var pos = Q.absPosition(wndNode);  
+  $ResizeTo(wndNode, pos.right-pos.left, $GetTitle(wndNode).offsetHeight);
   $ChangeCtrlButton(wndNode, CONST.SIZE_MAX, CONST.SIZE_MAX);
   $SetWindowStatus(wndNode, CONST.SIZE_MIN);
 }
@@ -469,6 +443,7 @@ function $DefaultWindowProc(hwnd, msg, data) {
     break;  
   case MESSAGE.MIN:
     Q.printf('DefaultWindowProc MESSAGE.MIN');
+    $MinimizeWindow(hwnd);
     break;
   case MESSAGE.MAX:
     Q.printf('DefaultWindowProc MESSAGE.MAX');
@@ -492,15 +467,6 @@ function $DefaultWindowProc(hwnd, msg, data) {
       var top_zindex = $GetWindowZIndex(top_wnd);
       var t = hwnd;
 
-      while(true) {
-        var wstyle = $GetWindowStyle(t);
-        if(!$IsStyle(wstyle, CONST.STYLE_CHILD)) {
-          break;
-        } else {
-          $ActivateWindow(t);
-        }
-        t = $GetContainerWindow(t);
-      }
       // 最底部的模式窗口
       while(t && t.modal_prev) 
         t = t.modal_prev;
@@ -593,23 +559,9 @@ function $CreateWindow(parent_wnd, title, ws, pos_left, pos_top, width, height, 
   if( !$IsWindow(parent_wnd) ) 
     parent_wnd = $GetDesktopWindow();
  
-  if($IsDesktopWindow(parent_wnd)) {
-    if($IsStyle(wstyle, CONST.STYLE_CHILD)) {
-      // ps: 桌面装口不能创建STYLE_CHILD样式的窗口
-      return null;
-    } else {
-      container = $GetDesktopWindow();
-      container_wnd = $GetDesktopWindow();
-    }
-  } else {
-    if($IsStyle(wstyle, CONST.STYLE_CHILD)) {
-      container = $GetClient(parent_wnd)
-      container_wnd = parent_wnd;
-    }  else {
-      container = $GetDesktopWindow();
-      container_wnd = $GetDesktopWindow();
-    }
-  }
+  container = $GetDesktopWindow();
+  container_wnd = $GetDesktopWindow();
+  
   // 创建窗口
   var hwnd = document.createElement('DIV');
   // user data
@@ -875,7 +827,7 @@ var __DRAGWND = Q.extend({
       target_wnd = target_wnd.parentNode;
     }
 
-    if(target_wnd && $IsDragObject(target_wnd, oDragHandle)) {
+    if(target_wnd && (!$IsMaxWindow(target_wnd)) && $IsDragObject(target_wnd, oDragHandle)) {
       var pos = Q.absPosition(target_wnd);
       _this.isdrag = true; 
       _this.hCaptureWnd = target_wnd; 

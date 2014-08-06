@@ -414,8 +414,10 @@ function $SetWindowStyle(wndNode, ws){
   }
   
   if( $IsStyle(ws, CONST.STYLE_WITHBOTTOM) ) {
+    $GetClient(wndNode).className = "clsClientArea clsWithBottom"
     wndNode.hBottomBar.style.display = '';
   } else {
+    $GetClient(wndNode).className = "clsClientArea"
     wndNode.hBottomBar.style.display = 'none';
   }
     

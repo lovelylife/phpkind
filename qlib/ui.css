@@ -75,7 +75,7 @@ html { margin: 0px; padding: 0px; height: 100%; border:none; }
 
 .clsTitleContent{ margin-right:70px; height:30px; overflow:hidden; text-indent: 5px; text-overflow:ellipsis; color:white;cursor: default;}
 .clsTitleCtrlBar{ position:absolute; width:65px; overflow:hidden; height:30px; top:0; right:5px; text-align:right; /*background:#fd3500;*/}
-.clsTitleCtrlBar button {background: transparent url(images/wnd/wnd.png) 0 0 no-repeat;	border-width:0;	outline: 0;	width: 16px;height: 16px;  padding:0;	margin:7px 0 0 0;	font-size: 12px;}
+.clsTitleCtrlBar button {background: transparent url(images/wnd/wnd.png) 0 0 no-repeat;	border-width:0;	outline: 0; width:16px;height: 16px;padding:0; margin:7px 0 0 0; font-size: 12px;}
 .clsTitleCtrlBar button:hover { background-color: #6175af; }
 .clsTitleCtrlBar button.min { background-position: 0 0}
 .clsTitleCtrlBar button.max { background-position: -16px 0}
@@ -86,7 +86,7 @@ html { margin: 0px; padding: 0px; height: 100%; border:none; }
 
 .clsIcon {float:left; width:15px; height:18px; margin-left:6px; margin-right:3px;margin-top: 6px;border-width:0;}
 .clsMaskWindow {position:absolute; background: #000000; display:; left:0;top:0;right:0;bottom:0;}
-.clsClientArea {overflow: hidden; position:absolute; left:0; top:30px; right:0; bottom:0;margin:0;padding:0; background: #FF0;}
+.clsClientArea {overflow: hidden; position:absolute; left:0; top:30px; right:0; bottom:0;margin:0;padding:0;}
 .clsClientArea .clsWithBottom {overflow: hidden; position:absolute; left:0; top:30px; right:0; bottom:30;margin:0;padding:0; background: #FF0;}
 .clsBottomBar {position: absolute; bottom: 0; left:0; right:0;height:30px; line-height:30px; text-align:right;background: #F1F1F1;border-top: 1px solid #e0e0e0; font-size: 13px;}
 .clsDragWindow {position:absolute;display:none;background:blue;cursor:default;}

@@ -3,21 +3,7 @@
 <head>
 <title> 推荐画集 - wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<!-- 使用QLib控件是必须包含样式表 -->
-<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
-<script src="{$app:qlib}/Q.js">
-<!--
-import utils.stl;
-import utils.json2;
-import utils.ajax;
-import utils.tween;
--->
-</script>
-
-<script src="{$themes:path/}/common.js"></script>
-<script src="{$themes:path/}/waterfall.js"></script>
-
+{#template resinclude}
 <script>
 <!--
 
@@ -36,17 +22,15 @@ function do_follow_album(album_id) {
 
 {#template user.menubar/}
 
-<br>
 <br><br>
 <br><br>
-<div class="main-width" align="left">
-  <div class="btn-group time-limit">
+<div class="wf-main" style="height:40px;">
+  <div class="btn-group">
     <a href="{$app:app}" class="btn btn-default">最新分享</a>
     <a href="#" class="btn btn-primary">推荐画集</a>
     <a href="/recommend/user" class="btn btn-default">推荐用户</a>
   </div>
 </div>
-
 
 <div id="main">
   <div id="page" class="wf-main">
@@ -128,7 +112,7 @@ Q.Ready(function(){
   g_waterfall = new Waterfall({
 	"container":"wf-main",
 	"colWidth":238,
-	"colCount":4,
+	"colCount":5,
 	"template":Q.$('wf-template').value,
  	"item_callback": function(name, item) {
 	  if(name == "images") {

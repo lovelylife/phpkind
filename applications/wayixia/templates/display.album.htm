@@ -3,19 +3,7 @@
 <head>
 <title> {$fields:name} - {$fields:uname/} - wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<!-- 使用QLib控件是必须包含样式表 -->
-<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
-<script src="{$app:qlib}/Q.js">
-<!--
-import utils.stl;
-import utils.json2;
-import utils.ajax;
-
--->
-</script>
-
-<script src="{$themes:path/}/waterfall.js"></script>
+{#template resinclude}
 <script>
 <!--
 
@@ -48,15 +36,11 @@ function check_image_width(img) {
 
 <br>
 <br><br>
-<br><br>
+<br>
 <div id="main">
   <div id="page">
-    <div class="main-width"><h3 style="font-size: 16px; font-weight:normal"> 画集 >>  {$fields:name}</h3></div>
-    <div class="wf-main" id="wf-main">
-      <div class="box wf-cld" style="right: 0; top: 0; DISPLAY:none;"></DIV>
-      <div class="box wf-cld" style="right: 0; top: 0;DISPLAY:none;"></DIV>
-      <div class="box wf-cld" style="right: 0; top: 0;DISPLAY:none;"></DIV>
-      <div class="box wf-cld" style="right: 0; top:0; margin-top: 20px; height: {$fields:info_height}px;">
+    <!--div class="main-width"><h3 style="font-size: 16px; font-weight:normal"> 画集 >>  {$fields:name}</h3></div-->
+    <div class="main-width">
         <dl class="tbox" style="margin:0;margin-top: -5px;">
         <dt>
           <strong style="color: #333;">
@@ -70,24 +54,20 @@ function check_image_width(img) {
             </li>
           </ul>
         </dd>
-      </dl>
-      <div class="user-profile">
-        <div class="profile-basic">
-        <dl style="padding:5px 0;">
-          <dt>
-          <img src="{$app:host}{$cfg:site.avatar}/user92.{$fields:uid}.jpg" style="border:1px solid #CCC;width:92px; height:92px;" onerror="check_error(this);">
-          </dt>
-	  <dd class="name" style="margin-left: 90px;text-indent:15px;overflow:hidden;text-overflow:ellipsis;">
-	    <a href="/user/{$fields:uid}" title="{$fields:uname}" ><nobr>{$fields:uname/}</nobr></a>
-	  </dd>
-          <dd class="company">  </dd>
-          <dd></dd>
-          <dd class="privacy-set">
-          
-          <a href="#" >&nbsp;&nbsp;</a>
-          
-          </dd>
         </dl>
+        <div class="user-profile">
+          <div class="profile-basic">
+          <dl style="padding:5px 0;">
+            <dt>
+            <img src="{$app:host}{$cfg:site.avatar}/user92.{$fields:uid}.jpg" style="border:1px solid #CCC;width:92px; height:92px;" onerror="check_error(this);">
+            </dt>
+	    <dd class="name" style="margin-left: 90px;text-indent:15px;overflow:hidden;text-overflow:ellipsis;">
+	      <a href="/user/{$fields:uid}" title="{$fields:uname}" ><nobr>{$fields:uname/}</nobr></a>
+	    </dd>
+            <dd class="company"> &nbsp;{$fields:description} </dd>
+            <dd></dd>
+            <dd class="privacy-set"> <a href="#" >&nbsp;&nbsp;</a> </dd>
+          </dl>
         </div>
         <div>
         <html:list
@@ -99,15 +79,17 @@ function check_image_width(img) {
         >
         <t:data>
         <a href="{$app:host/}/paintings/[field:id]" >
-            <span class="uploadBtn small" style="width:195px;color:#333;margin: 3px 0px; text-indent: 10px;text-align:left;">
+            <span class="uploadBtn small" style="background:#F1F1F1; border-color: #F8F8F8; color:#111;margin: 3px 3px; padding: 0 10px;  width:auto;">
             <span> [field:name] </span></span>
           </a>
 	</t:data>
         </html:list>
         </div>
       </div>
-        <br><br>
-      </div>
+      <br><br>
+    </div>
+    <div class="wf-main" id="wf-main">
+       {#template waterfall/paintings}
     </div>
     <div class="clear"></div>
   </div>
@@ -116,82 +98,27 @@ function check_image_width(img) {
 </div>
 <br><br>
 
-<textarea id="wf-template" style="display:none">
-  <div class="hidden">
-    采集到
-    <a href=""></a>
-  </div>
-  <div class="actions hidden">
-    <div class="right">
-      <a href="" onclick="return false;" class="like btn btn11 wbtn">
-         <strong><em></em>赞</strong><span></span>
-    </a>
-    </div>
-    <div class="left">
-      <a title="快速转采" href="" onclick="return false;" class="thunderpin btn btn11 wbtn">
-        <strong><em></em></strong><span></span>
-      </a>
-      <a href="#" class="repin btn btn11 wbtn">
-        <strong>转采</strong><span></span>
-      </a>
-    </div>
-  </div>
-  <a href="{$app:host}/pins/[[id]]" target="_self" class="img x">
-    <img src="http://[[server]]/thumb/[[file_name]]" width=[[width]] height=[[height]] alt="">
-  </a>
-  <p class="description">[[title]]</p>
-  <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
-  <div class="convo attribution clearfix">
-    <p class="NoImage">
-      <a href="{$app:host}/pins/[[id]]" target="_self">[[from_host]]
-      </a>
-    </p>
-  </div>
-  <div style="display:none;" class="comments muted"></div>
-</textarea>
-
-
 <script type="text/javascript">
-
-function store(arr) {
-  var _this = this;
-  this.data = (arr instanceof Array)?arr:[];
-
-  this.pop = function(len) {
-    var arr = [];
-  while(len >= 0 && _this.data.length > 0) {
-    arr.push(_this.data.shift());
-    len--;
-  }
-  return arr;
-  }
-}
-var g_waterfall = null;
-var albums_data = {$fields:images_data};
-var g_store = new store(albums_data);
-
-function getScrollTop(){     
-         var scrollTop=0;     
-         if(document.documentElement&&document.documentElement.scrollTop){     
-           scrollTop=document.documentElement.scrollTop;     
-         }else if(document.body){     
-           scrollTop=document.body.scrollTop;     
-         }     
-         return scrollTop;     
-       }     
-
+g_page_num = 3;
 Q.Ready(function(){
+
   g_waterfall = new Waterfall({
   "container":"wf-main",
-  "colWidth":238,
-  "colCount":4,
-  "template":Q.$('wf-template').value,
+  "colWidth":240,
+  "colCount":5,
+  "template": '', // Q.$('wf-template').value,
+  "animate" : new alpha(),
+  "onloaditems" : function(timerout) {
+    Q.Ajax({
+command: "{$app:app}?mod=waterfall&action=paintings&aid={$get:aid}&p=" + (++g_page_num),
+      data: {},
+      oncomplete: function(xmlhttp) {
+        g_waterfall.append_html(xmlhttp.responseText);
+        timerout();
+      }
+    })
+  },
   });
-
-
-
-  g_waterfall.append(g_store.pop(10));
-
 });
 
 </script>

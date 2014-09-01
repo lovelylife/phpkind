@@ -3,9 +3,7 @@
 <head>
 <title> 挖一下，让更多人分享 |图片|美女|壁纸|片面设计|- www.wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
-<script src="{$themes:path/}/Q.js"></script>
-<script src="{$themes:path/}/waterfall.js"></script>
+{#template resinclude}
 </head>
 <body>
 {#template user.menubar/}
@@ -30,22 +28,7 @@
     </a>
     <br><br>
   </div-->
-  <html:list id="pins" datasrc="data://imagesdata">
-  <t:data>    
-  <div class="box wf-cld">
-  <a href="{$cfg:urls.image/}/[field:id]" target="_self" class="img x">
-    <img src="http://[field:server]/thumb/[field:file_name]" width="192" height="[field:height]" alt="">
-  </a>
-  <p class="description">[field:title]</p>
-  <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
-  <div class="convo attribution clearfix">
-    <p class="NoImage">
-      <a href="{$cfg:urls.image/}/[field:id]" target="_blank">[field:create_time]</a>
-    </p>
-  </div>
-  </div>
-  </t:data>
-  </html:list>
+  {#template waterfall/index}
 
 </div>
 
@@ -62,7 +45,7 @@ Q.Ready(function(){
   "container":"wf-main",
   "colWidth":240,
   "colCount":5,
-  "template": '', // Q.$('wf-template').value,
+  "template": '', 
   "animate" : new alpha(),
   "onloaditems" : function(timerout) {
     Q.Ajax({
@@ -76,7 +59,6 @@ Q.Ready(function(){
   },
   });
 });
-
 
 </script>
 </body>

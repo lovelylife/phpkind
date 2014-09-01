@@ -4,9 +4,7 @@
 <title> 来自 {$fields:from_host} 的分享 - wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- 使用QLib控件是必须包含样式表 -->
-<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
-
+{#template resinclude}
 <style>
 
 #wf-template {
@@ -34,16 +32,6 @@ padding:0;
 
 </style>
 
-<script src="{$app:qlib}/Q.js">
-<!--
-import utils.stl;
-import utils.json2;
-import utils.ajax;
-
--->
-</script>
-
-<script src="{$themes:path/}/waterfall.js"></script>
 <script>
 <!--
 
@@ -146,11 +134,11 @@ Q.Ready(function(){
   g_waterfall = new Waterfall({
 	"container":"wf-main",
 	"colWidth":238,
-	"colCount":4,
+	"colCount": 5,
 	"template":Q.$('wf-template').value,
   });
 
-  g_waterfall.append(g_store.pop(10));
+  g_waterfall.append(g_store.pop(30));
 
 });
 

@@ -58,7 +58,7 @@ class CLASS_MODULE_CACHE extends CLASS_MODULE {
   function js() {
     $resource_dir = $this->App()->getAppRoot().$this->App()->getTHEMES('path');
     $c = new combine_files;
-    $c->append(_QROOT.'/../qlib/Q2.js');
+    $c->append(_QROOT.'/../qlib/Q.js');
     $c->append(_QROOT.'/../qlib/utils/stl.js');
     $c->append(_QROOT.'/../qlib/utils/xml.js');
     $c->append(_QROOT.'/../qlib/utils/json2.js');
@@ -68,6 +68,7 @@ class CLASS_MODULE_CACHE extends CLASS_MODULE {
     $c->append(_QROOT.'/../qlib/ui/calendar.js');
     $c->append(_QROOT.'/../qlib/ui/wndx-1-0-2.js');
     $c->append($resource_dir.'/waterfall.js');
+    $c->append($resource_dir.'/common.js');
 
     // write to cache file
     $output_file = $resource_dir.'/Q.js';

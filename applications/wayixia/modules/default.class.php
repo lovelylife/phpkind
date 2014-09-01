@@ -34,7 +34,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $db = &$this->App()->db();
     $tag = $_GET['tag'];
 
-    $sql = "select distinct(file_name), server, file_name, (height*192/width*1.0) as height, id, uname as owner, title, DATE_FORMAT(create_time, '%Y-%m-%d') as create_time ";
+    $sql = "select distinct(file_name), server, file_name, (height*192/width*1.0) as height, id, uid as ownerid, uname as owner, album_id, album_name, title, DATE_FORMAT(create_time, '%Y-%m-%d') as create_time ";
     $sql.= "from ##__nosql_pins group by file_name ";
     $sql.=" order by id DESC ";
       
@@ -49,13 +49,10 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     } else {
       $totalsize = $count_row['totalsize'];
     }
-    //print_r($count_row);
     $cfg = array(
         "totalsize" => $totalsize,
         "pagesize" => $page_size,
         "pagekey" => "p",
-        "html" => true,
-        "tpl" => "/index/".urlencode($tag)."{pid}",
     );
 
     // 实例化分页类,初始化构造函数中的总条目数和每页显示条目数
@@ -67,17 +64,8 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $db->get_results($sql, $rs);
 
     $t = new CLASS_TEMPLATES($this->App());
-    /*
-    if(empty($rs)) {
-      $t->push('images_data', '[]');
-    } else {
-      $t->push('images_data', json_encode($rs));
-    } 
-     */
-
     $t->push_data('imagesdata', $rs);
     $t->push('tag', $tag);
-    $t->push('pager', $pager->__toString());
 
     // 显示界面
     $t->render('index');
@@ -140,7 +128,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $album_id = intval($_GET['aid'], 10);
     
     // get album info
-    $get_album_info_sql = "select A.name, U.name as uname, U.uid as uid from ##__users_albums as A, ##__users AS U where A.id={$album_id} and A.uid=U.uid limit 0,1;";
+    $get_album_info_sql = "select A.name, U.name as uname, U.uid as uid, U.description from ##__users_albums as A, ##__users AS U where A.id={$album_id} and A.uid=U.uid limit 0,1;";
     $album_info = $db->get_row($get_album_info_sql);
     //print_r($album_info);
     if(empty($album_info)) {
@@ -163,13 +151,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
 
     $images = array();
     $db->get_results($sql, $images);
-    //print_r($images);
-
-    if(empty($images)) {
-      $t->push('images_data', '[]');
-    } else {
-      $t->push('images_data', json_encode($images));
-    }
+    $t->push_data('images_data', $images);
 
     $t->render('display.album');
   }

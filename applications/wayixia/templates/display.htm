@@ -3,11 +3,9 @@
 <head>
 <title> {$fields:title/} | wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
-<script src="{$themes:path}/Q.js"></script>
-<script src="{$themes:path/}/share.js" ></script>
-<script src="{$themes:path/}/common.js" ></script>
 <script type="text/javascript" src="{$themes:path}/lightwindow/prototype.js"></script>
+{#template resinclude}
+<script src="{$themes:path/}/share.js" ></script>
 <script type="text/javascript" src="{$themes:path}/lightwindow/scriptaculous.js?load=effects"></script>
 <script type="text/javascript" src="{$themes:path}/lightwindow/lightwindow.js"></script>
 <link rel="stylesheet" href="{$themes:path}/lightwindow/css/lightwindow.css" type="text/css" media="screen" />
@@ -96,14 +94,16 @@ Q.Ready(function() {
   }
 
   Q.$('btn-wa').onclick = function() {
-    Q.Ajax({
-      command: '{$app:app}&mod=api&inajax=true&action=wayixia&id='+{$fields:id},
+	  
+     Q.Ajax({
+      command: '{$app:app}?mod=api&inajax=true&action=wayixia&id='+{$fields:id},
+      data: {},
       oncomplete: function(xmlhttp) {
         var resp = Q.json_decode(xmlhttp.responseText);
         if(resp.header == 0) {
           alert('恭喜您，成功地挖到了一张美图哦!');  
         } else if(resp.header == -2) {
-          gotologin('http://wayixia.com/index.php?app=wayixia&mod=user&action=login');
+          gotologin('http://wayixia.com/index.php?mod=user&action=login');
         } else {
           alert('error code: ' + resp.header + '\nmessage: ' + resp.data);
         }
@@ -184,7 +184,7 @@ Q.Ready(function() {
     </div>
     <div class="clear" style="height: 15px;"></div>
     <div class="panel" style="position:relative;">
-	    <div class="btn-group">
+      <div class="btn-group">
         <a href="#" class="btn btn-default" id="btn-wa" title="挖一下">挖一下</a>
       </div>
       <div class="btn-group">

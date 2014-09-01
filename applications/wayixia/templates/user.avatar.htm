@@ -182,8 +182,7 @@ var BindAsEventHandler = function(object, func) {
   };
 };
 
-Q.ImageSelector = Q.KLASS();
-Q.ImageSelector.prototype = {
+Q.ImageSelector = Q.extend( {
 
 hwnd : null,
 hwnd_position : null,
@@ -212,7 +211,7 @@ cur: null,
 select_div:null,
 
 // entry
-_initialize: function(config) {
+construct: function(config) {
   var _this = this;
   _this.hwnd = Q.$(config.render);
   _this.thumb = Q.$(config.thumb);
@@ -630,7 +629,7 @@ select_stop : function(evt) {
     this._isDragable  = false;
 },
 
-}
+});
 
 /*
 function intersectRect(r1, r2) {

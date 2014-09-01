@@ -3,21 +3,7 @@
 <head>
 <title> 推荐用户 - wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<!-- 使用QLib控件是必须包含样式表 -->
-<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
-
-<script src="{$app:qlib}/Q.js">
-<!--
-import utils.stl;
-import utils.json2;
-import utils.ajax;
-import utils.tween;
--->
-</script>
-
-<script src="{$themes:path/}/common.js"></script>
-<script src="{$themes:path/}/waterfall.js"></script>
+{#template resinclude}
 <script>
 <!--
 
@@ -26,7 +12,7 @@ function check_error(img_) {
 }
 
 function do_follow_album(album_id) {
-  follow_album('{$app:app}&mod=album&action=follow&inajax=true', album_id);
+  follow_album('{$app:app}?mod=album&action=follow&inajax=true', album_id);
 }
 
 -->
@@ -36,10 +22,9 @@ function do_follow_album(album_id) {
 	
 {#template user.menubar/}
 
-<br>
 <br><br>
 <br><br>
-<div class="main-width" align="left">
+<div class="wf-main" style="height:40px;">
   <div class="btn-group time-limit">
     <a href="{$app:app}" class="btn btn-default">最新分享</a>
     <a href="/recommend/album" class="btn btn-default">推荐画集</a>
@@ -65,7 +50,7 @@ function do_follow_album(album_id) {
 <br><br>
 
 <textarea id="wf-template" style="display:none;">
-  <div class="user-profile" style="width:429px;border-right: 1px solid #F2F5F5;float: left;">
+  <div class="user-profile" style="width:520px;border-right: 1px solid #F2F5F5;float: left;">
     <div class="profile-basic">
       <dl style="padding:12px 0;">
       <dt>
@@ -175,7 +160,7 @@ var g_store = new store({$fields:users});
 Q.Ready(function(){
   g_waterfall = new Waterfall({
 	"container":"wf-main",
-	"colWidth":990,
+	"colWidth":1090,
 	"colCount":1,
 	"template":Q.$('wf-template').value,
 	"item_callback": function(name, item) {

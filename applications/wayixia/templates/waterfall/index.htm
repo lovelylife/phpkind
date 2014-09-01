@@ -1,16 +1,29 @@
-
+  <!--interface datasrc="imagesdata" -->
   <html:list id="pins" datasrc="data://imagesdata">
   <t:data>	  
   <div class="box wf-cld">
   <a href="{$cfg:urls.image/}/[field:id]" target="_self" class="img x">
-    <img src="http://[field:server]/thumb/[field:file_name]" width="192" height="[field:height]" alt="">
+    <img src="http://[field:server]/thumb/[field:file_name]" width="230" height="[field:height]" alt="">
   </a>
-  <p class="description">[field:title]</p>
+  <p class="description" style="font-size:14px;">[field:title]</p>
   <p class="stats less hidden"><span class="RepinsCount"> 1 转采&nbsp;&nbsp;</span></p>
-  <div class="convo attribution clearfix">
-    <p class="NoImage">
-      <a href="{$cfg:urls.image/}/[field:id]" target="_blank">[field:create_time]</a>
-    </p>
+  <div class="attribution clearfix" style="overflow:hidden; text-overflow:ellipsis;">
+    <div class="user-profile">
+      <div class="profile-basic" style="padding:0;">
+      <dl>
+        <dt style="width:50px;">
+          <img src="{$app:host}{$cfg:site.avatar}/user48.[field:ownerid].jpg"  onerror="check_error(this);" />
+        </dt>
+        <dd class="name" style="margin-left: 50px;text-indent:15px;overflow:hidden;text-overflow:ellipsis;">
+          <a href="/user/[field:ownerid]" title="[field:owner]" style="font-size:13px;"><nobr>[field:owner]</nobr></a>
+	</dd>
+	<dd class="company" style="margin-left: 65px;overflow:hidden;text-overflow:ellipsis;"> 
+	  <a href="{$cfg:urls.paintings/}/[field:album_id]" style="font-size:13px;color: #666;"><nobr>[field:album_name]</nobr></a>  
+	</dd>
+      </dl>
+      </div>
+    </div>
+    <!--a href="{$cfg:urls.image/}/[field:id]" target="_blank">[field:owner]</a-->
   </div>
   </div>
   </t:data>

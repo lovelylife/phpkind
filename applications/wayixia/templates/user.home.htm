@@ -29,7 +29,7 @@ function check_load(img) {
   //Q.printf(img.src);
 }
 
-var g_test_window = null;
+var g_create_dlg = null;
 
 Q.Ready(function() {
   Q.$('my-beibao').onclick=function() {
@@ -41,11 +41,7 @@ Q.Ready(function() {
   }
 
   Q.$('create-new-album').onclick=function() {
-    if(g_test_window) {
-      g_test_window.close();    
-    }
-
-    g_test_window = new Q.MsgBox({
+    g_create_dlg = new Q.MessageBox({
       title : '创建画集',
       content: Q.$('create-album-panel'),
       width: 350,

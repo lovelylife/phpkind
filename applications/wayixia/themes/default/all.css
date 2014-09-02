@@ -725,7 +725,7 @@ input[type="checkbox"] {
   border: 0px solid #CCC;
 }
 
-.user-profile{background:#FFF;*zoom:1;}
+.user-profile{*zoom:1;}
 .user-profile .profile-basic{border-bottom:0px dotted #ccc;background:url() left top no-repeat;padding-top:10px;}
 .user-profile-gold .profile-basic{background-position:right top;}
 .user-profile .profile-basic dl{padding:10px 10px 5px 10px;*zoom:1;}

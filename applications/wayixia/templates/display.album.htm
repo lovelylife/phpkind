@@ -40,10 +40,10 @@ function check_image_width(img) {
 <div id="main">
   <div id="page">
     <!--div class="main-width"><h3 style="font-size: 16px; font-weight:normal"> 画集 >>  {$fields:name}</h3></div-->
-    <div class="main-width">
-        <dl class="tbox" style="margin:0;margin-top: -5px;">
-        <dt>
-          <strong style="color: #333;">
+    <div class="main-width" style="background: #FFF">
+        <!--dl class="tbox" style="margin:0;margin-top: -5px;"-->
+        <!--dt>
+          <strong style="color: #333; text-indent:5px;">
             <em class="icon-calendar"></em>挖客
           </strong>
         </dt>
@@ -53,8 +53,8 @@ function check_image_width(img) {
 	    <a href="#" target=""></a>
             </li>
           </ul>
-        </dd>
-        </dl>
+        </dd-->
+        <!--/dl-->
         <div class="user-profile">
           <div class="profile-basic">
           <dl style="padding:5px 0;">
@@ -62,13 +62,14 @@ function check_image_width(img) {
             <img src="{$app:host}{$cfg:site.avatar}/user92.{$fields:uid}.jpg" style="border:1px solid #CCC;width:92px; height:92px;" onerror="check_error(this);">
             </dt>
 	    <dd class="name" style="margin-left: 90px;text-indent:15px;overflow:hidden;text-overflow:ellipsis;">
-	      <a href="/user/{$fields:uid}" title="{$fields:uname}" ><nobr>{$fields:uname/}</nobr></a>
+	      <a href="/user/{$fields:uid}" title="{$fields:uname}" style="color:#FF4400" ><nobr>{$fields:uname/}</nobr></a>
 	    </dd>
             <dd class="company"> &nbsp;{$fields:description} </dd>
             <dd></dd>
             <dd class="privacy-set"> <a href="#" >&nbsp;&nbsp;</a> </dd>
           </dl>
         </div>
+                
         <div>
         <html:list
           id="mydatamenu" 
@@ -79,15 +80,15 @@ function check_image_width(img) {
         >
         <t:data>
         <a href="{$app:host/}/paintings/[field:id]" >
-            <span class="uploadBtn small" style="background:#F1F1F1; border-color: #F8F8F8; color:#111;margin: 3px 3px; padding: 0 10px;  width:auto;">
+            <span class="uploadBtn small" style="background:#59677f; border-color: #F8F8F8; color:#FFF;margin: 0px 3px 3px 0px; padding: 0 10px;  width:auto;">
             <span> [field:name] </span></span>
           </a>
 	</t:data>
         </html:list>
         </div>
       </div>
-      <br><br>
     </div>
+    <br>
     <div class="wf-main" id="wf-main">
        {#template waterfall/paintings}
     </div>

@@ -7,6 +7,45 @@
  $ copyright :Copyright 2006 onlyaa.com
 ----------------------------------------------------------------------*/
 
+class page {
+  var $total_size;
+  var $page_size;
+  var $page_count;
+  var $current_page;
+
+  function __construct($total_size, $page_size, $current_page) {
+    $this->total_size = $total_size;
+    $this->page_size  = $page_size;
+    
+    if($this->page_size < 1) 
+      $this->page_size = 10;
+    
+    // 记录数
+    $this->page_count = ceil($this->total_size / $this->page_size);
+    $this->page_count = max($this->page_count, 1);  // 修正页数为1的bug
+
+    // 当前访问页
+    $current_page = max(1, $current_page);
+    $this->current_page = min($this->page_count, $current_page);
+  }
+
+  function page($total_size, $page_size, $current_page) {
+    $this->__construct($total_size, $page_size, $current_page);
+  }
+
+  function first() { return 1; }
+  function prev()  { return max(1, $this->current_page - 1);  }
+  function next()  { return min($this->current_page + 1, $this->page_count);  }
+  function last()  { return $this->page_count;  }
+  function size()  { return $this->page_size; }
+  function count() { return $this->page_count; }
+  function current() { return $this->current_page; }
+  function set($p) {
+    $cur = intval($p, 10);
+    $cur = max(1, $cur);
+    $this->current_page = min($this->page_count, $cur);
+  }
+}
 
 // 分页模板
 class CLASS_PAGE {

@@ -147,10 +147,12 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $t->push('info_height', 100+(count($albums)+4)*48);
 
     // images data
-    $sql = "select R.server, R.file_name, R.width, R.height, I.id as id, I.from_host, I.title from ##__images_resource R, ##__users_images I where I.res_id=R.id and I.album_id>0 and I.album_id='{$album_id}' order by I.id DESC";
+    $pins_model = new pins_model();
+    $pins_model->limit($pins_model->total_size($db), 20, $_GET['p']);
+    $pins_model->where("album_id={$album_id} and album_id>0 ");
 
     $images = array();
-    $db->get_results($sql, $images);
+    $db->get_results($pins_model->sql(), $images);
     $t->push_data('images_data', $images);
 
     $t->render('display.album');

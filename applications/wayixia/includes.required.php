@@ -16,6 +16,7 @@ return array(
   _QROOT.'/q-rpc.php',
   _QROOT.'/smtp.class.php',
   '/rc4crypt.class.php',
+  '/pins.model.php',
   '/function.php',
 );
 

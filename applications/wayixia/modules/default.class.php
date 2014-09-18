@@ -153,7 +153,8 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
 
     $images = array();
     $db->get_results($pins_model->sql(), $images);
-    $t->push_data('images_data', $images);
+    //print_r($images);
+    $t->push_data('imagesdata', $images);
 
     $t->render('display.album');
   }

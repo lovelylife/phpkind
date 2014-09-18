@@ -32,11 +32,11 @@ return array (
   ),
   'urls' => 
   array(
-    'paintings' => 'http://wayixia.com/paintings',
+    'albums' => 'http://wayixia.com/albums',
     'image' => 'http://wayixia.com/pins',
     'user' => 'http://wayixia.com/user',
     'sites' => 'http://wayixia.com/sites',
-    'paintingslist' => 'http://wayixia.com/paintingslist',
+    'albumslist' => 'http://wayixia.com/albumslist',
   ),	  
   'openapi' => 
   array(

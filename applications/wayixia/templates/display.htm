@@ -173,7 +173,7 @@ Q.Ready(function() {
             $is_from_to = intval($fields_from_id, 10); 
             if($is_from_to > 0) { 
           ?>
-          <!--span>采集自画集 <a href="{$cfg:urls.paintings}/{$fields:album_id}">{$fields:album_name}</a> </span-->
+          <!--span>采集自画集 <a href="{$cfg:urls.albums}/{$fields:album_id}">{$fields:album_name}</a> </span-->
           <?php
             } else { 
           ?>
@@ -234,7 +234,7 @@ Q.Ready(function() {
       <DIV class="seg-title selectitem" id="tree_album">
           <p style="color: #333; margin-top: 0px; margin-bottom: 0px;">
             <em class="icon-calendar"></em>
-            <a href="{$app:host/}/paintings/{$fields:album_id}">
+            <a href="{$app:urls.albums/}/{$fields:album_id}">
               {$fields:album_name}
             </a>
           </p>

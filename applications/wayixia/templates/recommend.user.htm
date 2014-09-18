@@ -62,7 +62,7 @@ function do_follow_album(album_id) {
 	  <a href="{$cfg:urls.user}/[[uid]]" class="info-link">	
             <span>  [[num_images]]  <p>图片</p></span>
           </a>
-          <a href="{$cfg:urls.paintingslist}/[[uid]]" class="info-link">
+          <a href="{$cfg:urls.albumslist}/[[uid]]" class="info-link">
             <span> [[num_albums]] <br> <p>画集</p></span>
           </a>
 	</dd>
@@ -86,7 +86,7 @@ function do_follow_album(album_id) {
 <textarea id="album_template" style="display:none;">
 <span class="album">
   <div class="ablum-name" style="font-size:14px; overflow:hidden; width:100px;text-overflow : ellipsis;float:left">
-    <nobr><a href="{$cfg:urls.paintings}/[[album_id]]">[[album_name]]</a></nobr>
+    <nobr><a href="{$cfg:urls.albums}/[[album_id]]">[[album_name]]</a></nobr>
   </div>
   <div class="ablum-name-right" style="overflow:hidden; width:55px; text-overflow : ellipsis; margin-left: 90px;text-align: right;">
     <nobr>([[num_images]])</nobr>

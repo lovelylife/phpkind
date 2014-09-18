@@ -10,8 +10,8 @@ class CLASS_MODULE_WATERFALL extends CLASS_MODULE {
     case 'index':
       $this->index();
       break;
-    case 'paintings':
-      $this->paintings();
+    case 'albums':
+      $this->albums();
       break;
     default:
       parent::doMain($action);
@@ -60,7 +60,7 @@ class CLASS_MODULE_WATERFALL extends CLASS_MODULE {
 
   }
 
-  function paintings() { 
+  function albums() { 
     $t = new CLASS_TEMPLATES($this->App());
     $db = &$this->App()->db();
     $album_id = intval($_GET['aid'], 10);
@@ -96,7 +96,7 @@ class CLASS_MODULE_WATERFALL extends CLASS_MODULE {
     $t->push_data('imagesdata', $images);
 
     // 显示界面
-    $t->render('waterfall/paintings');
+    $t->render('waterfall/albums');
   }
 }
 

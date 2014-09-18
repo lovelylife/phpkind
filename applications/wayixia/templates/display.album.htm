@@ -55,42 +55,43 @@ function check_image_width(img) {
           </ul>
         </dd-->
         <!--/dl-->
-        <div class="user-profile">
-          <div class="profile-basic">
-          <dl style="padding:5px 0;">
-            <dt>
-            <img src="{$app:host}{$cfg:site.avatar}/user92.{$fields:uid}.jpg" style="border:1px solid #CCC;width:92px; height:92px;" onerror="check_error(this);">
-            </dt>
-	    <dd class="name" style="margin-left: 90px;text-indent:15px;overflow:hidden;text-overflow:ellipsis;">
-	      <a href="/user/{$fields:uid}" title="{$fields:uname}" style="color:#FF4400" ><nobr>{$fields:uname/}</nobr></a>
-	    </dd>
-            <dd class="company"> &nbsp;{$fields:description} </dd>
-            <dd></dd>
-            <dd class="privacy-set"> <a href="#" >&nbsp;&nbsp;</a> </dd>
-          </dl>
-        </div>
-                
-        <div>
-        <html:list
-          id="mydatamenu" 
-          datasrc="data://albums_data" 
-          keySelected="name"
-          valueSelected="{$v:tag}"
-          maskSelected="curr"
-        >
-        <t:data>
-        <a href="{$app:host/}/albums/[field:id]" >
-            <span class="uploadBtn small" style="background:#e0eaf1; border-color: #e0eaf1; color:#3e6d8e;margin: 0px 3px 3px 0px; padding: 0 10px;  width:auto;">
-            <span> [field:name] </span></span>
-          </a>
-	</t:data>
-        </html:list>
-        </div>
-      </div>
     </div>
     <br>
     <div class="wf-main" id="wf-main">
-       {#template waterfall/albums}
+	    <div class="box wf-cld">
+				<div class="user-profile">
+          <div class="profile-basic">
+          <dl>
+            <dt>
+						<img src="{$app:host}{$cfg:site.avatar}/user92.{$fields:uid}.jpg"
+					   	style="border:1px solid #CCC;width:92px; height:92px;" onerror="check_error(this);">
+            </dt>
+	          <dd class="name" style="margin-left: 90px;text-indent:15px;overflow:hidden;text-overflow:ellipsis;">
+	            <a href="/user/{$fields:uid}" title="{$fields:uname}" style="color:#FF4400" ><nobr>{$fields:uname/}</nobr></a>
+	          </dd>
+            <dd class="company"> &nbsp;{$fields:description} </dd>
+						<dd>
+						</dd>
+            <dd class="privacy-set"> <a href="#" >&nbsp;&nbsp;</a> </dd>
+          <html:list
+            id="mydatamenu" 
+            datasrc="data://albums_data" 
+            keySelected="name"
+            valueSelected="{$v:tag}"
+            maskSelected="curr"
+          >
+          <t:data>
+          <a href="{$app:host/}/albums/[field:id]" >
+            <span class="uploadBtn small" style="background:#e0eaf1; border-color: #e0eaf1; color:#3e6d8e;margin: 0px 3px 3px 0px; padding: 0 10px;  width:auto;">
+            <span> [field:name] </span></span>
+          </a>
+	        </t:data>
+          </html:list>
+				  </dl>
+				</div>
+        </div>
+		  </div>
+	    {#template waterfall/albums}
     </div>
     <div class="clear"></div>
   </div>

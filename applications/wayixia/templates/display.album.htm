@@ -34,9 +34,7 @@ function check_image_width(img) {
 
 {#template user.menubar/}
 
-<br>
 <br><br>
-<br>
 <div id="main">
   <div id="page">
     <!--div class="main-width"><h3 style="font-size: 16px; font-weight:normal"> 画集 >>  {$fields:name}</h3></div-->
@@ -50,7 +48,7 @@ function check_image_width(img) {
         <dd>
           <ul class="module">
             <li> 
-	    <a href="#" target=""></a>
+      <a href="#" target=""></a>
             </li>
           </ul>
         </dd-->
@@ -58,20 +56,20 @@ function check_image_width(img) {
     </div>
     <br>
     <div class="wf-main" id="wf-main">
-	    <div class="box wf-cld">
-				<div class="user-profile">
+      <div class="box wf-cld">
+        <div class="user-profile">
           <div class="profile-basic">
           <dl>
             <dt>
-						<img src="{$app:host}{$cfg:site.avatar}/user92.{$fields:uid}.jpg"
-					   	style="border:1px solid #CCC;width:92px; height:92px;" onerror="check_error(this);">
+            <img src="{$app:host}{$cfg:site.avatar}/user92.{$fields:uid}.jpg"
+               style="border:1px solid #CCC;width:92px; height:92px;" onerror="check_error(this);">
             </dt>
-	          <dd class="name" style="margin-left: 90px;text-indent:15px;overflow:hidden;text-overflow:ellipsis;">
-	            <a href="/user/{$fields:uid}" title="{$fields:uname}" style="color:#FF4400" ><nobr>{$fields:uname/}</nobr></a>
-	          </dd>
+            <dd class="name" style="margin-left: 90px;text-indent:15px;overflow:hidden;text-overflow:ellipsis;">
+              <a href="/user/{$fields:uid}" title="{$fields:uname}" style="color:#FF4400" ><nobr>{$fields:uname/}</nobr></a>
+            </dd>
             <dd class="company"> &nbsp;{$fields:description} </dd>
-						<dd>
-						</dd>
+            <dd>
+            </dd>
             <dd class="privacy-set"> <a href="#" >&nbsp;&nbsp;</a> </dd>
           <html:list
             id="mydatamenu" 
@@ -85,13 +83,13 @@ function check_image_width(img) {
             <span class="uploadBtn small" style="background:#e0eaf1; border-color: #e0eaf1; color:#3e6d8e;margin: 0px 3px 3px 0px; padding: 0 10px;  width:auto;">
             <span> [field:name] </span></span>
           </a>
-	        </t:data>
+          </t:data>
           </html:list>
-				  </dl>
-				</div>
+          </dl>
         </div>
-		  </div>
-	    {#template waterfall/albums}
+        </div>
+      </div>
+      {#template waterfall/albums}
     </div>
     <div class="clear"></div>
   </div>
@@ -112,11 +110,12 @@ Q.Ready(function(){
   "animate" : new alpha(),
   "onloaditems" : function(timerout) {
     Q.Ajax({
-command: "{$app:app}?mod=waterfall&action=albums&aid={$get:aid}&p=" + (++g_page_num),
+      command: "{$app:app}?mod=waterfall&action=albums&aid={$get:aid}&p=" + (++g_page_num),
       data: {},
       oncomplete: function(xmlhttp) {
         g_waterfall.append_html(xmlhttp.responseText);
-        timerout();
+        if(xmlhttp.responseText != "")
+          timerout();
       }
     })
   },

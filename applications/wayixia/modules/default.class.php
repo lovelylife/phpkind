@@ -144,7 +144,6 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
 
     //print_r($albums);
     $t->push_data('albums_data', $albums);
-    $t->push('info_height', 100+(count($albums)+4)*48);
 
     // images data
     $pins_model = new pins_model();

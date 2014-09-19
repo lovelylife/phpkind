@@ -3,20 +3,7 @@
 <head>
 <title> {$fields:name} - 我的画集 - wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<!-- 使用QLib控件是必须包含样式表 -->
-<link type="text/css" rel="stylesheet" href="{$app:qlib/}/ui.css" />
-<link type="text/css" rel="stylesheet" href="{$themes:path/}/all.css" />
-
-<script src="{$app:qlib}/Q.js">
-<!--
-import utils.tween;
-import utils.stl;
-import utils.json2;
-import utils.ajax;
-import utils.xml;
-import ui.wndx-1-0-2;
--->
-</script>
+{#template resinclude}
 <script src="{$themes:path/}/waterfall.js"></script>
 
 <body>
@@ -38,43 +25,43 @@ Q.Ready(function() {
   // save settings
   Q.$('button-save').onclick=function() {
     Q.$('button-delete').disabled = true;
-  this.disabled = true;
+    this.disabled = true;
     var data = {};
 
-  var album_id = parseInt('{$fields:id}', 10);
-  if(album_id == 0) {
-    alert('该背包是系统默认，不能修改');
+    var album_id = parseInt('{$fields:id}', 10);
+    if(album_id == 0) {
+      alert('该背包是系统默认，不能修改');
       Q.$('button-delete').disabled = false;
-    this.disabled = false;
-    return;
-  } else {
-    data['id'] = album_id;
-  }
-
-  var album_name = Q.$('album_name').value;
-  if(!album_name) {
-    alert('请输入背包名称!');
-    Q.$('button-delete').disabled = false;
-    this.disabled = false;
-    return;
-  } else {
-    data['album_name'] = album_name;
-  }
-
-  var album_class = Q.$('album_class').value;
-    if(!album_class) {
-    alert('请选择所属分类!');
-    Q.$('button-delete').disabled = false;
-    this.disabled = false;
-    return;
-  } else {
-    data['album_class'] = album_class;
-  }
-
-  data['description'] = Q.$('description').value;
+      this.disabled = false;
+      return;
+    } else {
+      data['id'] = album_id;
+    }
   
-  Q.Ajax({
-    command: '{$app:app}&mod=album&action=edit&inajax=true',
+    var album_name = Q.$('album_name').value;
+    if(!album_name) {
+      alert('请输入背包名称!');
+      Q.$('button-delete').disabled = false;
+      this.disabled = false;
+      return;
+    } else {
+      data['album_name'] = album_name;
+    }
+
+    var album_class = Q.$('album_class').value;
+    if(!album_class) {
+      alert('请选择所属分类!');
+      Q.$('button-delete').disabled = false;
+      this.disabled = false;
+      return;
+    } else {
+      data['album_class'] = album_class;
+    }
+
+    data['description'] = Q.$('description').value;
+  
+    Q.Ajax({
+    command: '{$app:module}&action=edit&inajax=true',
     data : data,
     oncomplete : function(xmlhttp) {
       try {

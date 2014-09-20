@@ -125,7 +125,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
   function display_album() {
     $t = new CLASS_TEMPLATES($this->App());
     $db = &$this->App()->db();
-    $album_id = intval($_GET['aid'], 10);
+    $album_id = intval($_GET['id'], 10);
     
     // get album info
     $get_album_info_sql = "select A.name, U.name as uname, U.uid as uid, U.description from ##__users_albums as A, ##__users AS U where A.id={$album_id} and A.uid=U.uid limit 0,1;";
@@ -138,7 +138,7 @@ class CLASS_MODULE_DEFAULT extends CLASS_MODULE {
     $uid = intval($album_info['uid'], 10);
     $t->dump2template($album_info);
     // album list
-    $get_albums_list = "select * from ##__users_albums where `uid`={$uid};";
+    $get_albums_list = "select album_id,album_name, num_images from ##__nosql_albums_recommend where `uid`={$uid};";
     $albums = array();
     $db->get_results($get_albums_list, $albums);
 

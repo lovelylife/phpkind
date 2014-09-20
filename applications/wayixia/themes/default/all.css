@@ -748,12 +748,30 @@ a.info-link p, a.info-link:visited p { font-size:14; color:#999}
 a.info-link:hover, a.info-link:hover p { color: #881100; textdecoration:none;}
 
 
-.uploadBtn{
-height:40px;width:71px; position:relative; display:inline-block; text-align:center;line-height:40px;
+.uploadBtn {
+height:36px;
+width:71px; 
+position:relative; 
+display:inline-block; 
+text-align:center;
+line-height:36px;
 background:url(upGrey.jpg) repeat-x left top;
-border:1px solid #c8c8c8;color:#6a6a6a; overflow:hidden;font-size:12px; cursor:pointer;
+border:1px solid #c8c8c8;color:#6a6a6a; 
+overflow:hidden;font-size:12px; cursor:pointer;
 }
-.uploadBtn.small{height:36px;border:1px solid #abadb3; background:url(hbtn.jpg) repeat-x left bottom;font-size:14px;line-height:36px;}
+
+/* 
+.uploadBtn.small {
+#height:36px;
+border:1px solid #abadb3; 
+background:url(hbtn.jpg) repeat-x left bottom;
+font-size:14px;
+line-height:36px;
+}
+  */
+
+.uploadBtn.small {height: 36px;font-size:14px;background:#F8F8F8;border-color: #CCC; color:#000;margin: 0px 3px 3px 0px; padding: 0 10px; width:auto;}
+.uploadBtn.small.curr {background:#F90;border-color: #F80; color:#FFF;margin: 0px 3px 3px 0px; padding: 0 10px; width:auto;}
 
 
 .bulk{
@@ -1171,7 +1189,6 @@ pre.wordwrap {
   height:39px;
   position:relative;
   padding-top:42px;
-  /* background:transparent url(../img/tab_bg_6cd047bc.png) repeat-x 0 0; */
   padding-left:20px;
   border-right:0px solid #c7d8ee;
   border-left:0px solid #c7d8ee
@@ -1397,21 +1414,22 @@ pre.wordwrap {
 #user-title-bar {
   position:fixed; 
   left:0;top:0;right:0; 
-  height: 38px;
-  z-index:999999999999991;
-  background:#59677f;
+  height: 43px;
+  z-index:1000;
+/*  background:#59677f; */
+  background:#1e1e1e;
   opacity: 0.9;
   color:#FFF;
   text-align:left;
-  box-shadow: 0 -1px 0 #59677f inset,0 0 16px rgba(0,0,0,.15);
+  /*box-shadow: 0 -1px 0 #e1e1e1 inset,0 0 16px rgba(0,0,0,.15);*/
 }
 
-.nav-menu { height:38px; }
+.nav-menu { height:43px; }
 .nav-menu ul {}
 .nav-menu ul li.nav_item {
   float:left;
-  height:38px;
-  line-height:38px;
+  height:43px;
+  line-height:43px;
   border-left:0px solid #CCC;
   margin-left:-1px;
   padding-left:10px;

@@ -39,20 +39,6 @@ function check_image_width(img) {
   <div id="page">
     <!--div class="main-width"><h3 style="font-size: 16px; font-weight:normal"> 画集 >>  {$fields:name}</h3></div-->
     <div class="main-width" style="background: #FFF">
-        <!--dl class="tbox" style="margin:0;margin-top: -5px;"-->
-        <!--dt>
-          <strong style="color: #333; text-indent:5px;">
-            <em class="icon-calendar"></em>挖客
-          </strong>
-        </dt>
-        <dd>
-          <ul class="module">
-            <li> 
-      <a href="#" target=""></a>
-            </li>
-          </ul>
-        </dd-->
-        <!--/dl-->
     </div>
     <br>
     <div class="wf-main" id="wf-main">
@@ -64,27 +50,28 @@ function check_image_width(img) {
             <img src="{$app:host}{$cfg:site.avatar}/user92.{$fields:uid}.jpg"
                style="border:1px solid #CCC;width:92px; height:92px;" onerror="check_error(this);">
             </dt>
-            <dd class="name" style="margin-left: 90px;text-indent:15px;overflow:hidden;text-overflow:ellipsis;">
-              <a href="/user/{$fields:uid}" title="{$fields:uname}" style="color:#FF4400" ><nobr>{$fields:uname/}</nobr></a>
+            <dd class="name" style="margin-left: 90px;text-indent:10px; color: #F40;overflow:hidden;width:120px;text-overflow:ellipsis;white-space:nowrap">
+              <nobr>{$fields:uname func="strtoupper(@this)"/}</nobr>
             </dd>
             <dd class="company"> &nbsp;{$fields:description} </dd>
             <dd>
             </dd>
             <dd class="privacy-set"> <a href="#" >&nbsp;&nbsp;</a> </dd>
-          <html:list
+            <div style="clear:both">
+            <html:list
             id="mydatamenu" 
             datasrc="data://albums_data" 
-            keySelected="name"
-            valueSelected="{$v:tag}"
+            keySelected="album_id"
+            valueSelected="{$get:id}"
             maskSelected="curr"
           >
           <t:data>
-          <a href="{$app:host/}/albums/[field:id]" >
-            <span class="uploadBtn small" style="background:#e0eaf1; border-color: #e0eaf1; color:#3e6d8e;margin: 0px 3px 3px 0px; padding: 0 10px;  width:auto;">
-            <span> [field:name] </span></span>
+          <a href="{$app:host/}/albums/[field:album_id]">
+            <span class="uploadBtn small [field:selected]">[field:album_name] ([field:num_images]) </span>
           </a>
           </t:data>
           </html:list>
+          </div>
           </dl>
         </div>
         </div>

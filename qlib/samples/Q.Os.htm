@@ -1,10 +1,19 @@
 <!DOCTYPE>
 <html>
 <head>
-  <title>Q.window | QLib | Powered By PHPKIND</title>
+  <title>Q.os | QLib | Powered By PHPKIND</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <!-- 使用QLib控件是必须包含样式表 -->
   <link type="text/css" rel="stylesheet" href="../ui.css" />
+  <style>
+  .skin-default {}
+  #task-bar { position:fixed; bottom: 0; height: 35px; left:0; right:0; background: transparent url(../images/task-bar2.png) -150px -2px; z-index:9999999999999999; }
+  #task-bar #task-list button.item { background: none; border:1px; color:#000;line-height:35px;}
+	#task-bar #task-list button.item:hover, 
+	#task-bar #task-list button.selected-item { background: #FF9900; color:#FFF;line-height:35px;}
+  </style>
+
+
   <!--  
   提示：src="{QLib目录}/Q.js" 
   根据实际存放路径， 测试代码都是在QLib目录的samples文件夹下，所以这里用的是"../Q.js" 
@@ -23,7 +32,8 @@
   <!--
   var g_test_window;
   var g_test_dialog;
-  var g_multi_window;
+	var g_multi_window;
+
   Q.Ready(function() {
     Q.debug(true);
     Q.setdebug(Q.$('debug_window'));
@@ -72,14 +82,48 @@
     Q.$('btnClear').onclick=function() {
       Q.$('debug_window').innerHTML = '';
     }
+    
+    Q.$('btnRefreshTaskBar').onclick=function() {
+      Q.$('task-list').innerHTML = "";
+      // intialize task bar 
+      __GLOBALS.desktop.wnds.each(function(item) {
+        Q.$('task-list').innerHTML += "<button class=\"item\">"+$GetTitleText(item)+"</button>";
+        return true;
+      });
+    }
+
+    register_hook(function(hwnd, message_id) {
+			
+			if(message_id == MESSAGE.CREATE || message_id == MESSAGE.CLOSE)
+			{
+				Q.$('task-list').innerHTML = "";
+        // intialize task bar 
+        __GLOBALS.desktop.wnds.each(function(item) {
+	        var button = document.createElement('button');
+			    button.className = "item";
+			    button.innerText = $GetTitleText(item);	
+				  button.onclick = function(wnd, btn){ 
+					  return function() {
+					 	  btn.className = "selected-item";  
+				    }; 
+				  }(item, button);	
+	        //Q.$('task-list').innerHTML += "<button class=\"item\">"+$GetTitleText(item)+"</button>";
+				  Q.$('task-list').appendChild(button);
+				  return true;
+        });
+			}
+
+   });
+
+
   });
-  
   -->
   </script>
 </head>
-<body onselectstart="return false;" style=" background: #CCC;height: 100%;overflow:hidden;-moz-user-select:none;-webkit-user-select: none;">
+<body onselectstart="return false;" style=" background: transparent url(../images/bg.jpg) center center;height: 100%;overflow:hidden;-moz-user-select:none;-webkit-user-select: none;">
 
 <p>提示对话框</p>
+<button id="btnRefreshTaskBar">RefreshTaskBar</button>
 <button id="btnClear">Clear</button>
 <button id="btnOpenWindow">Window</button>
 <button id="btnOpenMultiWindow">MultiWindow</button>
@@ -95,12 +139,15 @@
 
 </div>
 
-<div style="background: red; height: 40px; line-height: 40px; ">
+<!--div style="background: red; height: 40px; line-height: 40px; ">
   <button style="margin: 12px 0 0 0; padding:0; background:none; height: 16px;border-width:0;background:blue;">test</button>
+</div-->
+
+
+<div class="skin-default" id="task-bar">
+  <div id="task-list">
+  </div> 
 </div>
-
-
-
 
 </body>
 </html>

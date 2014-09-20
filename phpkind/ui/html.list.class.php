@@ -37,6 +37,7 @@ class CLASS_DTL_LIST extends CLASS_DTL {
     if($item[$this->key_selected] == $this->value_selected) {
       $item['selected'] = $this->mask_selected;
     }
+ 
     return parent::item_process($item, $item_tpl);
   }
 

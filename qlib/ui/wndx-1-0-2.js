@@ -131,9 +131,21 @@ function $BindWindowMessage(wndNode, messageid, parameters) {
   }
 } 
 
-function $MaskWindow(wndNode, bmask) { $GetMask(wndNode).style.display=(!!bmask)?'':'none'; }
+function $MaskWindow(wndNode, bmask) { 
+  var layer_mask = $GetMask(wndNode);
+  if($IsDesktopWindow(wndNode)) {
+    if(bmask) {
+      layer_mask.body_style = document.body.currentStyle.overflow;
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = layer_mask.body_style;
+    }
+  }
+  $GetMask(wndNode).style.display=(!!bmask)?'':'none'; 
+}
 function $CreateMaskLayer(wndNode) {
   wndNode.layer_mask = document.createElement('DIV');
+  wndNode.layer_mask.body_style = document.body.currentStyle.overflow;
   wndNode.layer_mask.className = 'clsMaskWindow alpha_1';
   wndNode.appendChild(wndNode.layer_mask);
   wndNode.layer_mask.style.display = 'none';
@@ -478,7 +490,7 @@ function $DefaultWindowProc(hwnd, msg, data) {
   
   case MESSAGE.ACTIVATE:
     {
-      Q.printf('DefaultWindowProc MESSAGE.ACTIVATE');
+      Q.printf('DefaultWindowProc MESSAGE.ACTIVATE -> ' + $GetTitleText(hwnd));
       var top_wnd = $GetTopZIndexWindow($GetDesktopWindow());
       var top_zindex = $GetWindowZIndex(top_wnd);
       var t = hwnd;

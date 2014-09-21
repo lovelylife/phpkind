@@ -94,3 +94,7 @@ function follow_album(api, album_id) {
   });
 }
 
+function album_display(id) {
+  alert(1)
+}
+

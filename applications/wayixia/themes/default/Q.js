@@ -1257,10 +1257,10 @@ __GLOBALS.count      = 0;
 __GLOBALS.appid      = -1;
 __GLOBALS.apps       = {};
 
-
 // global windows intitalize  
 Q.Ready(function() {
   __GLOBALS.desktop = document.body;
+  __GLOBALS.desktop.hook = new Q.LIST();
   __GLOBALS.desktop.wnds   = new Q.LIST();  // popups windows
   __GLOBALS.desktop.active_child = null;
   __GLOBALS.explorer = new Q.UIApplication();
@@ -1313,6 +1313,20 @@ function $IsWithStyle(style, wstyle) { return ((style & wstyle) == style); }
 /*-----------------------------------------------------------------
   windows APIs
 -------------------------------------------------------------------*/
+function register_hook(h) {
+  __GLOBALS.desktop.hook.append(h);
+}
+
+function unregister_hook(h) {
+  __GLOBALS.desktop.hook.erase(h);
+}
+
+function invoke_hook(hwnd, message_id) {
+  __GLOBALS.desktop.hook.each(function(f) {
+    f(hwnd, message_id);
+  });
+}
+
 function $IsDesktopWindow(wndNode) { return (__GLOBALS.desktop == wndNode); }
 function $IsWindow(wndNode)        { return (!$IsNull(wndNode)) && (wndNode.nodeType == Q.ELEMENT_NODE) && wndNode.getAttribute('__QWindow__');}
 function $IsMaxWindow(wndNode)     { return ($IsStyle($GetWindowStyle(wndNode), CONST.STYLE_MAX) && (CONST.SIZE_MAX == $GetWindowStatus(wndNode))); }
@@ -1322,9 +1336,22 @@ function $BindWindowMessage(wndNode, messageid, parameters) {
   }
 } 
 
-function $MaskWindow(wndNode, bmask) { $GetMask(wndNode).style.display=(!!bmask)?'':'none'; }
+function $MaskWindow(wndNode, bmask) { 
+  var layer_mask = $GetMask(wndNode);
+  if($IsDesktopWindow(wndNode)) {
+    if(bmask) {
+      layer_mask.body_style = document.body.currentStyle.overflow;
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = layer_mask.body_style;
+    }
+  }
+  $GetMask(wndNode).style.display=(!!bmask)?'':'none'; 
+}
 function $CreateMaskLayer(wndNode) {
   wndNode.layer_mask = document.createElement('DIV');
+  wndNode.layer_mask.body_style = document.body.currentStyle.overflow;
+  //alert(document.body.currentStyle.overflow);
   wndNode.layer_mask.className = 'clsMaskWindow alpha_1';
   wndNode.appendChild(wndNode.layer_mask);
   wndNode.layer_mask.style.display = 'none';
@@ -1669,7 +1696,7 @@ function $DefaultWindowProc(hwnd, msg, data) {
   
   case MESSAGE.ACTIVATE:
     {
-      Q.printf('DefaultWindowProc MESSAGE.ACTIVATE');
+      Q.printf('DefaultWindowProc MESSAGE.ACTIVATE -> ' + $GetTitleText(hwnd));
       var top_wnd = $GetTopZIndexWindow($GetDesktopWindow());
       var top_zindex = $GetWindowZIndex(top_wnd);
       var t = hwnd;
@@ -1692,6 +1719,7 @@ function $DefaultWindowProc(hwnd, msg, data) {
     }
     break;  
   }
+  invoke_hook(hwnd, msg);
 }
 
 function $SetWindowProc(wndNode, new_window_proc) {
@@ -2715,10 +2743,10 @@ __GLOBALS.count      = 0;
 __GLOBALS.appid      = -1;
 __GLOBALS.apps       = {};
 
-
 // global windows intitalize  
 Q.Ready(function() {
   __GLOBALS.desktop = document.body;
+  __GLOBALS.desktop.hook = new Q.LIST();
   __GLOBALS.desktop.wnds   = new Q.LIST();  // popups windows
   __GLOBALS.desktop.active_child = null;
   __GLOBALS.explorer = new Q.UIApplication();
@@ -2771,6 +2799,20 @@ function $IsWithStyle(style, wstyle) { return ((style & wstyle) == style); }
 /*-----------------------------------------------------------------
   windows APIs
 -------------------------------------------------------------------*/
+function register_hook(h) {
+  __GLOBALS.desktop.hook.append(h);
+}
+
+function unregister_hook(h) {
+  __GLOBALS.desktop.hook.erase(h);
+}
+
+function invoke_hook(hwnd, message_id) {
+  __GLOBALS.desktop.hook.each(function(f) {
+    f(hwnd, message_id);
+  });
+}
+
 function $IsDesktopWindow(wndNode) { return (__GLOBALS.desktop == wndNode); }
 function $IsWindow(wndNode)        { return (!$IsNull(wndNode)) && (wndNode.nodeType == Q.ELEMENT_NODE) && wndNode.getAttribute('__QWindow__');}
 function $IsMaxWindow(wndNode)     { return ($IsStyle($GetWindowStyle(wndNode), CONST.STYLE_MAX) && (CONST.SIZE_MAX == $GetWindowStatus(wndNode))); }
@@ -2780,9 +2822,22 @@ function $BindWindowMessage(wndNode, messageid, parameters) {
   }
 } 
 
-function $MaskWindow(wndNode, bmask) { $GetMask(wndNode).style.display=(!!bmask)?'':'none'; }
+function $MaskWindow(wndNode, bmask) { 
+  var layer_mask = $GetMask(wndNode);
+  if($IsDesktopWindow(wndNode)) {
+    if(bmask) {
+      layer_mask.body_style = document.body.currentStyle.overflow;
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = layer_mask.body_style;
+    }
+  }
+  $GetMask(wndNode).style.display=(!!bmask)?'':'none'; 
+}
 function $CreateMaskLayer(wndNode) {
   wndNode.layer_mask = document.createElement('DIV');
+  wndNode.layer_mask.body_style = document.body.currentStyle.overflow;
+  //alert(document.body.currentStyle.overflow);
   wndNode.layer_mask.className = 'clsMaskWindow alpha_1';
   wndNode.appendChild(wndNode.layer_mask);
   wndNode.layer_mask.style.display = 'none';
@@ -3127,7 +3182,7 @@ function $DefaultWindowProc(hwnd, msg, data) {
   
   case MESSAGE.ACTIVATE:
     {
-      Q.printf('DefaultWindowProc MESSAGE.ACTIVATE');
+      Q.printf('DefaultWindowProc MESSAGE.ACTIVATE -> ' + $GetTitleText(hwnd));
       var top_wnd = $GetTopZIndexWindow($GetDesktopWindow());
       var top_zindex = $GetWindowZIndex(top_wnd);
       var t = hwnd;
@@ -3150,6 +3205,7 @@ function $DefaultWindowProc(hwnd, msg, data) {
     }
     break;  
   }
+  invoke_hook(hwnd, msg);
 }
 
 function $SetWindowProc(wndNode, new_window_proc) {
@@ -4107,5 +4163,9 @@ function follow_album(api, album_id) {
       alert(xmlhttp); 
     }
   });
+}
+
+function album_display(id) {
+  alert(1)
 }
 

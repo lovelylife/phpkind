@@ -760,16 +760,6 @@ border:1px solid #c8c8c8;color:#6a6a6a;
 overflow:hidden;font-size:12px; cursor:pointer;
 }
 
-/* 
-.uploadBtn.small {
-#height:36px;
-border:1px solid #abadb3; 
-background:url(hbtn.jpg) repeat-x left bottom;
-font-size:14px;
-line-height:36px;
-}
-  */
-
 .uploadBtn.small {height: 36px;font-size:14px;background:#F8F8F8;border-color: #CCC; color:#000;margin: 0px 3px 3px 0px; padding: 0 10px; width:auto;}
 .uploadBtn.small.curr {background:#F90;border-color: #F80; color:#FFF;margin: 0px 3px 3px 0px; padding: 0 10px; width:auto;}
 

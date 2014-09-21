@@ -6,34 +6,30 @@
 {#template resinclude}
 <script>
 <!--
-
-function check_width() {
-  if(Q.$('tweenimg').width > Q.$('tweenimg').parentNode.offsetWidth) {
-    Q.$('tweenimg').style.width = "100%";
-  }
-}
-
 function check_error(img) {
   img.src = '{$themes:path}/icon48.png';
 }
 
-function check_image_width(img) {
-  var img_width = img.width;
-  var img_height = img.height;
-  if(img_width > img_height) {
-    img.style.height = "100%"; 
-  } else {
-    img.style.width = "100%";
-  }
+var g_viewer = null;
+function album_display(id, url) {
+  g_viewer = new Q.Dialog({
+    title: "图片查看 v1.0",
+    width: 1024,
+    height: 768,
+    content: '<img src='+url+'>',
+    onok : function() { return true; }
+  });
+
+  $BindWindowMessage(g_viewer.wnd(), MESSAGE.MAX)();
+  g_viewer.domodal();
+  return false;
 }
 
 -->
 </script>
 
 <body>
-
 {#template user.menubar/}
-
 <br><br>
 <div id="main">
   <div id="page">
@@ -97,7 +93,7 @@ Q.Ready(function(){
   "animate" : new alpha(),
   "onloaditems" : function(timerout) {
     Q.Ajax({
-      command: "{$app:app}?mod=waterfall&action=albums&aid={$get:aid}&p=" + (++g_page_num),
+      command: "{$app:app}?mod=waterfall&action=albums&id={$get:id}&p=" + (++g_page_num),
       data: {},
       oncomplete: function(xmlhttp) {
         g_waterfall.append_html(xmlhttp.responseText);

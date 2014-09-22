@@ -12,16 +12,32 @@ function check_error(img) {
 
 var g_viewer = null;
 function album_display(id, url) {
-  g_viewer = new Q.Dialog({
-    title: "图片查看 v1.0",
-    width: 1024,
-    height: 768,
-    content: '<img src='+url+'>',
-    onok : function() { return true; }
-  });
+  //g_viewer = new Q.Dialog({
+  //  title: "图片查看 v1.0",
+  //  width: 1024,
+  //  height: 768,
+  //  content: '<img src='+url+'>',
+  //});
 
-  $BindWindowMessage(g_viewer.wnd(), MESSAGE.MAX)();
-  g_viewer.domodal();
+
+  var old = Q.$('page').currentStyle.postion;
+  Q.$('page').style.position = 'absolute';
+  //$BindWindowMessage(g_viewer.wnd(), MESSAGE.MAX)();
+  //g_viewer.domodal();
+  (new Q.Animate({
+      tween: 'Cubic',
+      ease: 'easyIn',
+      max: Q.$('page').offsetWidth,
+      begin: 0,
+      duration: 20,
+      bind : function(x) {
+        Q.$('page').style.left = -x + 'px';
+      }
+    })).play();
+  //var old = Q.$('page').currentStyle.postion;
+  //Q.$('page').style.position = 'absolute';
+  //Q.$('page').style.left = -100 + 'px';
+  //Q.$('page').style.position = old;
   return false;
 }
 
@@ -75,14 +91,13 @@ function album_display(id, url) {
       {#template waterfall/albums}
     </div>
     <div class="clear"></div>
+    {#template user.footer}
   </div>
-  <div class="clear"></div>
-  {#template user.footer}
 </div>
 <br><br>
 
 <script type="text/javascript">
-g_page_num = 3;
+g_page_num = 2;
 Q.Ready(function(){
 
   g_waterfall = new Waterfall({
@@ -96,10 +111,14 @@ Q.Ready(function(){
       command: "{$app:app}?mod=waterfall&action=albums&id={$get:id}&p=" + (++g_page_num),
       data: {},
       oncomplete: function(xmlhttp) {
-        g_waterfall.append_html(xmlhttp.responseText);
-        if(xmlhttp.responseText != "")
+			  var str = xmlhttp.responseText.replace(/(^\s*)|(\s*$)/g, "");
+				if(str != "") {
+				  g_waterfall.append_html(xmlhttp.responseText);
           timerout();
-      }
+        }else {
+	        g_waterfall.set_completed();
+				}
+			}
     })
   },
   });

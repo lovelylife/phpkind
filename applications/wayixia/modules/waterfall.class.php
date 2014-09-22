@@ -40,7 +40,7 @@ class CLASS_MODULE_WATERFALL extends CLASS_MODULE {
 
     // images data
     $pins_model = new pins_model();
-    $pins_model->limit($pins_model->total_size($db), 20, $_GET['p']);
+    $pins_model->limit($pins_model->total_size($db), 10, $_GET['p']);
     $pins_model->groupby("file_name")->orderby('id', false);
 
     $images = array();
@@ -59,7 +59,7 @@ class CLASS_MODULE_WATERFALL extends CLASS_MODULE {
     
     // images data
     $pins_model = new pins_model();
-    $pins_model->limit($pins_model->total_size($db), 20, $_GET['p']);
+    $pins_model->limit($pins_model->total_size($db), 10, $_GET['p']);
     $pins_model->where("album_id={$album_id} and album_id>0 ");
 
     $images = array();

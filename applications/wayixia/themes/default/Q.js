@@ -1351,7 +1351,6 @@ function $MaskWindow(wndNode, bmask) {
 function $CreateMaskLayer(wndNode) {
   wndNode.layer_mask = document.createElement('DIV');
   wndNode.layer_mask.body_style = document.body.currentStyle.overflow;
-  //alert(document.body.currentStyle.overflow);
   wndNode.layer_mask.className = 'clsMaskWindow alpha_1';
   wndNode.appendChild(wndNode.layer_mask);
   wndNode.layer_mask.style.display = 'none';
@@ -2465,7 +2464,7 @@ timer: null,
 begin: 0,
 duration: 0,
 max  : 0,
-_initialize : function(cfg) {
+construct : function(cfg) {
    var _this = this;
    if(cfg.tween == 'Linear' || !Tween[cfg.tween] ) {
       _this.func = Tween.Linear;
@@ -2837,7 +2836,6 @@ function $MaskWindow(wndNode, bmask) {
 function $CreateMaskLayer(wndNode) {
   wndNode.layer_mask = document.createElement('DIV');
   wndNode.layer_mask.body_style = document.body.currentStyle.overflow;
-  //alert(document.body.currentStyle.overflow);
   wndNode.layer_mask.className = 'clsMaskWindow alpha_1';
   wndNode.appendChild(wndNode.layer_mask);
   wndNode.layer_mask.style.display = 'none';
@@ -3886,33 +3884,34 @@ Waterfall.prototype = {
 
   needload : function() {
     function getScrollTop(){
-         var scrollTop=0;
-         if(document.documentElement&&document.documentElement.scrollTop){     
-           scrollTop=document.documentElement.scrollTop;     
-         }else if(document.body){
-           scrollTop=document.body.scrollTop;     
-         }
-         return scrollTop;
-       }
+      var scrollTop=0;
+      if(document.documentElement&&document.documentElement.scrollTop){     
+        scrollTop=document.documentElement.scrollTop;     
+      } else if(document.body){
+        scrollTop=document.body.scrollTop;     
+      }
+      return scrollTop;
+    }
        
-       function getClientHeight(){
-         var clientHeight=0;     
-         if(document.body.clientHeight&&document.documentElement.clientHeight){      var clientHeight = (document.body.clientHeight<document.documentElement.clientHeight)?document.body.clientHeight:document.documentElement.clientHeight;             
-         }else{     
-            var clientHeight = (document.body.clientHeight>document.documentElement.clientHeight)?document.body.clientHeight:document.documentElement.clientHeight;         
-         }     
-         return clientHeight;     
-       }
+    function getClientHeight(){
+      var clientHeight=0;     
+      if(document.body.clientHeight&&document.documentElement.clientHeight){
+				var clientHeight = (document.body.clientHeight<document.documentElement.clientHeight)?document.body.clientHeight:document.documentElement.clientHeight;             
+      } else {     
+        var clientHeight = (document.body.clientHeight>document.documentElement.clientHeight)?document.body.clientHeight:document.documentElement.clientHeight;         
+      }     
+      return clientHeight;     
+    }
        
-       function getScrollHeight(){
-         return Math.max(document.body.scrollHeight,document.documentElement.scrollHeight);     
-       }
+    function getScrollHeight(){
+      return Math.max(document.body.scrollHeight,document.documentElement.scrollHeight);     
+    }
        
-       if(getScrollTop()+getClientHeight() >= getScrollHeight() - 500){
-          return true;
-       }
+    if((!this.completed) && (getScrollTop()+getClientHeight() >= getScrollHeight() - 500)){
+       return true;
+    }
 
-       return false;
+    return false;
   },
 
   onscroll : function() {
@@ -3920,13 +3919,14 @@ Waterfall.prototype = {
     var _this = this;
     
     if(!_this.needload()) return;
-      // console.log('load new data');
-      //_this.append(g_store.pop(5));
-      Q.removeEvent(window, 'scroll', _this.cache_scroll_handler);
-      _this.onloaditems(function(){ Q.addEvent(window, 'scroll', _this.cache_scroll_handler, false)});  
-      //Q.removeEvent(window, 'scroll', _this.cache_scroll_handler);
+    Q.removeEvent(window, 'scroll', _this.cache_scroll_handler);
+    _this.onloaditems(function(){ Q.addEvent(window, 'scroll', _this.cache_scroll_handler, false)});  
   },
-
+  
+	set_completed : function() {
+		this.completed = true;	
+	},
+	 
   append_html : function(items) {
     var _this = this;
     var div = document.createElement('div');

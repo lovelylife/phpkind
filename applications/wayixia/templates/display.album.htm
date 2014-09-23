@@ -4,40 +4,85 @@
 <title> {$fields:name} - {$fields:uname/} - wayixia.com</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 {#template resinclude}
+
+<style>
+<!--
+#album-view {
+ position:fixed;
+ background:#2a2a2a;
+ top:43px;
+ left: 0;
+ right:0;
+ bottom:0;
+ overflow:auto;
+}
+//-->
+</style>
 <script>
 <!--
 function check_error(img) {
   img.src = '{$themes:path}/icon48.png';
 }
 
-var g_viewer = null;
+var g_div = null;
+
+function get_div(sibling) {
+  if(!g_div) {
+    g_div = document.createElement('div');
+    sibling.parentNode.appendChild(g_div);
+    g_div.id = "album-view";
+    g_div.style.left = -sibling.scrollWidth;
+    g_div.onclick = function() {
+      var _this = this;
+      var max_width = Q.$('page').scrollWidth;
+      Q.$('page').style.left = -max_width;
+      (new Q.Animate({
+        tween: 'Cubic',
+        ease: 'easyIn',
+        max: max_width,
+        begin: 0,
+        duration: 15,
+        bind : function(x) {
+          _this.style.left = (-x)+'px';
+          _this.style.right = x+'px';
+          Q.$('page').style.left = (this.max-x) + 'px';
+          if(x>=max_width) {
+            document.body.style.overflow = g_old_overflow;
+            document.body.scrollTop = g_old_scrolltop;
+          }
+        }
+      })).play();
+    }
+  }
+  
+
+  return g_div;
+}
+
+var g_old_overflow = '';
+var g_old_scrolltop = 0;
 function album_display(id, url) {
-  //g_viewer = new Q.Dialog({
-  //  title: "图片查看 v1.0",
-  //  width: 1024,
-  //  height: 768,
-  //  content: '<img src='+url+'>',
-  //});
-
-
-  var old = Q.$('page').currentStyle.postion;
+  var old = Q.$('page').currentStyle.position;
   Q.$('page').style.position = 'absolute';
-  //$BindWindowMessage(g_viewer.wnd(), MESSAGE.MAX)();
-  //g_viewer.domodal();
+  var d = get_div(Q.$('page'));
+  d.innerHTML = '<img src='+url+'>';
+  g_old_overflow = document.body.currentStyle.overflow;
+  g_old_scrolltop = document.body.scrollTop;
+  document.body.style.overflow = 'hidden';
   (new Q.Animate({
       tween: 'Cubic',
       ease: 'easyIn',
-      max: Q.$('page').offsetWidth,
+      max: document.body.scrollWidth,
       begin: 0,
-      duration: 20,
+      duration: 15,
       bind : function(x) {
         Q.$('page').style.left = -x + 'px';
+        if(d) {
+          d.style.left = (-x+this.max)+'px';
+          d.style.right = -x + 'px';
+        }
       }
     })).play();
-  //var old = Q.$('page').currentStyle.postion;
-  //Q.$('page').style.position = 'absolute';
-  //Q.$('page').style.left = -100 + 'px';
-  //Q.$('page').style.position = old;
   return false;
 }
 

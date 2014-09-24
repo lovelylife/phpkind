@@ -68,7 +68,6 @@ function album_display(id, url) {
   d.innerHTML = '<img src='+url+'>';
   g_old_overflow = document.body.currentStyle.overflow;
   g_old_scrolltop = document.body.scrollTop;
-  document.body.style.overflow = 'hidden';
   (new Q.Animate({
       tween: 'Cubic',
       ease: 'easyIn',
@@ -80,7 +79,10 @@ function album_display(id, url) {
         if(d) {
           d.style.left = (-x+this.max)+'px';
           d.style.right = -x + 'px';
-        }
+	  if(x>=this.max) {
+            document.body.style.overflow = 'hidden';
+	  }
+	}
       }
     })).play();
   return false;

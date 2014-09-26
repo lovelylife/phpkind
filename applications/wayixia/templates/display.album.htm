@@ -16,6 +16,13 @@
  bottom:0;
  overflow:auto;
 }
+
+#album-close-button {
+	background: red;
+	height: 30px;
+ 
+}
+
 //-->
 </style>
 <script>
@@ -24,71 +31,138 @@ function check_error(img) {
   img.src = '{$themes:path}/icon48.png';
 }
 
-var g_div = null;
+Q.album_display = Q.extend({
+	hwnd: null,
+	display: false,
+  sibling: null,
+	image_list : null,
+  image_view : null,
+  old_overflow: null,
+  old_scrolltop: 0,
+  construct : function(config) {
+    var sibling = config.sibling;
+    var container = document.body;
+    if(sibling && sibling.parentNode) {
+      container = sibling.parentNode;
+    }
+    // main view
+    this.hwnd = document.createElement('DIV');
+    this.hwnd.id = 'album-view';
+    this.hwnd.style.left = sibling.scrollWidth + 'px';
+		var close_button = document.createElement('div');
+		close_button.onclick = (function(e) {
+			return function() { e.close(); };
+		})(this)
+    close_button.id = 'album-close-button';
+		this.hwnd.appendChild(close_button);
+		container.appendChild(this.hwnd);
+    this.sibling = sibling;
+    // image view
+    this.image_view = document.createElement('img');
+    this.hwnd.appendChild(this.image_view);
+  },
 
-function get_div(sibling) {
-  if(!g_div) {
-    g_div = document.createElement('div');
-    sibling.parentNode.appendChild(g_div);
-    g_div.id = "album-view";
-    g_div.style.left = -sibling.scrollWidth;
-    g_div.onclick = function() {
-      var _this = this;
-      var max_width = Q.$('page').scrollWidth;
-      Q.$('page').style.left = -max_width;
-      (new Q.Animate({
-        tween: 'Cubic',
-        ease: 'easyIn',
-        max: max_width,
+  render : function(url, album_id) {
+    this.image_view.src = url;
+		var _this = this;
+		if(!_this.display) {
+			_this.old_scrolltop = document.body.scrollTop;
+			_this.display = true;
+			(new Q.Animate({
+        tween: 'cubic',
+        ease: 'easyin',
+        max: _this.sibling.offsetWidth,
         begin: 0,
         duration: 15,
         bind : function(x) {
-          _this.style.left = (-x)+'px';
-          _this.style.right = x+'px';
-          Q.$('page').style.left = (this.max-x) + 'px';
-          if(x>=max_width) {
-            document.body.style.overflow = g_old_overflow;
-            document.body.scrollTop = g_old_scrolltop;
-          }
-        }
-      })).play();
-    }
-  }
-  
+					console.log('---------------' + x);
+					Q.$('page').style.left = -x + 'px';
+          _this.hwnd.style.left = (-x+this.max)+'px';
+          _this.hwnd.style.right = -x + 'px';
+	        if(x>=document.body.scrollWidth) {
+            document.body.style.overflow = 'hidden';
+	        }
+	      }
+			})).play();
+		}
+	},
 
-  return g_div;
-}
-
-var g_old_overflow = '';
-var g_old_scrolltop = 0;
-function album_display(id, url) {
-  var old = Q.$('page').currentStyle.position;
-  Q.$('page').style.position = 'absolute';
-  var d = get_div(Q.$('page'));
-  d.innerHTML = '<img src='+url+'>';
-  g_old_overflow = document.body.currentStyle.overflow;
-  g_old_scrolltop = document.body.scrollTop;
-  (new Q.Animate({
+	close : function() {
+	  var _this = this;
+		if(_this.display) {
+			_this.display = false;
+		}
+    var max_width = _this.sibling.scrollWidth;
+    _this.sibling.style.left = -max_width + 'px';
+    (new Q.Animate({
       tween: 'Cubic',
       ease: 'easyIn',
-      max: document.body.scrollWidth,
+      max: max_width,
       begin: 0,
       duration: 15,
       bind : function(x) {
-        Q.$('page').style.left = -x + 'px';
-        if(d) {
-          d.style.left = (-x+this.max)+'px';
-          d.style.right = -x + 'px';
-	  if(x>=this.max) {
-            document.body.style.overflow = 'hidden';
-	  }
-	}
+        _this.hwnd.style.left = (-x)+'px';
+        _this.hwnd.style.right = x+'px';
+        _this.sibling.style.left = (this.max-x) + 'px';
+        if(x>=max_width) {
+          document.body.style.overflow = _this.old_overflow;
+          document.body.scrollTop = _this.old_scrolltop;
+        }
       }
     })).play();
-  return false;
+	},
+
+  onclose : function() {
+  
+  },
+  
+});
+
+var obj = null;
+
+function get_album_display() {
+  if(!obj)
+    obj = new Q.album_display({sibling: Q.$('page')});
+   
+  return obj;
+}
+function album_display(id, url) {
+  var display = get_album_display();
+  display.render(url, id); 
+	
+	return false;
 }
 
 -->
+</script>
+<script type="text/javascript">
+g_page_num = 2;
+Q.Ready(function(){
+
+  g_waterfall = new Waterfall({
+  "container":"wf-main",
+  "colWidth":240,
+  "colCount":5,
+  "template": '', // Q.$('wf-template').value,
+  "animate" : new alpha(),
+  "onloaditems" : function(timerout) {
+    Q.Ajax({
+      command: "{$app:app}?mod=waterfall&action=albums&id={$get:id}&p=" + (++g_page_num),
+      data: {},
+      oncomplete: function(xmlhttp) {
+			  var str = xmlhttp.responseText.replace(/(^\s*)|(\s*$)/g, "");
+				if(str != "") {
+				  g_waterfall.append_html(xmlhttp.responseText);
+          timerout();
+        }else {
+	        g_waterfall.set_completed();
+				}
+			}
+    })
+  },
+  });
+});
+
 </script>
 
 <body>
@@ -142,36 +216,5 @@ function album_display(id, url) {
   </div>
 </div>
 <br><br>
-
-<script type="text/javascript">
-g_page_num = 2;
-Q.Ready(function(){
-
-  g_waterfall = new Waterfall({
-  "container":"wf-main",
-  "colWidth":240,
-  "colCount":5,
-  "template": '', // Q.$('wf-template').value,
-  "animate" : new alpha(),
-  "onloaditems" : function(timerout) {
-    Q.Ajax({
-      command: "{$app:app}?mod=waterfall&action=albums&id={$get:id}&p=" + (++g_page_num),
-      data: {},
-      oncomplete: function(xmlhttp) {
-			  var str = xmlhttp.responseText.replace(/(^\s*)|(\s*$)/g, "");
-				if(str != "") {
-				  g_waterfall.append_html(xmlhttp.responseText);
-          timerout();
-        }else {
-	        g_waterfall.set_completed();
-				}
-			}
-    })
-  },
-  });
-});
-
-</script>
-
 </body>
 </html>
